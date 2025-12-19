@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useActiveSubscription } from '@/hooks/useActiveSubscription';
 import { useToast } from '@/hooks/use-toast';
-import { showPointsToast } from '@/components/gamification/PointsToast';
+
 import { getISOWeekNumber, isSameISOWeek } from '@/utils/dateHelpers';
 
 interface FeedbackSettings {
@@ -44,7 +44,7 @@ export const useWeeklyFeedback = () => {
 
     try {
       console.log('[Feedback] Verifying student status for user:', user.id);
-      
+
       // Direct check in students table for most reliable verification
       const { data: studentData, error } = await supabase
         .from('students')
@@ -63,7 +63,7 @@ export const useWeeklyFeedback = () => {
       }
 
       const isActive = studentData.membership_status === 'active' || studentData.membership_status === 'free_trial';
-      
+
       console.log('[Feedback] Student verification result:', {
         userId: user.id,
         teacherId: studentData.teacher_id,
@@ -72,9 +72,9 @@ export const useWeeklyFeedback = () => {
         fallbackUsed: !hasActiveSubscription
       });
 
-      return { 
-        isActive, 
-        teacherId: studentData.teacher_id 
+      return {
+        isActive,
+        teacherId: studentData.teacher_id
       };
     } catch (error) {
       console.error('[Feedback] Error in student verification:', error);
@@ -167,7 +167,7 @@ export const useWeeklyFeedback = () => {
       const today = new Date();
       const dayOfWeek = today.getDay(); // 0=Sunday, 1=Monday, ..., 5=Friday, 6=Saturday
       const expectedDay = settings.feedback_days?.[0] || 5; // Default Friday
-      
+
       console.log('[Feedback] 📅 Current state:', {
         hasExistingFeedback: !!existingFeedback,
         today: today.toISOString(),
@@ -179,13 +179,13 @@ export const useWeeklyFeedback = () => {
       // CASE 1: First feedback ever
       if (!existingFeedback) {
         console.log('[Feedback] 🎯 FIRST FEEDBACK DETECTED');
-        
+
         // If it's the expected day (e.g., Friday) → show modal
         if (dayOfWeek === expectedDay) {
           console.log('[Feedback] ✅ First feedback on expected day → SHOW MODAL');
           return true;
         }
-        
+
         // If it's past the expected day → show modal (missed first feedback)
         if (settings.feedback_frequency === 'weekly') {
           // For weekly: if it's weekend or early next week, show modal
@@ -194,7 +194,7 @@ export const useWeeklyFeedback = () => {
             return true;
           }
         }
-        
+
         console.log('[Feedback] ⏳ First feedback not yet due');
         return false;
       }
@@ -340,11 +340,11 @@ export const useWeeklyFeedback = () => {
       console.log('[Feedback] ✅ Fetching settings for teacher:', finalTeacherId);
       const settings = await Promise.race([
         fetchFeedbackSettingsForTeacher(finalTeacherId),
-        new Promise<null>((_, reject) => 
+        new Promise<null>((_, reject) =>
           setTimeout(() => reject(new Error('Settings fetch timeout')), 5000)
         )
       ]);
-      
+
       if (!settings || !settings.is_active) {
         console.log('[Feedback] Settings not active or not found:', settings);
         return false;
@@ -355,21 +355,21 @@ export const useWeeklyFeedback = () => {
 
       const today = new Date();
       const dayOfWeek = today.getDay(); // 0 = Sunday, 6 = Saturday
-      
+
       // First, check if feedback was missed and needs rescheduling
       const isMissedFeedback = await checkMissedFeedback(settings, finalTeacherId);
       if (isMissedFeedback) {
         console.log('[Feedback] ✅ Showing rescheduled feedback modal');
         return true;
       }
-      
+
       // Check if today is one of the configured feedback days
       console.log('[Feedback] 📅 Day check:', {
         today: dayOfWeek,
         configuredDays: settings.feedback_days,
         isConfiguredDay: settings.feedback_days.includes(dayOfWeek)
       });
-      
+
       if (!settings.feedback_days.includes(dayOfWeek)) {
         console.log('[Feedback] ❌ Today is not a feedback day');
         return false;
@@ -395,7 +395,7 @@ export const useWeeklyFeedback = () => {
       if (existingFeedback) {
         const lastFeedbackDate = new Date(existingFeedback.created_at);
         const today = new Date();
-        
+
         // Check based on frequency - CORRIGIDO para não aparecer no mesmo período
         let shouldShow = false;
         switch (settings.feedback_frequency) {
@@ -413,8 +413,8 @@ export const useWeeklyFeedback = () => {
             break;
           case 'monthly':
             // Se foi enviado neste mês, não mostrar novamente
-            shouldShow = !(lastFeedbackDate.getMonth() === today.getMonth() && 
-                          lastFeedbackDate.getFullYear() === today.getFullYear());
+            shouldShow = !(lastFeedbackDate.getMonth() === today.getMonth() &&
+              lastFeedbackDate.getFullYear() === today.getFullYear());
             break;
           default:
             const daysSinceDefault = Math.floor((today.getTime() - lastFeedbackDate.getTime()) / (1000 * 60 * 60 * 24));
@@ -458,7 +458,7 @@ export const useWeeklyFeedback = () => {
 
     // ETAPA 1: Fallback robusto para buscar teacherId diretamente
     let finalTeacherId = teacherId;
-    
+
     if (!finalTeacherId && user?.id) {
       console.log('🔄 [Feedback] Teacher ID not available from hook, fetching directly from students table...');
       const { data: studentData, error: studentError } = await supabase
@@ -467,7 +467,7 @@ export const useWeeklyFeedback = () => {
         .eq('user_id', user.id)
         .eq('membership_status', 'active')
         .maybeSingle();
-      
+
       if (studentError) {
         console.error('❌ [Feedback] Error fetching teacher_id from students:', studentError);
       } else {
@@ -481,8 +481,8 @@ export const useWeeklyFeedback = () => {
     }
 
     if (!user?.id || !finalTeacherId) {
-      console.error('❌ [DEBUG] Missing required IDs after fallback', { 
-        userId: user?.id, 
+      console.error('❌ [DEBUG] Missing required IDs after fallback', {
+        userId: user?.id,
         teacherId: finalTeacherId,
         fromHook: teacherId,
         fromFallback: finalTeacherId !== teacherId,
@@ -498,8 +498,8 @@ export const useWeeklyFeedback = () => {
 
     try {
       setLoading(true);
-      console.log('✅ [DEBUG] Preparing RPC call with:', { 
-        studentId: user.id, 
+      console.log('✅ [DEBUG] Preparing RPC call with:', {
+        studentId: user.id,
         teacherId,
         currentWeek: getWeekNumber(new Date()),
         currentYear: new Date().getFullYear()
@@ -528,8 +528,8 @@ export const useWeeklyFeedback = () => {
         }
       });
 
-      console.log('📊 [DEBUG] RPC response received:', { 
-        hasData: !!result, 
+      console.log('📊 [DEBUG] RPC response received:', {
+        hasData: !!result,
         hasError: !!error,
         error: error ? {
           message: error.message,
@@ -551,7 +551,7 @@ export const useWeeklyFeedback = () => {
       }
 
       console.log('✅ [DEBUG] RPC success! Result:', result);
-      
+
       const resultData = result as any;
       console.log('🔍 [DEBUG] Analyzing result data:', {
         success: resultData?.success,
@@ -570,15 +570,15 @@ export const useWeeklyFeedback = () => {
           message: errorMessage,
           fullData: resultData
         });
-        
+
         if (resultData?.duplicate) {
           console.log('🔄 [DEBUG] Duplicate feedback detected');
-          
+
           // PROTEÇÃO 2: Salvar no localStorage que feedback foi enviado
           const today = new Date().toISOString().split('T')[0];
           const feedbackKey = `feedback_sent_${user.id}_${today}`;
           localStorage.setItem(feedbackKey, 'true');
-          
+
           toast({
             title: "Feedback já enviado",
             description: errorMessage,
@@ -604,18 +604,17 @@ export const useWeeklyFeedback = () => {
       // Sucesso - mostrar toast com pontos e fechar modal
       const pointsAwarded = resultData.points_awarded || 0;
       console.log('[Feedback] Success! Points awarded:', pointsAwarded);
-      
+
       // PROTEÇÃO 3: Salvar no localStorage que feedback foi enviado com sucesso
       const today = new Date().toISOString().split('T')[0];
       const feedbackKey = `feedback_sent_${user.id}_${today}`;
       localStorage.setItem(feedbackKey, 'true');
       setFeedbackSubmittedToday(true); // Marcar flag de estado
-      
+
       // Usar toast padrão do sistema de gamificação
-      showPointsToast({
-        points: pointsAwarded,
-        activity: 'Feedback Enviado',
-        description: 'Obrigado pelo seu feedback!'
+      toast({
+        title: "Feedback Enviado",
+        description: "Obrigado pelo seu feedback!",
       });
 
       setShouldShowModal(false);
@@ -624,11 +623,11 @@ export const useWeeklyFeedback = () => {
 
     } catch (error: any) {
       console.error('[Feedback] Submit error:', error);
-      
+
       // Mensagens de erro mais específicas e amigáveis
       let errorMessage = "Erro interno. Tente novamente em alguns instantes.";
       let errorTitle = "Erro ao enviar feedback";
-      
+
       if (error.message?.includes('relationship') || error.message?.includes('not found')) {
         errorMessage = "Relacionamento professor-aluno não encontrado. Verifique se você está vinculado corretamente.";
         errorTitle = "Erro de vinculação";
@@ -642,13 +641,13 @@ export const useWeeklyFeedback = () => {
         errorMessage = "Problema de conexão. Verifique sua internet e tente novamente.";
         errorTitle = "Erro de conexão";
       }
-      
+
       toast({
         title: errorTitle,
         description: errorMessage,
         variant: "destructive"
       });
-      
+
       return false;
     } finally {
       setLoading(false);
@@ -696,12 +695,12 @@ export const useWeeklyFeedback = () => {
   // Enhanced effect with retry mechanism and better timing
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
-    
+
     // Limpar localStorage de dias anteriores
     const cleanOldFeedbackFlags = () => {
       const today = new Date().toISOString().split('T')[0];
       const prefix = `feedback_sent_${user?.id}_`;
-      
+
       // Verificar todas as chaves no localStorage
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
@@ -714,10 +713,10 @@ export const useWeeklyFeedback = () => {
         }
       }
     };
-    
+
     const checkModalWithRetry = async (retryCount = 0) => {
       console.log('[Feedback] Effect triggered, retry count:', retryCount);
-      
+
       if (!user?.id) {
         console.log('[Feedback] No user, waiting...');
         return;
@@ -748,7 +747,7 @@ export const useWeeklyFeedback = () => {
         setShouldShowModal(shouldShow);
       } catch (error) {
         console.error('[Feedback] Error in modal check:', error);
-        
+
         // Retry up to 3 times with increasing delay
         if (retryCount < 3) {
           const delay = (retryCount + 1) * 2000; // 2s, 4s, 6s

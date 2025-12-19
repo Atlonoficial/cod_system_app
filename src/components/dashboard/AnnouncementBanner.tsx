@@ -13,7 +13,7 @@ export const AnnouncementBanner = ({ userId }: AnnouncementBannerProps) => {
   const { banners, loading } = useBanners(userId);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isExpanded, setIsExpanded] = useState(false);
-  
+
   // Updated tracking with new types
   const { trackView, trackClick } = useBannerTracking();
 
@@ -35,7 +35,7 @@ export const AnnouncementBanner = ({ userId }: AnnouncementBannerProps) => {
     return 'from-secondary/10 to-secondary-variant/10';
   }, [current]);
 
-  const imageSrc = current?.image_url || "/lovable-uploads/65cd0e38-8355-4d41-8be9-a292750e3daa.png";
+  const imageSrc = current?.image_url || "/placeholder.svg";
   const actionLabel = current?.action_text || 'Saiba Mais';
   const linkUrl = current?.action_url;
   const tagType = current?.type || 'campanha';
@@ -56,7 +56,7 @@ export const AnnouncementBanner = ({ userId }: AnnouncementBannerProps) => {
   const handleBannerClick = () => {
     if (current?.id) {
       trackView(current.id, { placement: 'dashboard' });
-      
+
       if (!isExpanded) {
         setIsExpanded(true);
         // Auto-hide after 4 seconds
@@ -91,7 +91,7 @@ export const AnnouncementBanner = ({ userId }: AnnouncementBannerProps) => {
 
   return (
     <div className="relative mb-6 overflow-hidden rounded-xl border border-border/50">
-      <div 
+      <div
         className={`bg-gradient-to-r ${gradient} p-4 cursor-pointer transition-all duration-300 hover:scale-[1.02]`}
         onClick={handleBannerClick}
       >
@@ -103,10 +103,10 @@ export const AnnouncementBanner = ({ userId }: AnnouncementBannerProps) => {
             className="w-full h-full object-cover"
             loading="lazy"
           />
-          
+
           {/* Overlay gradient for text readability */}
           <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent" />
-          
+
           {/* Content overlay */}
           <div className="absolute inset-0 p-4 flex items-center justify-center">
             {/* Collapsed State - Only show expand indicator */}
@@ -116,30 +116,29 @@ export const AnnouncementBanner = ({ userId }: AnnouncementBannerProps) => {
                 <p className="text-sm mt-2 opacity-80">Clique para ver detalhes</p>
               </div>
             )}
-            
+
             {/* Expanded State - Show all content */}
             {isExpanded && (
               <div className="w-full animate-in slide-in-from-bottom duration-300">
                 <div className="flex items-center gap-2 mb-2">
-                  <span className={`text-xs px-2 py-1 rounded-full font-medium ${
-                    tagType === 'produto' ? 'bg-primary/30 text-white border border-primary/50' : 'bg-accent/30 text-white border border-accent/50'
-                  }`}>
+                  <span className={`text-xs px-2 py-1 rounded-full font-medium ${tagType === 'produto' ? 'bg-primary/30 text-white border border-primary/50' : 'bg-accent/30 text-white border border-accent/50'
+                    }`}>
                     📢 Campanha
                   </span>
                 </div>
-                
+
                 <h3 className="text-lg font-bold text-white mb-1 line-clamp-2">
                   {current?.title}
                 </h3>
-                
+
                 {(current?.description || current?.message) && (
                   <p className="text-sm text-white/90 mb-3 line-clamp-2">
                     {current.description || current.message}
                   </p>
                 )}
-                
+
                 {linkUrl && (
-                  <button 
+                  <button
                     onClick={handleRedirectClick}
                     className="self-start text-sm bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-full transition-colors flex items-center gap-2 backdrop-blur-sm border border-white/20"
                   >
@@ -147,7 +146,7 @@ export const AnnouncementBanner = ({ userId }: AnnouncementBannerProps) => {
                     <ExternalLink size={14} />
                   </button>
                 )}
-                
+
                 {/* Collapse indicator */}
                 <div className="flex justify-center mt-3">
                   <ChevronUp size={20} className="text-white/60 animate-pulse" />
@@ -199,9 +198,8 @@ export const AnnouncementBanner = ({ userId }: AnnouncementBannerProps) => {
                 e.stopPropagation();
                 setCurrentIndex(index);
               }}
-              className={`w-2 h-2 rounded-full transition-colors ${
-                index === currentIndex ? 'bg-primary' : 'bg-muted-foreground/30'
-              }`}
+              className={`w-2 h-2 rounded-full transition-colors ${index === currentIndex ? 'bg-primary' : 'bg-muted-foreground/30'
+                }`}
             />
           ))}
         </div>

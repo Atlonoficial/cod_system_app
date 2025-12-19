@@ -60,23 +60,29 @@ export const useWorkouts = () => {
           name: sessionData.name || 'Treino Principal',
           notes: sessionData.notes,
           exercises: Array.isArray(sessionData.exercises)
-            ? sessionData.exercises.map(ex => ({
-              id: ex.id || `ex-${Math.random()}`,
-              name: ex.name,
-              category: ex.category || 'general',
-              sets: ex.sets || '3',
-              reps: ex.reps || 12,
-              weight: ex.weight,
-              duration: ex.duration,
-              rest_time: ex.rest_time || 60,
-              notes: ex.notes,
-              muscle_groups: [],
-              equipment: [],
-              difficulty: plan.difficulty,
-              instructions: '',
-              video_url: '',
-              image_url: ''
-            }))
+            ? sessionData.exercises.map((exData, idx) => {
+              const ex = exData as any; // Cast for dynamic properties
+              const category = ex.category || ex.type || 'Força';
+              const fallbackName = `Exercício #${idx + 1} (${category})`;
+
+              return {
+                id: ex.id || `ex-${Math.random()}`,
+                name: ex.name || ex.exercise || ex.exerciseName || fallbackName,
+                category: category,
+                sets: ex.sets || '3',
+                reps: ex.reps || 12,
+                weight: ex.weight,
+                duration: ex.duration,
+                rest_time: ex.rest_time || ex.rest_seconds || 60,
+                notes: ex.notes || ex.instructions,
+                muscle_groups: ex.muscle_groups || [],
+                equipment: ex.equipment || [],
+                difficulty: ex.difficulty || plan.difficulty,
+                instructions: ex.instructions || ex.notes || '',
+                video_url: ex.video_url || '',
+                image_url: ex.image_url || ''
+              };
+            })
             : []
         }));
       }
@@ -86,30 +92,36 @@ export const useWorkouts = () => {
           id: `session-${plan.id}`,
           name: 'Treino Completo',
           notes: plan.description,
-          exercises: plan.exercises_data.map((ex: any) => ({
-            id: ex.id || `ex-${Math.random()}`,
-            name: ex.name || ex.exercise || 'Exercício sem nome',
-            category: ex.category || 'general',
-            sets: ex.sets || '3',
-            reps: ex.reps || 12,
-            weight: ex.weight,
-            duration: ex.duration,
-            rest_time: ex.rest_time || 60,
-            notes: ex.notes,
-            muscle_groups: [],
-            equipment: [],
-            difficulty: plan.difficulty,
-            instructions: ex.instructions || '',
-            video_url: '',
-            image_url: ''
-          }))
+          exercises: plan.exercises_data.map((ex: any, idx: number) => {
+            // Build a meaningful name if none provided
+            const category = ex.category || ex.type || 'Força';
+            const fallbackName = `Exercício #${idx + 1} (${category})`;
+
+            return {
+              id: ex.id || `ex-${Math.random()}`,
+              name: ex.name || ex.exercise || ex.exerciseName || fallbackName,
+              category: category,
+              sets: ex.sets || '3',
+              reps: ex.reps || 12,
+              weight: ex.weight,
+              duration: ex.duration,
+              rest_time: ex.rest_time || ex.rest_seconds || 60,
+              notes: ex.notes || ex.instructions,
+              muscle_groups: ex.muscle_groups || [],
+              equipment: ex.equipment || [],
+              difficulty: ex.difficulty || plan.difficulty,
+              instructions: ex.instructions || ex.notes || '',
+              video_url: ex.video_url || '',
+              image_url: ex.image_url || ''
+            };
+          })
         }];
       }
     }
 
     return {
       id: plan.id,
-      name: plan.name,
+      name: plan.description || plan.name, // ✅ Use description (custom name like "Método AGT") when available
       description: plan.description,
       difficulty: plan.difficulty,
       duration_weeks: plan.duration_weeks,

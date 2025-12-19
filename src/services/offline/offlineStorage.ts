@@ -9,7 +9,7 @@ export interface OfflineAction {
 }
 
 class OfflineStorage {
-    private dbName = 'shape-pro-db';
+    private dbName = 'cood-system-db';
     private version = 1;
     private db: IDBDatabase | null = null;
 

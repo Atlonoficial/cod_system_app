@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
-import { Star, MessageSquare, Dumbbell, Apple, HelpCircle } from 'lucide-react';
+import { Star, MessageSquare, Dumbbell, HelpCircle } from 'lucide-react';
 import { logger } from '@/lib/logger';
 
 export interface WeeklyFeedbackData {
@@ -33,13 +33,13 @@ interface WeeklyFeedbackModalProps {
   feedbackFrequency?: string;
 }
 
-export const WeeklyFeedbackModal = ({ 
-  isOpen, 
-  onClose, 
-  onSubmit, 
-  loading = false, 
-  customQuestions = [], 
-  feedbackFrequency = 'semanal' 
+export const WeeklyFeedbackModal = ({
+  isOpen,
+  onClose,
+  onSubmit,
+  loading = false,
+  customQuestions = [],
+  feedbackFrequency = 'semanal'
 }: WeeklyFeedbackModalProps) => {
   const [feedbackData, setFeedbackData] = useState<WeeklyFeedbackData>({
     overallRating: 0,
@@ -63,9 +63,9 @@ export const WeeklyFeedbackModal = ({
       });
       return;
     }
-    
+
     logger.debug('FeedbackModal', 'Submitting feedback');
-    
+
     const success = await onSubmit(feedbackData);
     if (success) {
       logger.info('FeedbackModal', 'Feedback submitted successfully');
@@ -108,10 +108,9 @@ export const WeeklyFeedbackModal = ({
   };
 
   const isValid = feedbackData.overallRating > 0 &&
-                  feedbackData.trainingRating > 0 && 
-                  feedbackData.dietRating > 0 && 
-                  feedbackData.generalFeedback.trim().length > 0 &&
-                  checkCustomQuestionValidity();
+    feedbackData.trainingRating > 0 &&
+    feedbackData.generalFeedback.trim().length > 0 &&
+    checkCustomQuestionValidity();
 
   const StarRating = ({ label, value, onChange, questionId }: {
     questionId?: string;
@@ -145,7 +144,7 @@ export const WeeklyFeedbackModal = ({
         <DialogHeader>
           <DialogTitle>Feedback {feedbackFrequency}</DialogTitle>
           <DialogDescription>
-            Como foi seu período? Compartilhe seu feedback sobre treinos e dieta.
+            Como foi seu período? Compartilhe seu feedback sobre seus treinos.
           </DialogDescription>
         </DialogHeader>
 
@@ -189,29 +188,6 @@ export const WeeklyFeedbackModal = ({
             </CardContent>
           </Card>
 
-          {/* Diet Rating */}
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2 mb-3">
-                <Apple className="h-4 w-4 text-secondary" />
-                <h4 className="font-medium">Alimentação</h4>
-              </div>
-              <StarRating
-                value={feedbackData.dietRating}
-                onChange={(rating) => setFeedbackData(prev => ({ ...prev, dietRating: rating }))}
-                label="Como foi sua alimentação neste período?"
-              />
-              <div className="mt-3">
-                <Label className="text-sm">Comentários sobre alimentação (opcional)</Label>
-                <Textarea
-                  placeholder="Dificuldades com a dieta, mudanças, preferências..."
-                  value={feedbackData.dietFeedback}
-                  onChange={(e) => setFeedbackData(prev => ({ ...prev, dietFeedback: e.target.value }))}
-                  className="mt-1 min-h-[60px]"
-                />
-              </div>
-            </CardContent>
-          </Card>
 
           {/* General Feedback */}
           <div className="space-y-2">
@@ -237,9 +213,9 @@ export const WeeklyFeedbackModal = ({
                   <Label htmlFor={question.id}>
                     {question.text} {question.required && <span className="text-red-500">*</span>}
                   </Label>
-                  
+
                   {question.type === 'text' && (
-                     <Textarea
+                    <Textarea
                       id={question.id}
                       placeholder="Digite sua resposta..."
                       value={feedbackData.customResponses?.[question.id] || ''}
@@ -247,7 +223,7 @@ export const WeeklyFeedbackModal = ({
                       className="min-h-[80px]"
                     />
                   )}
-                  
+
                   {question.type === 'rating' && (
                     <StarRating
                       questionId={question.id}
@@ -256,7 +232,7 @@ export const WeeklyFeedbackModal = ({
                       onChange={(value) => handleCustomResponse(question.id, value)}
                     />
                   )}
-                  
+
                   {question.type === 'multiple_choice' && question.options && (
                     <div className="space-y-2">
                       {question.options.map((option, index) => (
@@ -296,8 +272,8 @@ export const WeeklyFeedbackModal = ({
           <Button variant="outline" onClick={onClose} className="flex-1" disabled={loading}>
             Cancelar
           </Button>
-          <Button 
-            onClick={handleSubmit} 
+          <Button
+            onClick={handleSubmit}
             className="flex-1"
             disabled={!isValid || loading}
           >

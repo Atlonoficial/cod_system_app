@@ -11,19 +11,18 @@ export interface StudentPermissions {
   hasNutritionAccess: boolean;
   hasAgendaAccess: boolean;
   hasProgressAccess: boolean;
-  hasCoachAccess: boolean;
-  
+
   // Informações do plano
   planName: string | null;
   planFeatures: string[];
   membershipStatus: string | null;
   daysRemaining: number | null;
   teacherId: string | null;
-  
+
   // Estados
   loading: boolean;
   error: string | null;
-  
+
   // Métodos
   refresh: () => Promise<void>;
   getAccessMessage: (feature: string) => string;
@@ -31,18 +30,18 @@ export interface StudentPermissions {
 
 export const useStudentPermissions = (): StudentPermissions => {
   const { user } = useAuth();
-  const { 
-    subscription, 
+  const {
+    subscription,
     hasActiveSubscription: hasActiveSubscriptionBase,
     loading: subscriptionLoading,
     error: subscriptionError,
-    refresh: refreshSubscription 
+    refresh: refreshSubscription
   } = useActiveSubscription();
-  
-  const { 
-    todaysMeals, 
+
+  const {
+    todaysMeals,
     loading: nutritionLoading,
-    hasNutritionAccess 
+    hasNutritionAccess
   } = useMyNutrition();
 
   // Hook para escutar mudanças em tempo real
@@ -69,7 +68,7 @@ export const useStudentPermissions = (): StudentPermissions => {
           .maybeSingle();
 
         if (error) throw error;
-        
+
         console.log('[useStudentPermissions] Student data:', data);
         setStudentData(data);
       } catch (err: any) {
@@ -93,21 +92,21 @@ export const useStudentPermissions = (): StudentPermissions => {
       if (!hasActiveSubscriptionBase) {
         return `Para acessar ${feature}, você precisa de uma consultoria ativa. Entre em contato com seu professor ou contrate um plano.`;
       }
-      
+
       if (subscription?.status === 'pending') {
         return `Sua consultoria está pendente de aprovação. Entre em contato com seu professor.`;
       }
-      
+
       if (subscription?.expirationStatus === 'expired') {
         return `Sua consultoria expirou. Renove para continuar acessando ${feature}.`;
       }
-      
+
       return `Acesso liberado para ${feature}.`;
     };
 
     // Verificações específicas por funcionalidade
     const hasNutritionAccessReal = hasNutritionAccess?.() || todaysMeals.length > 0;
-    
+
     // Log detalhado das verificações
     console.log('[useStudentPermissions] Permission calculations:', {
       hasActiveSubscriptionBase,
@@ -125,19 +124,18 @@ export const useStudentPermissions = (): StudentPermissions => {
       hasNutritionAccess: hasNutritionAccessReal,
       hasAgendaAccess: hasActiveSubscriptionBase,
       hasProgressAccess: hasActiveSubscriptionBase,
-      hasCoachAccess: hasActiveSubscriptionBase,
-      
+
       // Informações do plano
       planName: subscription?.plan_name || null,
       planFeatures: subscription?.plan_features || [],
       membershipStatus: studentData?.membership_status || subscription?.status || null,
       daysRemaining: subscription?.daysRemaining || null,
       teacherId: subscription?.teacher_id || studentData?.teacher_id || null,
-      
+
       // Estados
       loading: baseLoading,
       error: baseError,
-      
+
       // Métodos
       refresh: async () => {
         await refreshSubscription();

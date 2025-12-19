@@ -1,5 +1,5 @@
 /**
- * 🔗 REALTIME MANAGER CENTRALIZADO (Student App)
+ * 🔗 REALTIME MANAGER CENTRALIZADO ([APP_NAME])
  * 
  * Sistema de gerenciamento unificado de Supabase Realtime Subscriptions
  * 
@@ -32,13 +32,13 @@ interface ListenerKey {
 
 class RealtimeManager {
     private static instance: RealtimeManager;
-    private channels = new Map<TableName, RealtimeChannel>();
+    private globalChannel: RealtimeChannel | null = null;
     private listeners = new Map<string, Set<ListenerCallback>>();
     private listenerMetadata = new Map<string, ListenerKey>();
     private nextListenerId = 0;
 
     private constructor() {
-        logger.info('RealtimeManager', 'Inicializado (Singleton)');
+        logger.info('RealtimeManager', 'Inicializado (Single Channel Mode)');
     }
 
     static getInstance(): RealtimeManager {
@@ -52,33 +52,69 @@ class RealtimeManager {
         return `${table}:${event}${filter ? `:${filter}` : ''}`;
     }
 
-    private getOrCreateChannel(config: ChannelConfig): RealtimeChannel {
-        const { table } = config;
+    private async reconnect(): Promise<void> {
+        logger.info('RealtimeManager', '🔄 Iniciando reconexão...');
 
-        if (this.channels.has(table)) {
-            return this.channels.get(table)!;
+        if (this.globalChannel) {
+            await supabase.removeChannel(this.globalChannel);
+            this.globalChannel = null;
         }
 
-        logger.info('RealtimeManager', `Criando channel unificado para tabela: ${table}`);
+        const channel = this.createChannelInstance();
 
-        const channel = supabase.channel(`unified-student-${table}`);
-
-        this.channels.set(table, channel);
-
-        channel.subscribe((status) => {
-            if (status === 'SUBSCRIBED') {
-                logger.info('RealtimeManager', `Channel ${table} conectado`);
-            } else if (status === 'CHANNEL_ERROR') {
-                // Reduce noise for expected RLS errors during auth transitions
-                logger.warn('RealtimeManager', `Problema no channel ${table} (possível RLS ou conexão)`);
-                this.channels.delete(table);
-            } else if (status === 'TIMED_OUT') {
-                logger.warn('RealtimeManager', `Timeout no channel ${table}`);
-                this.channels.delete(table);
+        const uniqueListeners = new Map<string, ListenerKey>();
+        this.listenerMetadata.forEach(meta => {
+            const key = this.getListenerKey(meta.table, meta.event, meta.filter);
+            if (!uniqueListeners.has(key)) {
+                uniqueListeners.set(key, meta);
             }
         });
 
-        return channel;
+        logger.info('RealtimeManager', `🔄 Re-anexando ${uniqueListeners.size} grupos de listeners...`);
+
+        uniqueListeners.forEach(meta => {
+            logger.info('RealtimeManager', `   📌 Anexando: ${meta.table} | ${meta.event} | ${meta.filter || 'Sem filtro'}`);
+            this.addPostgresListener(channel, { table: meta.table, filter: meta.filter }, meta.event, meta.callback);
+        });
+
+        this.subscribeToChannel(channel);
+    }
+
+    private createChannelInstance(): RealtimeChannel {
+        logger.info('RealtimeManager', 'Criando instância do channel');
+        const channelId = `global-student-realtime-${Math.random().toString(36).substring(7)}`;
+        this.globalChannel = supabase.channel(channelId, {
+            config: {
+                // broadcast: { self: true },
+            },
+        });
+        return this.globalChannel;
+    }
+
+    private subscribeToChannel(channel: RealtimeChannel) {
+        channel.subscribe((status) => {
+            if (status === 'SUBSCRIBED') {
+                logger.info('RealtimeManager', '✅ Channel Global conectado');
+            } else if (status === 'CHANNEL_ERROR') {
+                logger.error('RealtimeManager', '❌ Erro no Channel Global');
+                logger.warn('RealtimeManager', '⚠️ Tentando reconectar em 5s...');
+                setTimeout(() => {
+                    this.reconnect();
+                }, 5000);
+            } else if (status === 'TIMED_OUT') {
+                logger.error('RealtimeManager', '⏱️ Timeout no Channel Global');
+                setTimeout(() => {
+                    this.reconnect();
+                }, 5000);
+            }
+        });
+    }
+
+    private getGlobalChannel(): RealtimeChannel {
+        if (this.globalChannel) {
+            return this.globalChannel;
+        }
+        return this.createChannelInstance();
     }
 
     private addPostgresListener(
@@ -133,8 +169,14 @@ class RealtimeManager {
         if (!this.listeners.has(key)) {
             this.listeners.set(key, new Set());
 
-            const channel = this.getOrCreateChannel({ table, filter });
+            const channel = this.getGlobalChannel();
             this.addPostgresListener(channel, { table, filter }, event, callback);
+
+            // Ensure connection is established AFTER adding the listener
+            // If it's a new channel, it won't be subscribed yet.
+            // If it's an existing channel, it might be subscribed or connecting.
+            // We can safely call subscribe() again, Supabase handles idempotency.
+            this.subscribeToChannel(channel);
         }
 
         this.listeners.get(key)!.add(callback);
@@ -165,8 +207,10 @@ class RealtimeManager {
     }
 
     unsubscribeAll(): void {
-        this.channels.forEach((channel) => supabase.removeChannel(channel));
-        this.channels.clear();
+        if (this.globalChannel) {
+            supabase.removeChannel(this.globalChannel);
+            this.globalChannel = null;
+        }
         this.listeners.clear();
         this.listenerMetadata.clear();
         logger.info('RealtimeManager', 'Limpeza completa realizada');

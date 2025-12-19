@@ -1,13 +1,12 @@
 import { Bell, Settings, Calendar, Trophy, MessageSquare } from "lucide-react";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { WeightChart } from "./WeightChart";
 import { WeightInputModal } from "./WeightInputModal";
-import { CoachAICard } from "./CoachAICard";
-import { BannerContainer } from "@/components/banners/BannerContainer";
+
 import { QuickActions } from "./QuickActions";
 import { DashboardStats } from "./DashboardStats";
-import { StravaIntegrationCard } from "./StravaIntegrationCard";
+
 import { MetricCard } from "@/components/ui/MetricCard";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -15,18 +14,28 @@ import { useAuthContext } from "@/components/auth/AuthProvider";
 import { useCurrentWorkoutSession } from "@/hooks/useCurrentWorkoutSession";
 import { useOptimizedAvatar } from "@/hooks/useOptimizedAvatar";
 
-import { NotificationCenter } from "@/components/notifications/NotificationCenter";
+// Notification system removed - deprecated
 import { useWeightProgress } from "@/hooks/useWeightProgress";
 import { useProgressActions } from "@/components/progress/ProgressActions";
 import { useWeeklyFeedback } from "@/hooks/useWeeklyFeedback";
 import { WeeklyFeedbackModal } from "@/components/feedback/WeeklyFeedbackModal";
 
+// COD System Wellness Components
+import { ReadinessDashboard } from "@/components/wellness/ReadinessDashboard";
+import { WellnessCheckinModal } from "@/components/wellness/WellnessCheckinModal";
+import { useWellnessCheckin } from "@/hooks/useWellnessCheckin";
+import "@/components/wellness/ReadinessDashboard.css";
+
+// COD System Phase 2 - Evolution Analytics
+import { EvolutionCharts } from "@/components/analytics/EvolutionCharts";
+import { useWorkoutEvolution } from "@/hooks/useWorkoutEvolution";
+
 interface DashboardProps {
-  onCoachClick?: () => void;
+
   onWorkoutClick?: () => void;
 }
 
-export const Dashboard = ({ onCoachClick, onWorkoutClick }: DashboardProps) => {
+export const Dashboard = ({ onWorkoutClick }: DashboardProps) => {
   const { userProfile, user, isAuthenticated } = useAuthContext();
   const { avatarUrl, avatarFallback } = useOptimizedAvatar();
   const progressActions = useProgressActions();
@@ -34,12 +43,19 @@ export const Dashboard = ({ onCoachClick, onWorkoutClick }: DashboardProps) => {
   const navigate = useNavigate();
   const [showWeightModal, setShowWeightModal] = useState(false);
   const { addWeightEntry, shouldShowWeightModal, error: weightError, clearError } = useWeightProgress(user?.id || '');
-  
+
+  // COD System - Wellness Check-in (gracefully degrades if tables don't exist)
+  const { needsCheckin, readinessLevel, tableExists: codTablesExist } = useWellnessCheckin();
+  const [showWellnessModal, setShowWellnessModal] = useState(false);
+
+  // COD System Phase 2 - Workout Evolution Data
+  const { chartData: evolutionChartData } = useWorkoutEvolution(30);
+
   // Weekly feedback hook
-  const { 
-    shouldShowModal: shouldShowFeedbackModal, 
-    setShouldShowModal: setShouldShowFeedbackModal, 
-    submitWeeklyFeedback, 
+  const {
+    shouldShowModal: shouldShowFeedbackModal,
+    setShouldShowModal: setShouldShowFeedbackModal,
+    submitWeeklyFeedback,
     loading: feedbackLoading,
     feedbackSettings,
     teacherId: feedbackTeacherId,
@@ -47,46 +63,58 @@ export const Dashboard = ({ onCoachClick, onWorkoutClick }: DashboardProps) => {
   } = useWeeklyFeedback();
 
   // ETAPA 3: Feedback system monitoring removed (BUILD 35)
-  
+
   const rawName = userProfile?.name || (user?.user_metadata as any)?.name || '';
-  const firstName = typeof rawName === 'string' && rawName.trim() && !rawName.includes('@') 
-    ? rawName.split(' ')[0] 
+  const firstName = typeof rawName === 'string' && rawName.trim() && !rawName.includes('@')
+    ? rawName.split(' ')[0]
     : 'Usuário';
-  
+
   useEffect(() => {
     if (!isAuthenticated) {
       navigate('/login');
     }
   }, [isAuthenticated, navigate]);
 
-  // Check if should show weight modal (only on Fridays)
+  // Check if should show weight modal (only once per session, only if not weighed this week)
+  const weightModalShownRef = useRef(false);
+
   useEffect(() => {
     if (!isAuthenticated || !user) return;
-    
-    // Show modal only on Fridays if user hasn't weighed this week
+    if (weightModalShownRef.current) return; // Already shown this session
+
+    // Show modal only if user hasn't weighed this week
     const checkWeightModal = async () => {
+      const today = new Date().toISOString().split('T')[0];
+      const dismissedKey = `weight_modal_dismissed_${today}`;
+      const wasDismissed = localStorage.getItem(dismissedKey);
+
+      if (wasDismissed === 'true') {
+        return;
+      }
+
       const shouldShow = await shouldShowWeightModal();
-      if (shouldShow) {
+      if (shouldShow && !weightModalShownRef.current) {
+        weightModalShownRef.current = true; // Mark as shown
         setTimeout(() => setShowWeightModal(true), 2000);
       }
     };
-    
+
     checkWeightModal();
-  }, [isAuthenticated, user, shouldShowWeightModal]);
+  }, [isAuthenticated, user?.id]); // Only depend on user.id, not the function
 
   // Check if should show feedback modal (after weight modal logic)
   useEffect(() => {
     if (!isAuthenticated || !user) return;
-    
+
     // NÃO sobrescrever se já foi enviado hoje
     const today = new Date().toISOString().split('T')[0];
     const feedbackKey = `feedback_sent_${user.id}_${today}`;
     const wasSentToday = localStorage.getItem(feedbackKey);
-    
+
     if (wasSentToday === 'true') {
       return;
     }
-    
+
     // Show feedback modal with delay if needed (after weight modal would show)
     if (shouldShowFeedbackModal) {
       const delay = shouldShowWeightModal ? 4000 : 2000; // Wait longer if weight modal is also showing
@@ -94,21 +122,38 @@ export const Dashboard = ({ onCoachClick, onWorkoutClick }: DashboardProps) => {
     }
   }, [isAuthenticated, user, shouldShowFeedbackModal, shouldShowWeightModal]);
 
+  // COD System - Auto-show wellness check-in modal if not completed today
+  useEffect(() => {
+    if (!isAuthenticated || !user) return;
+
+    // Only show modal if COD System tables exist
+    if (!codTablesExist) return;
+
+    // Show wellness check-in modal if user hasn't done it today
+    if (needsCheckin) {
+      // Wait a bit for the app to load
+      const timer = setTimeout(() => {
+        setShowWellnessModal(true);
+      }, 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [isAuthenticated, user, needsCheckin, codTablesExist]);
+
   const handleSaveWeight = async (weight: number) => {
     // Use the weight progress system which now includes validation and gamification
     const success = await addWeightEntry(weight);
-    
+
     if (success) {
       setShowWeightModal(false);
     }
-    
+
     return success;
   };
 
   if (!isAuthenticated) {
     return null; // Enquanto redireciona
   }
-  
+
   // Fetch current workout session
   const { currentSession, loading: workoutSessionLoading, hasWorkoutPlan } = useCurrentWorkoutSession();
   // const { progress, loading: progressLoading } = useProgress(user?.id || '');
@@ -121,24 +166,15 @@ export const Dashboard = ({ onCoachClick, onWorkoutClick }: DashboardProps) => {
   });
 
   return (
-    <div className="p-4 sm:p-6 pt-safe space-y-4">
-      {/* Logo Header */}
-      <div className="mb-4 text-center pt-2">
-        <img 
-          src="/lovable-uploads/2133926f-121d-45ce-8cff-80c84a1a0856.png" 
-          alt="Shape Pro Logo" 
-          className="w-20 h-auto mx-auto opacity-60"
-        />
-      </div>
-
+    <div className="space-y-4">
       {/* Header with Date and Profile */}
       <div className="flex items-start justify-between mb-4 animate-fade-up">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Calendar size={16} className="text-warning" />
           {currentDate}
         </div>
-        
-        {user && <NotificationCenter userId={user.id} />}
+
+        {/* Notification system removed - deprecated */}
       </div>
 
       {/* Profile Section with safe area */}
@@ -163,42 +199,48 @@ export const Dashboard = ({ onCoachClick, onWorkoutClick }: DashboardProps) => {
         </p>
       </div>
 
+      {/* COD System - Readiness Dashboard */}
+      <div className="mb-4">
+        <ReadinessDashboard
+          compact={false}
+          onCheckIn={() => setShowWellnessModal(true)}
+        />
+      </div>
+
+      {/* COD System Phase 2 - Evolution Charts (compact) */}
+      {codTablesExist && (
+        <div className="mb-4">
+          <EvolutionCharts data={evolutionChartData} compact />
+        </div>
+      )}
+
 
       {/* Weight Progress Chart */}
-      <WeightChart 
+      <WeightChart
         onWeightNeeded={() => setShowWeightModal(true)}
         aria-label="Gráfico de evolução de peso"
       />
 
       {/* Cards Grid */}
-      <div 
+      <div
         className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6"
         role="list"
         aria-label="Ações rápidas"
       >
-        <div role="listitem" className="animate-fade-up stagger-delay-1">
-          <CoachAICard onCoachClick={onCoachClick} />
-        </div>
-        <div role="listitem" className="animate-fade-up stagger-delay-2">
-          <StravaIntegrationCard />
-        </div>
+
+
       </div>
 
       {/* Quick Actions */}
       <QuickActions />
 
-      {/* Banner System - Positioned between agenda/meta and stats */}
-      <BannerContainer 
-        placement="header" 
-        maxBanners={2}
-        className="mb-6" 
-      />
+
 
       {/* Stats Overview */}
-      <DashboardStats 
-        workouts={currentSession ? [{ name: currentSession.sessionName }] : []} 
-        progress={progress} 
-        loading={workoutSessionLoading || progressLoading} 
+      <DashboardStats
+        workouts={currentSession ? [{ name: currentSession.sessionName }] : []}
+        progress={progress}
+        loading={workoutSessionLoading || progressLoading}
       />
 
 
@@ -210,7 +252,7 @@ export const Dashboard = ({ onCoachClick, onWorkoutClick }: DashboardProps) => {
               {currentSession.sessionLabel}
             </span>
           </div>
-          
+
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-sm text-muted-foreground">Sessão</span>
@@ -237,14 +279,14 @@ export const Dashboard = ({ onCoachClick, onWorkoutClick }: DashboardProps) => {
               </span>
             </div>
           </div>
-          
-            <button 
-              onClick={onWorkoutClick} 
-              className="btn-primary w-full mt-4 py-3 sm:py-4 touch-feedback"
-              aria-label={`Iniciar treino ${currentSession.sessionLabel}`}
-            >
-              Iniciar {currentSession.sessionLabel}
-            </button>
+
+          <button
+            onClick={onWorkoutClick}
+            className="btn-primary w-full mt-4 py-3 sm:py-4 touch-feedback"
+            aria-label={`Iniciar treino ${currentSession.sessionLabel}`}
+          >
+            Iniciar {currentSession.sessionLabel}
+          </button>
         </div>
       )}
 
@@ -254,6 +296,8 @@ export const Dashboard = ({ onCoachClick, onWorkoutClick }: DashboardProps) => {
         onClose={() => {
           clearError();
           setShowWeightModal(false);
+          const today = new Date().toISOString().split('T')[0];
+          localStorage.setItem(`weight_modal_dismissed_${today}`, 'true');
         }}
         onSave={handleSaveWeight}
         error={weightError}
@@ -268,11 +312,17 @@ export const Dashboard = ({ onCoachClick, onWorkoutClick }: DashboardProps) => {
         customQuestions={feedbackSettings?.custom_questions || []}
         feedbackFrequency={
           feedbackSettings?.feedback_frequency === 'daily' ? 'diário' :
-          feedbackSettings?.feedback_frequency === 'weekly' ? 'semanal' :
-          feedbackSettings?.feedback_frequency === 'biweekly' ? 'quinzenal' :
-          feedbackSettings?.feedback_frequency === 'monthly' ? 'mensal' :
-          'periódico'
+            feedbackSettings?.feedback_frequency === 'weekly' ? 'semanal' :
+              feedbackSettings?.feedback_frequency === 'biweekly' ? 'quinzenal' :
+                feedbackSettings?.feedback_frequency === 'monthly' ? 'mensal' :
+                  'periódico'
         }
+      />
+
+      {/* COD System - Wellness Check-in Modal */}
+      <WellnessCheckinModal
+        isOpen={showWellnessModal}
+        onComplete={() => setShowWellnessModal(false)}
       />
     </div>
   );

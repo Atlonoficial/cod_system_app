@@ -81,6 +81,9 @@ export const WeightInputModal = ({ isOpen, onClose, onSave, error }: WeightInput
   };
 
   const handleSkip = () => {
+    // Persist dismiss state so modal doesn't show again today
+    const today = new Date().toISOString().split('T')[0];
+    localStorage.setItem(`weight_modal_dismissed_${today}`, 'true');
     setWeight('');
     onClose();
   };

@@ -6,14 +6,14 @@ import { BrowserRouter, Routes, Route, useLocation, useNavigate } from "react-ro
 import { useEffect, Suspense } from "react";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import { TermsGuard } from "@/components/auth/TermsGuard";
-import { GamificationProvider } from "@/components/gamification/GamificationProvider";
-import { GamificationIntegrator } from "@/components/gamification/GamificationIntegrator";
+// Gamification imports removed
 import { SecurityProvider } from "@/components/security/SecurityProvider";
 import { ErrorBoundary } from "@/components/common/ErrorBoundary";
 import { NativeIntegration } from "@/components/native/NativeIntegration";
 import { NotificationPermissionModal } from "@/components/notifications/NotificationPermissionModal";
 import { NetworkStatus } from "@/components/ui/NetworkStatus";
 import { AuthGuard } from "@/components/auth/AuthGuard";
+import { SubscriptionGuard } from "@/components/auth/SubscriptionGuard";
 import { useGlobalRealtime } from "@/hooks/useGlobalRealtime";
 import Index from "./pages/Index";
 // Core application imports ready for production
@@ -30,16 +30,14 @@ import { LoadingScreen } from "@/components/auth/LoadingScreen";
 import ContaSeguranca from "./pages/ContaSeguranca";
 import AssinaturasPlanos from "./pages/AssinaturasPlanos";
 import { LazySettings } from "./pages/lazy/LazySettings";
-import { LazyAIChat } from "./pages/lazy/LazyAIChat";
+// LazyAIChat removed
 import { LazyTeacherStudentChat } from "./pages/lazy/LazyTeacherStudentChat";
 import { LazyAgenda } from "./pages/lazy/LazyAgenda";
 import { LazyMetas } from "./pages/lazy/LazyMetas";
 import PoliticaPrivacidade from "./pages/PoliticaPrivacidade";
 
 
-import { RegistrarRefeicao } from "./pages/RegistrarRefeicao";
-
-import { LazyCursos } from "./pages/lazy/LazyCursos";
+// LazyCursos removed
 import { LazyExames } from "./pages/lazy/LazyExames";
 import { LazyFotos } from "./pages/lazy/LazyFotos";
 import { LazyAvaliacoes } from "./pages/lazy/LazyAvaliacoes";
@@ -47,8 +45,10 @@ import { LazyAvaliacoes } from "./pages/lazy/LazyAvaliacoes";
 import { AuthVerify } from "./pages/AuthVerify";
 import { AuthVerified } from "./pages/AuthVerified";
 import CadastroCompleto from "./pages/CadastroCompleto";
-import Recompensas from "./pages/Recompensas";
-import StravaCallback from "./pages/StravaCallback";
+// Recompensas removed
+import { HealthConnectionsScreen } from "./components/settings/HealthConnectionsScreen";
+import WellnessHistoryPage from "./pages/WellnessHistoryPage";
+
 
 
 
@@ -92,57 +92,66 @@ const AuthenticatedApp = () => {
   useGlobalRealtime();
 
   return (
-    <GamificationProvider>
-      <GamificationIntegrator>
-        <Routes>
-          {/* Public routes (no AuthGuard, no TermsGuard) */}
-          <Route path="/politica-privacidade" element={<PoliticaPrivacidade />} />
-          <Route path="/accept-terms" element={<AcceptTerms />} />
+    // GamificationProvider removed
+    // GamificationIntegrator removed
+    <Routes>
+      {/* Public routes (no AuthGuard, no TermsGuard) */}
+      <Route path="/politica-privacidade" element={<PoliticaPrivacidade />} />
+      <Route path="/accept-terms" element={<AcceptTerms />} />
 
-          {/* Authentication Routes */}
-          <Route path="/auth/confirm" element={<AuthConfirm />} />
+      {/* Authentication Routes */}
+      <Route path="/auth/confirm" element={<AuthConfirm />} />
 
-          {/* ✅ Aliases de compatibilidade (redireciona para /auth/confirm) */}
-          <Route path="/email/confirm" element={<RedirectToAuthConfirm />} />
-          <Route path="/auth/app/confirm.html" element={<RedirectToAuthConfirm />} />
+      {/* ✅ Aliases de compatibilidade (redireciona para /auth/confirm) */}
+      <Route path="/email/confirm" element={<RedirectToAuthConfirm />} />
+      <Route path="/auth/app/confirm.html" element={<RedirectToAuthConfirm />} />
 
-          <Route path="/auth/recovery" element={<AuthRecovery />} />
-          <Route path="/auth/invite" element={<AuthInvite />} />
-          <Route path="/auth/magic-link" element={<AuthMagicLink />} />
-          <Route path="/auth/change-email" element={<AuthChangeEmail />} />
-          <Route path="/auth/error" element={<AuthError />} />
-          <Route path="/auth/verify" element={<AuthVerify />} />
-          <Route path="/auth/verified" element={<AuthVerified />} />
+      <Route path="/auth/recovery" element={<AuthRecovery />} />
+      <Route path="/auth/invite" element={<AuthInvite />} />
+      <Route path="/auth/magic-link" element={<AuthMagicLink />} />
+      <Route path="/auth/change-email" element={<AuthChangeEmail />} />
+      <Route path="/auth/error" element={<AuthError />} />
+      <Route path="/auth/verify" element={<AuthVerify />} />
+      <Route path="/auth/verified" element={<AuthVerified />} />
 
-          {/* ✅ BUILD 37: Fallback para variações de URL de confirmação */}
-          <Route path="/auth/callback" element={<AuthConfirm />} />
+      {/* ✅ BUILD 37: Fallback para variações de URL de confirmação */}
+      <Route path="/auth/callback" element={<AuthConfirm />} />
 
-          {/* Protected routes (with TermsGuard) */}
-          <Route path="/" element={<TermsGuard><Index /></TermsGuard>} />
-          <Route path="/cadastro-completo" element={<AuthGuard><TermsGuard><CadastroCompleto /></TermsGuard></AuthGuard>} />
-          <Route path="/anamnese" element={<AuthGuard><TermsGuard><Anamnese /></TermsGuard></AuthGuard>} />
-          <Route path="/exames-medicos" element={<AuthGuard><TermsGuard><LazyExames /></TermsGuard></AuthGuard>} />
-          <Route path="/fotos-progresso" element={<AuthGuard><TermsGuard><LazyFotos /></TermsGuard></AuthGuard>} />
-          <Route path="/avaliacoes-fisicas" element={<AuthGuard><TermsGuard><LazyAvaliacoes /></TermsGuard></AuthGuard>} />
-          <Route path="/configuracoes" element={<AuthGuard><TermsGuard><LazySettings /></TermsGuard></AuthGuard>} />
+      {/* Protected routes (with TermsGuard) */}
+      <Route path="/" element={
+        <AuthGuard>
+          <TermsGuard>
+            <Index />
+          </TermsGuard>
+        </AuthGuard>
+      } />
 
-          <Route path="/conta-seguranca" element={<AuthGuard><TermsGuard><ContaSeguranca /></TermsGuard></AuthGuard>} />
-          <Route path="/assinaturas-planos" element={<AuthGuard><TermsGuard><AssinaturasPlanos /></TermsGuard></AuthGuard>} />
-          <Route path="/cursos" element={<AuthGuard><TermsGuard><LazyCursos /></TermsGuard></AuthGuard>} />
+      <Route path="/cadastro-completo" element={<AuthGuard><TermsGuard><CadastroCompleto /></TermsGuard></AuthGuard>} />
+      <Route path="/anamnese" element={<AuthGuard><TermsGuard><Anamnese /></TermsGuard></AuthGuard>} />
 
-          <Route path="/registrar-refeicao" element={<AuthGuard><TermsGuard><RegistrarRefeicao /></TermsGuard></AuthGuard>} />
-          <Route path="/agenda" element={<AuthGuard><TermsGuard><LazyAgenda /></TermsGuard></AuthGuard>} />
-          <Route path="/metas" element={<AuthGuard><TermsGuard><LazyMetas /></TermsGuard></AuthGuard>} />
-          <Route path="/recompensas" element={<AuthGuard><TermsGuard><Recompensas /></TermsGuard></AuthGuard>} />
-          <Route path="/chat" element={<AuthGuard><TermsGuard><LazyAIChat /></TermsGuard></AuthGuard>} />
-          <Route path="/teacher-chat" element={<AuthGuard><TermsGuard><LazyTeacherStudentChat /></TermsGuard></AuthGuard>} />
-          <Route path="/strava-callback" element={<StravaCallback />} />
+      {/* Rotas que requerem assinatura ativa */}
+      <Route path="/exames-medicos" element={<AuthGuard><TermsGuard><SubscriptionGuard><LazyExames /></SubscriptionGuard></TermsGuard></AuthGuard>} />
+      <Route path="/fotos-progresso" element={<AuthGuard><TermsGuard><SubscriptionGuard><LazyFotos /></SubscriptionGuard></TermsGuard></AuthGuard>} />
+      <Route path="/avaliacoes-fisicas" element={<AuthGuard><TermsGuard><SubscriptionGuard><LazyAvaliacoes /></SubscriptionGuard></TermsGuard></AuthGuard>} />
+
+      {/* Configurações sempre acessíveis (para ver status do plano) */}
+      <Route path="/configuracoes" element={<AuthGuard><TermsGuard><LazySettings /></TermsGuard></AuthGuard>} />
+      <Route path="/conta-seguranca" element={<AuthGuard><TermsGuard><ContaSeguranca /></TermsGuard></AuthGuard>} />
+      <Route path="/assinaturas-planos" element={<AuthGuard><TermsGuard><AssinaturasPlanos /></TermsGuard></AuthGuard>} />
+      <Route path="/conexoes-saude" element={<AuthGuard><TermsGuard><HealthConnectionsScreen onBack={() => window.history.back()} /></TermsGuard></AuthGuard>} />
+      <Route path="/wellness-history" element={<AuthGuard><TermsGuard><WellnessHistoryPage /></TermsGuard></AuthGuard>} />
+
+      {/* Rotas que requerem assinatura ativa */}
+      <Route path="/agenda" element={<AuthGuard><TermsGuard><SubscriptionGuard><LazyAgenda /></SubscriptionGuard></TermsGuard></AuthGuard>} />
+      <Route path="/metas" element={<AuthGuard><TermsGuard><SubscriptionGuard><LazyMetas /></SubscriptionGuard></TermsGuard></AuthGuard>} />
+
+      {/* Chats permitidos para suporte */}
+      <Route path="/teacher-chat" element={<AuthGuard><TermsGuard><LazyTeacherStudentChat /></TermsGuard></AuthGuard>} />
 
 
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </GamificationIntegrator>
-    </GamificationProvider>
+
+      <Route path="*" element={<NotFound />} />
+    </Routes>
   );
 };
 

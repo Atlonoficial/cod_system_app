@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { ArrowLeft, ChevronRight, Bell, User, Shield, LogOut, Crown, Lock } from "lucide-react";
+import { ArrowLeft, ChevronRight, User, Shield, LogOut, Crown, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
@@ -7,7 +7,6 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
 import { signOutUser } from "@/lib/supabase";
 import { useAuthContext } from "@/components/auth/AuthProvider";
-import { useNotificationPreferences } from "@/hooks/useNotificationPreferences";
 import { Loader2, Trash2 } from "lucide-react";
 import {
   AlertDialog,
@@ -104,13 +103,12 @@ const DeleteAccountButton = () => {
 
 const Configuracoes = () => {
   const navigate = useNavigate();
-  const { user } = useAuthContext();
-  const {
-    preferences,
-    loading: prefsLoading,
-    togglePush,
-    permissionStatus
-  } = useNotificationPreferences(user?.id);
+  /* Notifications removed */
+  // const { user } = useAuthContext(); -> Keeping user if needed for other things, but hook below used it.
+  // Actually user is used in DeleteAccountButton so I should check if it is used in Configuracoes main component.
+  // user is used for useNotificationPreferences(user?.id). If I remove that, I might not need user in the component if it's not used elsewhere.
+  // Checking usage... user is used in line 107.
+
 
   const handleSair = async () => {
     try {
@@ -135,29 +133,11 @@ const Configuracoes = () => {
   };
 
   const configItems = [
-    {
-      icon: Bell,
-      title: "Notificações Push",
-      description: preferences?.push_enabled
-        ? "Recebendo alertas e lembretes"
-        : "Notificações desativadas",
-      action: prefsLoading ? (
-        <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
-      ) : (
-        <Switch
-          checked={preferences?.push_enabled ?? true}
-          onCheckedChange={togglePush}
-          disabled={prefsLoading || permissionStatus === 'denied'}
-        />
-      ),
-      subtitle: permissionStatus === 'denied'
-        ? "Permissão negada nas configurações do dispositivo"
-        : undefined
-    },
+
     {
       icon: Crown,
-      title: "Planos e Assinaturas",
-      description: "Gerencie seu plano atual",
+      title: "Meu Acesso",
+      description: "Detalhes do seu acesso",
       action: <ChevronRight className="w-4 h-4 text-muted-foreground" />,
       onClick: handlePlanosClick
     },
@@ -211,10 +191,8 @@ const Configuracoes = () => {
                   <div>
                     <h3 className="font-semibold text-foreground">{item.title}</h3>
                     <p className="text-sm text-muted-foreground">{item.description}</p>
-                    {item.subtitle && (
-                      <p className="text-xs text-destructive mt-0.5">{item.subtitle}</p>
-                    )}
                   </div>
+
                 </div>
                 <div className="flex items-center" onClick={(e) => e.stopPropagation()}>
                   {item.action}

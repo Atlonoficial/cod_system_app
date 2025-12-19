@@ -1,4 +1,4 @@
-import { useGamificationActions } from "@/hooks/useRealtimeGamification";
+
 import { toast } from "sonner";
 
 /**
@@ -6,17 +6,15 @@ import { toast } from "sonner";
  * Integrado com sistema de gamificação mais robusto
  */
 export const useProgressActions = () => {
-  const { awardProgressPoints } = useGamificationActions();
+
 
   const logProgress = async (type: string, value: number, unit: string) => {
     try {
       // Aqui você faria o registro do progresso no banco de dados
       console.log(`Registering progress: ${type} = ${value} ${unit}`);
-      
+
       // Dar pontos automaticamente com metadata mais detalhada
-      await awardProgressPoints(type);
-      
-      toast.success("Progresso registrado! Você ganhou pontos!");
+      toast.success("Progresso registrado!");
     } catch (error) {
       console.error('Error logging progress:', error);
       toast.error("Erro ao registrar progresso");

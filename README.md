@@ -1,4 +1,4 @@
-# Shape Pro - Personal Training App 🏋️‍♂️
+# Student App White Label 🏋️‍♂️
 
 > **Aplicativo completo de personal training com React + TypeScript + Supabase**
 
@@ -31,7 +31,6 @@ npx cap open ios       # Xcode
 
 ### **Primeiro Setup:**
 ```bash
-# Após exportar projeto do Lovable
 npm install
 npx cap add android
 npx cap add ios
@@ -44,4 +43,4 @@ npx cap sync
 
 ---
 
-**Shape Pro - Ready for Android Studio & Xcode**
+**Student App - Ready for Android Studio & Xcode**

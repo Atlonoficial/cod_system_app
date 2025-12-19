@@ -1,26 +1,44 @@
 import { useState, useCallback } from "react";
-import { Search, Filter, Loader2, ArrowLeft } from "lucide-react";
+import { Search, Filter, Loader2, ArrowLeft, ShieldAlert } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useWorkouts } from "@/hooks/useWorkouts";
 import { useAuth } from "@/hooks/useAuth";
 import { useHapticFeedback } from "@/hooks/useHapticFeedback";
+import { useActiveSubscription } from "@/hooks/useActiveSubscription";
+import { useWellnessCheckin } from "@/hooks/useWellnessCheckin";
+import { useWorkoutHistory } from "@/hooks/useWorkoutHistory";
 import { WorkoutCard } from "./WorkoutCard";
 import { WorkoutDetail } from "./WorkoutDetail";
 import { ExerciseDetail } from "./ExerciseDetail";
-import { WorkoutSession } from "./WorkoutSession";
+import { WorkoutSessionCOD } from "./WorkoutSessionCOD";
+import { WellnessCheckinModal } from "@/components/wellness/WellnessCheckinModal";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 type ViewState = 'list' | 'detail' | 'exercise' | 'session';
 
 export const Workouts = () => {
   const { user } = useAuth();
   const { workouts, loading } = useWorkouts();
-  const { light: hapticLight, success: hapticSuccess } = useHapticFeedback();
+  const { isExpired, loading: subLoading } = useActiveSubscription();
+  const { isCompletedToday } = useWorkoutHistory();
+  const { light: hapticLight, success: hapticSuccess, error: hapticError } = useHapticFeedback();
   const navigate = useNavigate();
   const [currentView, setCurrentView] = useState<ViewState>('list');
   const [selectedWorkout, setSelectedWorkout] = useState<any>(null);
   const [selectedExercise, setSelectedExercise] = useState<any>(null);
+
+  // COD System - Check if wellness check-in is needed (moved to top to follow React hooks rules)
+  const { needsCheckin, tableExists: codTablesExist } = useWellnessCheckin();
+  const [showWellnessModal, setShowWellnessModal] = useState(false);
 
   // Muscle groups derived from workout data - extract from sessions and exercises
   const muscleGroups = ["Todos", ...Array.from(new Set(
@@ -59,12 +77,15 @@ export const Workouts = () => {
   };
 
   const handleWorkoutSelect = useCallback((workout: any) => {
+    // Logic moved to Blocking Modal - REMOVED for App Store Compliance
+    // if (isExpired) return;
+
     hapticLight();
     const mapped = mapWorkout(workout);
     setSelectedWorkout(mapped);
     setSelectedExercise(null);
     setCurrentView('detail');
-  }, [hapticLight]);
+  }, [hapticLight, hapticError]);
 
   const handleExerciseSelect = useCallback((exercise: any) => {
     setSelectedExercise(exercise);
@@ -77,16 +98,26 @@ export const Workouts = () => {
 
   // Helpers to map Supabase workout to UI shape
   const difficultyPt = (d?: string) => d === 'beginner' ? 'Iniciante' : d === 'intermediate' ? 'Intermediário' : d === 'advanced' ? 'Avançado' : 'Geral';
-  const mapExercises = (exs: any[] = []) => exs.map((ex: any, idx: number) => ({
-    id: idx + 1,
-    name: ex.name || `Exercício ${idx + 1}`,
-    type: ex.type || 'Força',
-    sets: ex.sets ? String(ex.sets) : undefined,
-    reps: ex.reps ? String(ex.reps) : undefined,
-    duration: ex.duration ? `${ex.duration} seg` : undefined,
-    rest: ex.rest || ex.rest_time ? `${ex.rest || ex.rest_time}s` : '60s',
-    description: ex.description || ex.instructions || ''
-  }));
+  const mapExercises = (exs: any[] = []) => exs.map((ex: any, idx: number) => {
+    const type = ex.type || ex.category || 'Força';
+    const fallbackName = `Exercício #${idx + 1} (${type})`;
+
+    return {
+      id: idx + 1,
+      name: ex.name || ex.exercise || ex.exerciseName || fallbackName,
+      type: type,
+      sets: ex.sets || 3,
+      reps: ex.reps || '12',
+      rest: ex.rest_seconds || ex.rest_time || '60',
+      load: ex.load_kg || ex.weight || 0,
+      video_url: ex.video_url, // Consistent with other components
+      instructions: ex.notes || ex.instructions,
+      description: ex.description || ex.instructions || '',
+      muscle_groups: ex.muscle_groups || [],
+      rest_seconds: ex.rest_seconds || ex.rest_time || 60
+    };
+  });
+
   const mapWorkout = (w: any) => ({
     id: w.id,
     name: w.name,
@@ -137,6 +168,15 @@ export const Workouts = () => {
     setSelectedExercise(null);
   }, []);
 
+  // Intercept workout start if check-in needed (only if COD System is active)
+  const handleCODStartWorkout = useCallback(() => {
+    if (codTablesExist && needsCheckin) {
+      setShowWellnessModal(true);
+    } else {
+      setCurrentView('session');
+    }
+  }, [needsCheckin, codTablesExist]);
+
   if (loading) {
     return (
       <div className="p-4 pt-8 pb-safe-4xl flex items-center justify-center min-h-96">
@@ -148,10 +188,12 @@ export const Workouts = () => {
     );
   }
 
+
+
   // Renderização condicional baseada no estado atual
   if (currentView === 'session' && selectedWorkout) {
     return (
-      <WorkoutSession
+      <WorkoutSessionCOD
         workout={selectedWorkout}
         onFinish={handleFinishWorkout}
         onExit={handleBackToList}
@@ -165,19 +207,29 @@ export const Workouts = () => {
         exercise={selectedExercise}
         workout={selectedWorkout}
         onBack={handleBackToDetail}
-        onStartExercise={handleStartWorkout}
+        onStartExercise={handleCODStartWorkout}
       />
     );
   }
 
   if (currentView === 'detail' && selectedWorkout) {
     return (
-      <WorkoutDetail
-        workout={selectedWorkout}
-        onBack={handleBackToList}
-        onStartWorkout={handleStartWorkout}
-        onExerciseSelect={handleExerciseSelect}
-      />
+      <>
+        <WorkoutDetail
+          workout={selectedWorkout}
+          onBack={handleBackToList}
+          onStartWorkout={handleCODStartWorkout}
+          onExerciseSelect={handleExerciseSelect}
+        />
+        {/* COD System - Wellness Check-in Modal */}
+        <WellnessCheckinModal
+          isOpen={showWellnessModal}
+          onComplete={() => {
+            setShowWellnessModal(false);
+            setCurrentView('session');
+          }}
+        />
+      </>
     );
   }
 
@@ -263,7 +315,7 @@ export const Workouts = () => {
               difficulty={difficultyPt(workout.difficulty)}
               calories={estimateCalories(workout)}
               muscleGroup={getWorkoutMuscleGroups(workout).join(', ') || 'Geral'}
-              isCompleted={workout.sessions && workout.sessions.length > 0}
+              isCompleted={isCompletedToday(workout.id)}
               onClick={() => handleWorkoutSelect(workout)}
             />
           ))}

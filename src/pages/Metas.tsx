@@ -1,4 +1,4 @@
-import { Target, TrendingUp, Award, Plus, ArrowLeft } from "lucide-react";
+import { Target, TrendingUp, Plus, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -6,11 +6,10 @@ import { useNavigate } from "react-router-dom";
 import { useGoals } from "@/hooks/useGoals";
 import { AddGoalDialog } from "@/components/goals/AddGoalDialog";
 import { UpdateProgressDialog } from "@/components/goals/UpdateProgressDialog";
-import { useGamificationContext } from "@/components/gamification/GamificationProvider";
 
 const categoryColors: Record<string, string> = {
   peso: "success",
-  cardio: "primary", 
+  cardio: "primary",
   forca: "warning",
   frequencia: "accent",
   general: "secondary"
@@ -19,7 +18,7 @@ const categoryColors: Record<string, string> = {
 const categoryLabels: Record<string, string> = {
   peso: "Peso",
   cardio: "Cardio",
-  forca: "Força", 
+  forca: "Força",
   frequencia: "Frequência",
   general: "Geral"
 };
@@ -27,30 +26,28 @@ const categoryLabels: Record<string, string> = {
 export const Metas = () => {
   const navigate = useNavigate();
   const { goals, loading, getGoalStats } = useGoals();
-  const { userPoints, achievements = [], userAchievements = [] } = useGamificationContext();
 
   const stats = getGoalStats();
   const activeGoals = goals.filter(goal => goal.status === 'active');
-  const recentAchievements = userAchievements.slice(0, 3);
 
   const estatisticas = [
-    { 
-      label: "Metas Ativas", 
-      valor: stats.activeGoals.toString(), 
-      icone: Target, 
-      cor: "primary" 
+    {
+      label: "Metas Ativas",
+      valor: stats.activeGoals.toString(),
+      icone: Target,
+      cor: "primary"
     },
-    { 
-      label: "Conquistas", 
-      valor: userAchievements.length.toString(), 
-      icone: Award, 
-      cor: "warning" 
+    {
+      label: "Concluídas",
+      valor: stats.completedGoals?.toString() || "0",
+      icone: Target,
+      cor: "warning"
     },
-    { 
-      label: "Progresso Médio", 
-      valor: `${stats.averageProgress}%`, 
-      icone: TrendingUp, 
-      cor: "success" 
+    {
+      label: "Progresso Médio",
+      valor: `${stats.averageProgress}%`,
+      icone: TrendingUp,
+      cor: "success"
     }
   ];
 
@@ -125,7 +122,7 @@ export const Metas = () => {
           <h3 className="text-lg font-semibold text-foreground">Metas Ativas</h3>
           <span className="text-sm text-muted-foreground">{activeGoals.length} metas</span>
         </div>
-        
+
         {activeGoals.length === 0 ? (
           <Card className="card-gradient p-8 text-center border border-border/50">
             <Target size={48} className="mx-auto mb-4 text-muted-foreground" />
@@ -144,7 +141,7 @@ export const Metas = () => {
           activeGoals.map((meta) => {
             const cor = categoryColors[meta.category] || "primary";
             const categoria = categoryLabels[meta.category] || meta.category;
-            
+
             return (
               <Card key={meta.id} className="card-gradient p-6 border border-border/50">
                 <div className="flex items-start justify-between mb-4">
@@ -159,15 +156,15 @@ export const Metas = () => {
                     <Target size={20} className="text-white" />
                   </div>
                 </div>
-                
+
                 <div className="space-y-3">
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-muted-foreground">Progresso</span>
                     <span className="font-medium text-foreground">{Math.round(meta.progress_percentage)}%</span>
                   </div>
-                  
+
                   <Progress value={meta.progress_percentage} className="h-2" />
-                  
+
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-muted-foreground">
                       {meta.current_value} / {meta.target_value} {meta.target_unit}
@@ -179,12 +176,12 @@ export const Metas = () => {
                     )}
                   </div>
                 </div>
-                
+
                 <div className="flex gap-2 mt-4">
                   <Button size="sm" variant="outline" className="flex-1">
                     Editar
                   </Button>
-                  <UpdateProgressDialog 
+                  <UpdateProgressDialog
                     goal={meta}
                     trigger={
                       <Button size="sm" className="btn-primary flex-1">
@@ -199,40 +196,6 @@ export const Metas = () => {
         )}
       </div>
 
-      {/* Conquistas Recentes */}
-      {recentAchievements.length > 0 && (
-        <div className="mt-8">
-          <h3 className="text-lg font-semibold text-foreground mb-4">Conquistas Recentes</h3>
-          
-          <div className="space-y-3">
-            {recentAchievements.map((conquista, index) => (
-              <Card key={index} className="card-gradient p-4 border border-border/50">
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 bg-gradient-to-br from-warning to-warning/80 rounded-full flex items-center justify-center">
-                    <Award size={16} className="text-white" />
-                  </div>
-                  
-                  <div className="flex-1">
-                    <h4 className="font-medium text-foreground">
-                      {conquista.achievement?.title || 'Conquista'}
-                    </h4>
-                    <p className="text-sm text-muted-foreground">
-                      +{conquista.points_earned} pontos
-                    </p>
-                  </div>
-                  
-                  <div className="text-right">
-                    <span className="text-xs text-muted-foreground">
-                      {new Date(conquista.earned_at).toLocaleDateString('pt-BR')}
-                    </span>
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
-        </div>
-      )}
-
       {/* Dica Motivacional */}
       <Card className="card-gradient p-4 mt-6 border border-primary/20">
         <div className="flex items-center gap-3">
@@ -240,9 +203,9 @@ export const Metas = () => {
             <span className="text-sm">💡</span>
           </div>
           <div>
-            <h4 className="font-medium text-foreground">Dica do Coach</h4>
+            <h4 className="font-medium text-foreground">Dica de Progresso</h4>
             <p className="text-sm text-muted-foreground">
-              {activeGoals.length === 0 
+              {activeGoals.length === 0
                 ? "Defina metas específicas e mensuráveis. O progresso acontece um passo de cada vez!"
                 : "Continue firme! Atualize seu progresso regularmente para manter a motivação em alta!"
               }

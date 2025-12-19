@@ -1,4 +1,4 @@
-import { ShapeProLogo } from '@/components/ui/ShapeProLogo';
+import { AppLogo } from '@/components/ui/AppLogo';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { ReactNode } from 'react';
 
@@ -15,8 +15,8 @@ export const AuthLayout = ({ children, title, description }: AuthLayoutProps) =>
         <CardHeader className="text-center">
           <div className="mb-6">
             <img
-              src="/lovable-uploads/11efc078-c8bc-4ac4-9d94-1e18b4e6a54d.png"
-              alt="Shape Pro - Consultoria Online"
+              src="/cod-logo.png"
+              alt="COD System"
               className="h-16 w-auto mx-auto"
             />
           </div>

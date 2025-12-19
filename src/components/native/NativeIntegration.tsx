@@ -6,7 +6,7 @@ import { Keyboard } from '@capacitor/keyboard';
 import { logger } from '@/lib/logger';
 
 /**
- * Shape Pro - Native Integration Component
+ * COD SYSTEM - Native Integration Component
  * Gerencia todas as integrações nativas do Capacitor
  */
 export const NativeIntegration = () => {
@@ -43,7 +43,7 @@ export const NativeIntegration = () => {
 
   const configureStatusBar = async () => {
     try {
-      // Set dark status bar for Shape Pro dark theme
+      // Set dark status bar for COD SYSTEM dark theme
       await StatusBar.setStyle({ style: Style.Dark });
       await StatusBar.setBackgroundColor({ color: '#000000' });
       await StatusBar.show();

@@ -39,17 +39,17 @@ export const ProfileStats = ({ points, sessionsCount, activeDays, loading = fals
           </div>
         </CardContent>
       </Card>
-      
+
       <Card>
         <CardContent className="p-4 flex items-center gap-3">
           <Trophy className="w-5 h-5 text-warning" />
           <div>
             <p className="text-xs text-muted-foreground">Pontos Totais</p>
-            <p className="text-lg font-semibold text-foreground">{points.toLocaleString("pt-BR")}</p>
+            <p className="text-lg font-semibold text-foreground">{(points || 0).toLocaleString("pt-BR")}</p>
           </div>
         </CardContent>
       </Card>
-      
+
       <Card>
         <CardContent className="p-4 flex items-center gap-3">
           <CalendarDays className="w-5 h-5 text-primary" />

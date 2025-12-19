@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Settings as SettingsIcon, Bell, Moon, Shield, HelpCircle, Info, ChevronRight } from "lucide-react";
+import { Settings as SettingsIcon, Moon, Shield, HelpCircle, Info, ChevronRight } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { HelpCenter } from "./HelpCenter";
@@ -8,14 +8,7 @@ import { TermsOfService } from "./TermsOfService";
 import { StravaIntegrationSettings } from "./StravaIntegrationSettings";
 
 const settingsCategories = [
-  {
-    title: "Notificações",
-    items: [
-      { id: "workouts", label: "Lembretes de Treino", description: "Receber notificações de treinos", type: "toggle", value: true },
-      { id: "meals", label: "Lembretes de Refeições", description: "Alertas para horários de refeição", type: "toggle", value: true },
-      { id: "progress", label: "Atualizações de Progresso", description: "Notificações sobre conquistas", type: "toggle", value: false },
-    ]
-  },
+
   {
     title: "Aparência",
     items: [
@@ -87,11 +80,11 @@ export const Settings = () => {
       <div className="space-y-6">
         {/* Strava Integration */}
         <StravaIntegrationSettings />
-        
+
         {settingsCategories.map((category, categoryIndex) => (
           <div key={categoryIndex}>
             <h3 className="text-lg font-semibold text-foreground mb-3">{category.title}</h3>
-            
+
             <div className="space-y-2">
               {category.items.map((item) => (
                 <Card key={item.id} className="card-gradient">
@@ -108,7 +101,7 @@ export const Settings = () => {
                           <p className="text-sm text-muted-foreground">{item.description}</p>
                         </div>
                       </div>
-                      
+
                       <div className="flex items-center gap-2">
                         {item.type === 'toggle' && (
                           <Switch
@@ -117,7 +110,7 @@ export const Settings = () => {
                             className="data-[state=checked]:bg-primary"
                           />
                         )}
-                        
+
                         {item.type === 'navigation' && (
                           <button
                             onClick={() => {
@@ -142,7 +135,7 @@ export const Settings = () => {
       {/* App Version */}
       <Card className="mt-6 card-gradient">
         <CardContent className="p-4 text-center">
-          <p className="text-sm text-muted-foreground">Shape Pro v2.1.0</p>
+          <p className="text-sm text-muted-foreground">COD SYSTEM v2.1.0</p>
           <p className="text-xs text-muted-foreground mt-1">Última atualização: Janeiro 2024</p>
         </CardContent>
       </Card>

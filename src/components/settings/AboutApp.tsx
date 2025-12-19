@@ -27,7 +27,7 @@ export const AboutApp = ({ onBack }: AboutAppProps) => {
         <div className="w-20 h-20 bg-gradient-primary rounded-2xl mx-auto mb-4 flex items-center justify-center">
           <Heart className="w-10 h-10 text-white" />
         </div>
-        <h2 className="text-2xl font-bold text-foreground mb-2">Shape Pro</h2>
+        <h2 className="text-2xl font-bold text-foreground mb-2">COD SYSTEM</h2>
         <p className="text-muted-foreground mb-2">Versão 2.1.0</p>
         <p className="text-sm text-muted-foreground">Seu companheiro de fitness</p>
       </div>
@@ -35,11 +35,11 @@ export const AboutApp = ({ onBack }: AboutAppProps) => {
       {/* App Description */}
       <Card className="card-gradient mb-6">
         <CardContent className="p-6">
-          <h3 className="text-lg font-semibold text-foreground mb-3">Sobre o Shape Pro</h3>
+          <h3 className="text-lg font-semibold text-foreground mb-3">Sobre o COD SYSTEM</h3>
           <p className="text-muted-foreground mb-4">
-            O Shape Pro é seu aplicativo completo para fitness e bem-estar. 
-            Desenvolvido para ajudar você a alcançar seus objetivos de saúde 
-            com treinos personalizados, nutrição inteligente e acompanhamento 
+            O COD SYSTEM é seu aplicativo completo para fitness e bem-estar.
+            Desenvolvido para ajudar você a alcançar seus objetivos de saúde
+            com treinos personalizados, nutrição inteligente e acompanhamento
             de progresso.
           </p>
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
@@ -58,11 +58,10 @@ export const AboutApp = ({ onBack }: AboutAppProps) => {
       {/* Features */}
       <div className="space-y-4 mb-6">
         <h3 className="text-lg font-semibold text-foreground">Recursos Principais</h3>
-        
+
         {[
           { title: "Treinos Personalizados", desc: "Exercícios adaptados ao seu nível" },
           { title: "Nutrição Inteligente", desc: "Planos alimentares balanceados" },
-          { title: "Coach IA", desc: "Assistente virtual 24/7" },
           { title: "Progresso Detalhado", desc: "Acompanhe sua evolução" },
           { title: "Comunidade", desc: "Conecte-se com outros usuários" }
         ].map((feature, index) => (
@@ -83,7 +82,7 @@ export const AboutApp = ({ onBack }: AboutAppProps) => {
             <h4 className="font-medium text-foreground">Informações Legais</h4>
           </div>
           <div className="space-y-2 text-sm text-muted-foreground">
-            <p>© 2024 Shape Pro. Todos os direitos reservados.</p>
+            <p>© 2024 COD SYSTEM. Todos os direitos reservados.</p>
             <p>Última atualização: Janeiro 2024</p>
             <p>Desenvolvido com ❤️ para sua saúde</p>
           </div>

@@ -5,8 +5,8 @@ import { Capacitor } from '@capacitor/core';
 import { capacitorStorage } from '@/lib/capacitorStorage';
 import { logger } from '@/lib/logger';
 
-const SUPABASE_URL = "https://bqbopkqzkavhmenjlhab.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJxYm9wa3F6a2F2aG1lbmpsaGFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ5MjEwMTQsImV4cCI6MjA3MDQ5NzAxNH0.AeqAVWHVqyAn7wxNvHeuQFkJREHUTB9fZP22qpv73d0";
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
@@ -21,26 +21,26 @@ export const getSupabase = () => {
   if (!_supabaseInstance) {
     // ✅ BUILD 51: Logging detalhado incluindo fallback mode
     const usingFallback = isNativePlatform && !capacitorStorage.initialized;
-    
+
     logger.info('Supabase Client', 'Creating client instance', {
       isNativePlatform,
       storageInitialized: isNativePlatform ? capacitorStorage.initialized : 'N/A (web)',
       fallbackMode: usingFallback,
       timestamp: Date.now()
     });
-    
+
     // ✅ BUILD 51: SEMPRE permitir criação (usar localStorage como fallback)
     if (usingFallback) {
       logger.warn('Supabase Client', '⚠️ Using localStorage fallback (storage not ready)', {
         hint: 'Storage will be migrated in background'
       });
     }
-    
+
     // ✅ BUILD 51: Decidir storage baseado na disponibilidade
-    const storage = (isNativePlatform && capacitorStorage.initialized) 
-      ? capacitorStorage 
+    const storage = (isNativePlatform && capacitorStorage.initialized)
+      ? capacitorStorage
       : localStorage;
-    
+
     _supabaseInstance = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
       auth: {
         storage, // ✅ localStorage ou capacitorStorage (o que estiver pronto)
@@ -58,20 +58,20 @@ export const getSupabase = () => {
       },
       global: {
         headers: {
-          'X-Client-Info': 'shape-pro-mobile/1.0',
+          'X-Client-Info': 'cood-system-app/1.0',
           'X-Platform': isNativePlatform ? 'capacitor' : 'web',
         },
       },
     });
-    
+
     logger.info('Supabase Client', 'Client created successfully');
-    
+
     // ✅ FASE 5: Request interceptor for detailed logging (dev only)
     if (import.meta.env.DEV) {
       const originalFetch = window.fetch;
       window.fetch = async (...args) => {
         const url = args[0]?.toString() || '';
-        
+
         // Log only Supabase requests
         if (url.includes('supabase.co')) {
           console.log('🌐 Supabase Request:', {
@@ -80,10 +80,10 @@ export const getSupabase = () => {
             timestamp: new Date().toISOString()
           });
         }
-        
+
         try {
           const response = await originalFetch(...args);
-          
+
           if (url.includes('supabase.co') && !response.ok) {
             console.error('❌ Supabase Response Error:', {
               url: url.replace(/apikey=[^&]+/, 'apikey=***'),
@@ -91,7 +91,7 @@ export const getSupabase = () => {
               statusText: response.statusText
             });
           }
-          
+
           return response;
         } catch (error: any) {
           if (url.includes('supabase.co')) {
@@ -105,7 +105,7 @@ export const getSupabase = () => {
       };
     }
   }
-  
+
   return _supabaseInstance;
 };
 

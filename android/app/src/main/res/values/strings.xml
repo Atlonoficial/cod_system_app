@@ -1,11 +1,11 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Shape Pro</string>
-    <string name="title_activity_main">Shape Pro</string>
-    <string name="package_name">com.atlontech.shapepro.aluno</string>
-    <string name="custom_url_scheme">com.atlontech.shapepro.aluno</string>
+    <string name="app_name">[APP_NAME]</string>
+    <string name="title_activity_main">[APP_NAME]</string>
+    <string name="package_name">com.yourcompany.studentapp</string>
+    <string name="custom_url_scheme">com.yourcompany.studentapp</string>
     
     <!-- OneSignal App ID -->
-    <string name="onesignal_app_id">be1bd1f4-bd4f-4dc9-9c33-7b9f7fe5dc82</string>
+    <string name="onesignal_app_id">your_onesignal_app_id</string>
     <string name="onesignal_google_project_number">DO_NOT_CHANGE</string>
 </resources>

@@ -16,12 +16,12 @@ const maybeServer =
     : {};
 
 const config: CapacitorConfig = {
-  appId: "com.atlontech.shapepro.aluno",
-  appName: "Shape Pro",
+  appId: "com.atlontech.codsystem.app",
+  appName: "COD SYSTEM",
   webDir: "dist",
   bundledWebRuntime: false,
   backgroundColor: "#000000",
-  version: "4.0.1", // ✅ BUILD 54: Fix botão Iniciar Treino e bottom nav móvel
+  version: "1.0.0",
 
   // Em PROD/CI não terá server.url
   ...maybeServer,
@@ -31,25 +31,24 @@ const config: CapacitorConfig = {
     cleartext: true,
     allowNavigation: [
       'https://bqbopkqzkavhmenjlhab.supabase.co',
-      'https://www.strava.com',
+
       '*.lovableproject.com',
       'https://*.lovable.app'
     ]
   },
 
   deepLinkingConfig: {
-    customURLScheme: 'shapepro'
+    customURLScheme: 'codsystem'
   },
 
   ios: {
-    scheme: "shapepro",
+    scheme: "codsystem",
     contentInset: "automatic",
     backgroundColor: "#000000",
     allowsLinkPreview: false,
     handleApplicationNotifications: false,
-    // ✅ BUILD 66: Fix botão Iniciar Treino e bottom nav móvel
-    CFBundleVersion: '66',
-    CFBundleShortVersionString: "4.0.1",
+    CFBundleVersion: '1',
+    CFBundleShortVersionString: "1.0.0",
 
     // Tudo aqui vira Info.plist do app (garantido a cada build)
     plist: {
@@ -90,8 +89,8 @@ const config: CapacitorConfig = {
       UILaunchStoryboardName: "LaunchScreen",
 
       // *** Versões (garantem sincronização em todos os builds)
-      CFBundleShortVersionString: "4.0.1",
-      CFBundleVersion: "67", // ✅ BUILD 67: Fix save errors and update build
+      CFBundleShortVersionString: "1.0.0",
+      CFBundleVersion: "1",
 
       // ---- OneSignal App ID ----
       OneSignal_app_id: "be1bd1f4-bd4f-4dc9-9c33-7b9f7fe5dc82",
@@ -103,13 +102,13 @@ const config: CapacitorConfig = {
     allowMixedContent: true,
     captureInput: true,
     webContentsDebuggingEnabled: false,
-    appendUserAgent: "Shape Pro/1.0",
-    overrideUserAgent: "Shape Pro/1.0 Mobile App",
+    appendUserAgent: "COD SYSTEM/1.0",
+    overrideUserAgent: "[APP_NAME]/1.0 Mobile App",
     hideLogs: true,
     cleartext: true,
     networkSecurityConfig: true,
-    versionCode: 67, // ✅ BUILD 67: Fix save errors and update build
-    versionName: "4.0.1"
+    versionCode: 1,
+    versionName: "1.0.0"
   },
 
   plugins: {
@@ -119,15 +118,15 @@ const config: CapacitorConfig = {
     PushNotifications: { presentationOptions: ["badge", "sound", "alert"] },
     SplashScreen: {
       launchAutoHide: true,
-      launchShowDuration: 0, // ✅ BUILD 24: 0ms = LoadingScreen assume imediatamente
+      launchShowDuration: 0,
       backgroundColor: "#000000",
       androidSplashResourceName: "splash",
       androidScaleType: "CENTER_CROP",
-      showSpinner: false, // ✅ Sem spinner nativo
+      showSpinner: false,
       iosSpinnerStyle: "small",
       spinnerColor: "#999999",
     },
-    Keyboard: { resize: "native", style: "dark", resizeOnFullScreen: true }, // ✅ BUILD 29: native evita resize do viewport
+    Keyboard: { resize: "native", style: "dark", resizeOnFullScreen: true },
     StatusBar: { style: "dark", backgroundColor: "#000000" },
     Camera: { permissions: ["camera", "photos"] },
   },

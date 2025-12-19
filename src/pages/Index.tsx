@@ -1,26 +1,14 @@
-
 import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { MobileContainer } from "@/components/layout/MobileContainer";
-import { BottomNavigation } from "@/components/layout/BottomNavigation";
+import { AppLayout } from "@/components/layout/AppLayout";
 import { Dashboard } from "@/components/dashboard/Dashboard";
 import { Workouts } from "@/components/workouts/Workouts";
-import { Nutrition } from "@/components/nutrition/Nutrition";
 import { Profile } from "@/components/profile/Profile";
-import { Members } from "@/components/members/Members";
-import { GamificationDashboard } from "@/components/gamification/GamificationDashboard";
-import { NotificationPermissionPrompt } from "@/components/notifications/NotificationPermissionPrompt";
-import { useGamificationIntegration } from "@/hooks/useGamificationIntegration";
-import { useGamificationStravaIntegration } from "@/hooks/useGamificationStravaIntegration";
 
 const Index = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('home');
-
-  // Integração automática de gamificação
-  useGamificationIntegration();
-  useGamificationStravaIntegration();
 
   useEffect(() => {
     const tab = searchParams.get('tab');
@@ -28,10 +16,6 @@ const Index = () => {
       setActiveTab(tab);
     }
   }, [searchParams]);
-
-  const handleCoachClick = () => {
-    navigate('/chat');
-  };
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
@@ -42,49 +26,34 @@ const Index = () => {
   };
 
   const renderContent = () => {
-    const content = (() => {
-      switch (activeTab) {
-        case 'home':
-          return <Dashboard onCoachClick={handleCoachClick} onWorkoutClick={handleWorkoutClick} />;
-        case 'workouts':
-          return <Workouts />;
-        case 'nutrition':
-          return <Nutrition />;
-        case 'gamification':
-          return <GamificationDashboard />;
-        case 'members':
-          return <Members />;
-        case 'profile':
-          return <Profile />;
-        default:
-          return <Dashboard onCoachClick={handleCoachClick} onWorkoutClick={handleWorkoutClick} />;
-      }
-    })();
-
-    return (
-      <div
-        key={activeTab}
-        style={{ isolation: 'isolate' }}
-        className="animate-in fade-in slide-in-from-bottom-4 duration-300"
-      >
-        {content}
-      </div>
-    );
+    switch (activeTab) {
+      case 'home':
+        return <Dashboard onWorkoutClick={handleWorkoutClick} />;
+      case 'workouts':
+        return <Workouts />;
+      case 'profile':
+        return <Profile />;
+      default:
+        return <Dashboard onWorkoutClick={handleWorkoutClick} />;
+    }
   };
 
   return (
-    <>
-      <NotificationPermissionPrompt />
-      <MobileContainer key={`container-${activeTab}`}>
+    <AppLayout
+      activeTab={activeTab}
+      onTabChange={handleTabChange}
+      showHeader={true}
+      showBottomNav={true}
+    >
+      <div
+        key={activeTab}
+        className="animate-in fade-in slide-in-from-bottom-4 duration-300 p-4"
+      >
         {renderContent()}
-      </MobileContainer>
-      <BottomNavigation
-        key={`bottom-nav-${activeTab}`}
-        activeTab={activeTab}
-        onTabChange={handleTabChange}
-      />
-    </>
+      </div>
+    </AppLayout>
   );
 };
 
 export default Index;
+

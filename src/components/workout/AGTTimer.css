@@ -1,0 +1,109 @@
+/* AGT Timer Styles */
+
+.agt-timer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem;
+}
+
+/* Circular Progress */
+.timer-circle {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    margin-bottom: 1.5rem;
+}
+
+.timer-svg {
+    width: 100%;
+    height: 100%;
+    transform: scaleX(-1);
+}
+
+.progress-circle {
+    transition: stroke-dasharray 0.3s ease;
+}
+
+.timer-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.timer-time {
+    font-size: 3rem;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    display: block;
+    line-height: 1;
+    transition: color 0.3s ease;
+}
+
+.timer-label {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.6);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-top: 0.25rem;
+    display: block;
+}
+
+/* Controls */
+.timer-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.timer-btn {
+    --color: rgba(255, 255, 255, 0.7);
+}
+
+.timer-btn-main {
+    --border-radius: 50%;
+    width: 64px;
+    height: 64px;
+    font-size: 1.5rem;
+}
+
+.timer-btn-main ion-icon {
+    font-size: 1.75rem;
+}
+
+.timer-btn-complete {
+    --border-radius: 16px;
+    --background: #22c55e;
+    --padding-start: 2rem;
+    --padding-end: 2rem;
+    font-weight: 600;
+}
+
+/* Progress Bar */
+.timer-progress-bar {
+    width: 100%;
+    max-width: 280px;
+    --background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    height: 6px;
+}
+
+/* Animation for complete state */
+@keyframes pulse-complete {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+.timer-circle.complete {
+    animation: pulse-complete 1s infinite;
+}

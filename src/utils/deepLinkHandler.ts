@@ -14,33 +14,28 @@ export async function initializeDeepLinkHandler() {
 
     try {
       const urlObj = new URL(url);
-      
-      // shapepro://auth/confirm?token_hash=xxx&type=signup
+
+      // coodsystem://auth/confirm?token_hash=xxx&type=signup
       if (urlObj.pathname.includes('/auth/confirm')) {
         const params = urlObj.searchParams.toString();
         const targetUrl = `/auth/confirm?${params}`;
-        
+
         console.log('[DeepLink] ✅ Redirecting to:', targetUrl);
         window.location.href = targetUrl;
         return;
       }
 
-      // shapepro://auth/recovery?token_hash=xxx&type=recovery
+      // coodsystem://auth/recovery?token_hash=xxx&type=recovery
       if (urlObj.pathname.includes('/auth/recovery')) {
         const params = urlObj.searchParams.toString();
         const targetUrl = `/auth/recovery?${params}`;
-        
+
         console.log('[DeepLink] ✅ Redirecting to:', targetUrl);
         window.location.href = targetUrl;
         return;
       }
 
-      // shapepro://app/configuracoes (from Strava callback)
-      if (urlObj.pathname.includes('/app/configuracoes')) {
-        console.log('[DeepLink] ✅ Redirecting to settings after Strava');
-        window.location.href = '/configuracoes';
-        return;
-      }
+
 
       console.log('[DeepLink] ⚠️ Unhandled deep link:', url);
 

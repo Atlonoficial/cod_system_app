@@ -51,9 +51,8 @@ export const useWeightProgress = (userId: string) => {
           .select('*')
           .eq('user_id', userId)
           .eq('type', 'weight')
-          .gte('date', new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0])
-          .lt('date', new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1).toISOString().split('T')[0])
-          .order('date', { ascending: true });
+          .order('date', { ascending: false })
+          .limit(5);
       });
 
       if (fetchError) {
@@ -81,7 +80,7 @@ export const useWeightProgress = (userId: string) => {
             weekDay: entryDate.toLocaleDateString('pt-BR', { weekday: 'short' }),
             rawDate: entry.date // Keep original date for calculations
           };
-        });
+        }).reverse(); // Reverter para mostrar cronologicamente (antigo -> novo)
 
         console.log('📈 Formatted chart data:', formattedData);
 

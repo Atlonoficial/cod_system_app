@@ -64,22 +64,12 @@ const waitForCapacitor = async () => {
       bootHealthCheck.addStep('STEP 5: Supabase client ready');
 
       // ✅ BUILD 51: Inicializar storage EM BACKGROUND (não bloquear boot)
-      // ✅ BUILD 51: Inicializar storage EM BACKGROUND (não bloquear boot)
       // Modificado: Executar para TODAS as plataformas nativas (Android e iOS)
       setTimeout(async () => {
         try {
           logger.info('Boot', 'Background: Initializing Capacitor Storage...');
           await createCapacitorStorage();
-
-          // ✅ Migrar sessão de localStorage → Capacitor Storage
-          const storageKey = 'sb-bqbopkqzkavhmenjlhab-auth-token';
-          const session = localStorage.getItem(storageKey);
-          if (session) {
-            logger.info('Boot', 'Migrating session to Capacitor Storage');
-            // A migração acontece automaticamente no próximo setItem()
-          }
-
-          logger.info('Boot', '✅ Background: Storage initialized and migrated');
+          logger.info('Boot', '✅ Background: Storage initialized');
         } catch (err) {
           logger.warn('Boot', 'Background: Storage init failed, continuing with localStorage:', err);
         }

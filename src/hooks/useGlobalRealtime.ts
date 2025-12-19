@@ -66,15 +66,7 @@ export const useGlobalRealtime = () => {
         }
       },
 
-      // User points (crítico - gamificação tempo real)
-      {
-        table: 'user_points',
-        event: '*' as const,
-        filter: `user_id=eq.${user.id}`,
-        callback: () => {
-          window.dispatchEvent(new CustomEvent('gamification-updated'));
-        }
-      },
+
 
       // ✅ Conversations (consolidado de useUnreadMessages)
       {

@@ -1,0 +1,167 @@
+/* Set Logger Styles */
+
+.set-logger {
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+}
+
+/* Header */
+.set-logger-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.set-badge {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.target-info {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.875rem;
+}
+
+/* Input Groups */
+.input-group {
+    margin-bottom: 1.5rem;
+}
+
+.input-label {
+    display: block;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+/* Stepper Input */
+.stepper-input {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.stepper-btn {
+    --color: rgba(255, 255, 255, 0.8);
+    font-size: 1.5rem;
+}
+
+.stepper-value {
+    display: flex;
+    align-items: baseline;
+    gap: 0.25rem;
+    min-width: 100px;
+    justify-content: center;
+}
+
+.value-number {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #fff;
+    font-variant-numeric: tabular-nums;
+}
+
+.value-unit {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* Quick Adjust Buttons */
+.quick-adjust {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+}
+
+.quick-btn {
+    --border-radius: 8px;
+    --border-color: rgba(255, 255, 255, 0.2);
+    --color: rgba(255, 255, 255, 0.8);
+    font-size: 0.75rem;
+    min-width: 50px;
+}
+
+/* RPE Section */
+.rpe-group {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 1rem;
+    border-radius: 12px;
+}
+
+.rpe-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.rpe-value {
+    font-size: 3.5rem;
+    font-weight: 800;
+    line-height: 1;
+    transition: color 0.3s ease;
+}
+
+.rpe-description {
+    font-size: 0.875rem;
+    opacity: 0.9;
+    margin-top: 0.25rem;
+    transition: color 0.3s ease;
+}
+
+.rpe-slider {
+    --knob-size: 28px;
+    --knob-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.rpe-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.5);
+    margin-top: 0.25rem;
+}
+
+/* Volume Preview */
+.volume-preview {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: rgba(99, 102, 241, 0.1);
+    border-radius: 12px;
+    margin-bottom: 1rem;
+    border: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+.volume-label {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.875rem;
+}
+
+.volume-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #6366f1;
+}
+
+/* Submit Button */
+.submit-btn {
+    --border-radius: 12px;
+    --background: linear-gradient(135deg, #22c55e, #16a34a);
+    font-weight: 600;
+    font-size: 1rem;
+    height: 56px;
+}
+
+.submit-btn ion-icon {
+    font-size: 1.25rem;
+}

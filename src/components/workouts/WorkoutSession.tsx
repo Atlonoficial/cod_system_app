@@ -1,16 +1,31 @@
 import { useState, useEffect, useCallback } from "react";
-import { ArrowLeft, Pause, Play, Timer, SkipForward, Target, CheckCircle2, Trophy, MoreVertical } from "lucide-react";
+import { ArrowLeft, Pause, Play, Timer, SkipForward, Target, CheckCircle2, Trophy, MoreVertical, Flame, Clock } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+} from "@/components/ui/dialog";
 import { VideoPlayer } from "./VideoPlayer";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { useGamificationActions } from "@/hooks/useRealtimeGamification";
+
 import { toast } from "sonner";
 import { BottomNavigation } from "@/components/layout/BottomNavigation";
 import { useNavigate } from "react-router-dom";
@@ -44,7 +59,7 @@ export const WorkoutSession = ({ workout, onFinish, onExit }: WorkoutSessionProp
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { user } = useAuth();
-  const { awardWorkoutPoints } = useGamificationActions();
+
   const haptics = useHapticFeedback();
   const [time, setTime] = useState(0);
   const [isRunning, setIsRunning] = useState(true);
@@ -55,6 +70,16 @@ export const WorkoutSession = ({ workout, onFinish, onExit }: WorkoutSessionProp
   const [completedSets, setCompletedSets] = useState<Record<number, number>>({});
   const [currentSet, setCurrentSet] = useState(1);
   const [isSaving, setIsSaving] = useState(false);
+
+  // Exit confirmation and completion modal states
+  const [showExitConfirm, setShowExitConfirm] = useState(false);
+  const [showCompletionModal, setShowCompletionModal] = useState(false);
+  const [workoutStats, setWorkoutStats] = useState({
+    duration: 0,
+    totalSets: 0,
+    calories: 0
+  });
+
   const DEFAULT_REST_TIME = 60; // 60 segundos padrão
 
   const handleTabChange = useCallback((tab: string) => {
@@ -104,23 +129,63 @@ export const WorkoutSession = ({ workout, onFinish, onExit }: WorkoutSessionProp
     }
   };
 
+  // Handle exit request - show confirmation popup
+  const handleExitRequest = () => {
+    setShowExitConfirm(true);
+  };
+
+  // Handle confirmed exit - discard progress
+  const handleConfirmExit = () => {
+    setShowExitConfirm(false);
+    onExit();
+  };
+
+  // Calculate estimated calories
+  const calculateCalories = () => {
+    const totalSets = Object.values(completedSets).reduce((a, b) => a + b, 0);
+    const minutes = Math.floor(time / 60);
+    const MET = 5.0; // Average MET for strength training
+    return Math.round((MET * 70 * minutes) / 60); // Assuming 70kg avg weight
+  };
+
   const handleFinish = async () => {
     setIsRunning(false);
     setIsSaving(true);
 
     try {
       await haptics.success();
+
+      // Calculate workout stats
+      const totalSets = Object.values(completedSets).reduce((a, b) => a + b, 0);
+      const calories = calculateCalories();
+
+      setWorkoutStats({
+        duration: time,
+        totalSets: totalSets,
+        calories: calories
+      });
+
+      // Save workout session
       await saveWorkoutSession();
-      onFinish();
+
+      // Show completion modal
+      setShowCompletionModal(true);
+
+    } catch (error) {
+      console.error('Error finishing workout:', error);
+      toast.error('Erro ao salvar treino');
     } finally {
       setIsSaving(false);
     }
   };
 
-  const calculateWorkoutPoints = () => {
-    const minutes = Math.floor(time / 60);
-    return Math.min(100, 30 + minutes * 2);
+  // Handler for closing completion modal
+  const handleCloseCompletion = () => {
+    setShowCompletionModal(false);
+    onFinish();
   };
+
+
 
   const saveWorkoutSession = async () => {
     try {
@@ -170,31 +235,43 @@ export const WorkoutSession = ({ workout, onFinish, onExit }: WorkoutSessionProp
             }]);
 
           if (retryError) {
-            throw retryError;
+            console.error('Error saving workout session (retry):', retryError);
+            // Não lança erro aqui para permitir que os pontos sejam dados
+            toast.error('Erro ao salvar histórico do treino, mas seus pontos serão computados.');
           }
         } else {
-          throw error;
+          console.error('Error saving workout session:', error);
+          toast.error('Erro ao salvar histórico do treino, mas seus pontos serão computados.');
         }
       }
 
-      // Dar pontos manualmente
-      await awardWorkoutPoints(workout.name);
+      // Dar pontos manualmente - SEPARADO DO SALVAMENTO
+      try {
+        toast.success(`Treino concluído! 🎉`);
+      } catch (pointError) {
+        console.error('[WorkoutSession] Error awarding points:', pointError);
+      }
 
       // Registrar atividade diária
-      await supabase.rpc('register_daily_activity');
+      try {
+        await supabase.rpc('register_daily_activity');
+      } catch (e) {
+        console.error('Error registering daily activity:', e);
+      }
 
       // Invalidar queries para atualizar UI
       queryClient.invalidateQueries({ queryKey: ['profile-stats'] });
       queryClient.invalidateQueries({ queryKey: ['user-points'] });
       queryClient.invalidateQueries({ queryKey: ['workout-history'] });
 
-      const points = calculateWorkoutPoints();
-      toast.success(`Treino concluído! +${points} pontos 🎉`);
     } catch (error: any) {
       console.error('Error saving workout session:', error);
       toast.error(`Erro ao salvar treino: ${error.message || 'Erro de conexão'}`);
+    } finally {
+      setIsSaving(false);
     }
   };
+
 
   const currentExercise = workout.exercises[currentExerciseIndex];
 
@@ -204,8 +281,8 @@ export const WorkoutSession = ({ workout, onFinish, onExit }: WorkoutSessionProp
       <div className="flex-shrink-0 bg-gradient-to-br from-secondary to-secondary/80 p-4 pt-safe">
         <div className="flex items-center justify-between mb-4">
           <button
-            onClick={onExit}
-            className="w-10 h-10 rounded-2xl bg-background/20 backdrop-blur-sm flex items-center justify-center hover:bg-background/30 transition-colors"
+            onClick={handleExitRequest}
+            className="w-10 h-10 rounded-2xl bg-background/20 backdrop-blur-sm flex items-center justify-center hover:bg-background/30 transition-colors active:scale-95"
           >
             <ArrowLeft className="w-5 h-5 text-white" />
           </button>
@@ -289,15 +366,7 @@ export const WorkoutSession = ({ workout, onFinish, onExit }: WorkoutSessionProp
           </CardContent>
         </Card>
 
-        <Card className="bg-accent/10 border-accent/20 backdrop-blur-sm">
-          <CardContent className="p-2.5 flex items-center gap-2">
-            <Trophy className="w-4 h-4 text-yellow-500 flex-shrink-0" />
-            <div className="min-w-0">
-              <p className="text-xs text-muted-foreground leading-tight">Pontos</p>
-              <p className="text-sm font-bold leading-tight">{calculateWorkoutPoints()}</p>
-            </div>
-          </CardContent>
-        </Card>
+
       </div>
 
       {/* Conteúdo scrollável */}
@@ -574,6 +643,93 @@ export const WorkoutSession = ({ workout, onFinish, onExit }: WorkoutSessionProp
           </div>
         </div>
       </div>
+
+      {/* Exit Confirmation Dialog */}
+      <AlertDialog open={showExitConfirm} onOpenChange={setShowExitConfirm}>
+        <AlertDialogContent className="max-w-sm">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              ⚠️ Sair do Treino?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-left space-y-2">
+              <p>Se você sair agora:</p>
+              <ul className="list-disc pl-5 space-y-1">
+                <li>O treino <strong>NÃO será salvo</strong></li>
+                <li>Você não receberá pontos</li>
+                <li>Todo o progresso será perdido</li>
+              </ul>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+            <AlertDialogCancel className="w-full sm:w-auto">
+              Continuar Treino
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmExit}
+              className="w-full sm:w-auto bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Sair Mesmo Assim
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Workout Completion Modal */}
+      <Dialog open={showCompletionModal} onOpenChange={setShowCompletionModal}>
+        <DialogContent className="max-w-sm text-center">
+          <div className="py-4">
+            {/* Trophy Icon */}
+            <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center animate-bounce">
+              <Trophy className="w-10 h-10 text-white" />
+            </div>
+
+            <h2 className="text-2xl font-bold text-foreground mb-2">
+              🎉 Treino Concluído!
+            </h2>
+            <p className="text-muted-foreground mb-6">
+              Parabéns! Você completou seu treino.
+            </p>
+
+            {/* Stats Grid */}
+            <div className="grid grid-cols-3 gap-3 mb-6">
+              <div className="bg-muted/50 rounded-xl p-3">
+                <Clock className="w-5 h-5 text-primary mx-auto mb-1" />
+                <p className="text-xl font-bold text-foreground">
+                  {formatTime(workoutStats.duration)}
+                </p>
+                <p className="text-[10px] text-muted-foreground uppercase">Duração</p>
+              </div>
+              <div className="bg-muted/50 rounded-xl p-3">
+                <CheckCircle2 className="w-5 h-5 text-green-500 mx-auto mb-1" />
+                <p className="text-xl font-bold text-foreground">
+                  {workoutStats.totalSets}
+                </p>
+                <p className="text-[10px] text-muted-foreground uppercase">Séries</p>
+              </div>
+              <div className="bg-muted/50 rounded-xl p-3">
+                <Flame className="w-5 h-5 text-orange-500 mx-auto mb-1" />
+                <p className="text-xl font-bold text-foreground">
+                  ~{workoutStats.calories}
+                </p>
+                <p className="text-[10px] text-muted-foreground uppercase">kcal</p>
+              </div>
+            </div>
+
+            {/* Professor notification message */}
+            <p className="text-xs text-muted-foreground mb-4 bg-primary/10 px-3 py-2 rounded-lg">
+              ✅ Seu professor foi notificado sobre a conclusão do treino!
+            </p>
+
+            <Button
+              onClick={handleCloseCompletion}
+              className="w-full bg-gradient-to-r from-primary to-primary/80"
+            >
+              <Trophy className="w-4 h-4 mr-2" />
+              Ver Meu Progresso
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

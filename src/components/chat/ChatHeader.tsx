@@ -97,7 +97,7 @@ export const ChatHeader = ({
     // Logic to report user
     const subject = `Denúncia de Usuário: ${chatPartner} (${chatPartnerId})`;
     const body = "Por favor, descreva o motivo da denúncia:\n\n";
-    window.open(`mailto:suporte@shapepro.app?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
+    window.open(`mailto:suporte@[DOMAIN]?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
 
     toast({
       title: "Denúncia Iniciada",
@@ -156,8 +156,8 @@ export const ChatHeader = ({
 
         {connectionStatus === 'connected' && (
           <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all ${isOnline
-              ? 'border-success/30 bg-success/10 shadow-sm shadow-success/20'
-              : 'border-border bg-muted/50'
+            ? 'border-success/30 bg-success/10 shadow-sm shadow-success/20'
+            : 'border-border bg-muted/50'
             }`}>
             <div className={`w-2.5 h-2.5 rounded-full ${isOnline ? 'bg-success animate-pulse shadow-lg shadow-success/50' : 'bg-muted-foreground'
               }`} />

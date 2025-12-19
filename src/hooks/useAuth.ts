@@ -74,9 +74,17 @@ export const useAuth = () => {
             const profile = await Promise.race([profilePromise, timeoutPromise]);
 
             if (profile) {
-              profileRef.current = profile;
-              setUserProfile(profile);
-              logger.info('useAuth', '✅ Profile loaded');
+              // ✅ MERGE: Garantir que dados críticos do metadata (como aceite de termos) 
+              // tenham precedência se faltarem no banco (devido a erro de schema)
+              const mergedProfile = {
+                ...profile,
+                terms_accepted_at: profile.terms_accepted_at || newUser.user_metadata?.terms_accepted_at,
+                privacy_accepted_at: profile.privacy_accepted_at || newUser.user_metadata?.privacy_accepted_at
+              };
+
+              profileRef.current = mergedProfile;
+              setUserProfile(mergedProfile);
+              logger.info('useAuth', '✅ Profile loaded (with metadata merge)');
             } else {
               // Fallback profile
               const fallback: any = {
@@ -153,8 +161,16 @@ export const useAuth = () => {
         fetchingProfileRef.current = true;
         const profile = await getUserProfile(userRef.current.id);
         if (profile) {
-          profileRef.current = profile;
-          setUserProfile(profile);
+          // ✅ MERGE: Aplicar mesma lógica de merge do handleAuthChange
+          const mergedProfile = {
+            ...profile,
+            terms_accepted_at: profile.terms_accepted_at || userRef.current.user_metadata?.terms_accepted_at,
+            privacy_accepted_at: profile.privacy_accepted_at || userRef.current.user_metadata?.privacy_accepted_at
+          };
+
+          profileRef.current = mergedProfile;
+          setUserProfile(mergedProfile);
+          logger.info('useAuth', '✅ Profile refreshed (with metadata merge)');
         }
         fetchingProfileRef.current = false;
       }

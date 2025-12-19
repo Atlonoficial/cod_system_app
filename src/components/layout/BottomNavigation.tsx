@@ -1,4 +1,4 @@
-import { Home, Dumbbell, Apple, User, Users, Sparkles } from "lucide-react";
+import { Home, Dumbbell, User } from "lucide-react";
 import { useEffect } from "react";
 import { useKeyboardState } from "@/hooks/useKeyboardState";
 import { useBottomNavGestures } from "@/hooks/useBottomNavGestures";
@@ -7,8 +7,6 @@ import { useIsMobileApp } from "@/hooks/useIsMobileApp";
 const navItems = [
   { id: 'home', icon: Home, label: 'Início' },
   { id: 'workouts', icon: Dumbbell, label: 'Treinos' },
-  { id: 'nutrition', icon: Apple, label: 'Dieta' },
-  { id: 'members', icon: Users, label: 'Membros' },
   { id: 'profile', icon: User, label: 'Perfil' },
 ];
 

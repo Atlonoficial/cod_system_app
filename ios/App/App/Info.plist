@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>pt_BR</string>
 	<key>CFBundleDisplayName</key>
-	<string>Shape Pro</string>
+	<string>COD SYSTEM</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -17,9 +17,9 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>4.0.1</string>
+	<string>1.0.0</string>
 	<key>CFBundleVersion</key>
-	<string>67</string>
+	<string>1</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>
@@ -58,6 +58,10 @@
 	<string>Usamos sua localização apenas para enviar notificações relevantes sobre treinos próximos a você.</string>
 	<key>NSUserNotificationsUsageDescription</key>
 	<string>Este app envia notificações para lembrar sobre treinos e refeições.</string>
+	<key>NSHealthShareUsageDescription</key>
+	<string>Usamos dados do Apple Health para monitorar seu progresso de treino, passos, calorias e atividade física.</string>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>Registramos dados de exercícios concluídos para acompanhamento do seu progresso.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>
@@ -65,24 +69,25 @@
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>OneSignal_app_id</key>
-	<string>be1bd1f4-bd4f-4dc9-9c33-7b9f7fe5dc82</string>
+	<string>your_onesignal_app_id</string>
 	<key>OneSignal_APNS_Environment</key>
 	<string>production</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
 			<key>CFBundleURLName</key>
-			<string>com.getcapacitor.capacitor</string>
+			<string>com.atlontech.codsystem.app</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>capacitor</string>
-				<string>shapepro</string>
+				<string>codsystem</string>
 			</array>
 		</dict>
 	</array>
 	<key>com.apple.developer.associated-domains</key>
 	<array>
-		<string>applinks:shapepro.site</string>
+		<string>applinks:painel.metodocod.com</string>
+		<string>applinks:metodocod.com</string>
 	</array>
 </dict>
 </plist>

@@ -24,26 +24,26 @@ export default function Agenda() {
   const [selectedSlot, setSelectedSlot] = useState<AvailableSlot | null>(null);
 
   // Use the custom hooks
-  const { 
-    upcomingAppointments, 
-    pastAppointments, 
-    loading: appointmentsLoading, 
+  const {
+    upcomingAppointments,
+    pastAppointments,
+    loading: appointmentsLoading,
     cancelAppointment,
     refreshAppointments,
-    isOptimistic 
+    isOptimistic
   } = useStudentAppointments();
-  
-  const { 
-    teacherId, 
+
+  const {
+    teacherId,
     loading: teacherLoading,
     availability,
-    getWeekdayName 
+    getWeekdayName
   } = useStudentTeacherAvailability();
-  
-  const { 
-    getAvailableSlots, 
-    bookAppointment, 
-    loading: slotsLoading 
+
+  const {
+    getAvailableSlots,
+    bookAppointment,
+    loading: slotsLoading
   } = useAvailableSlots();
 
   const {
@@ -58,27 +58,27 @@ export default function Agenda() {
   } = useTeacherBookingSettings(teacherId);
 
   const loading = appointmentsLoading || teacherLoading || subscriptionLoading || bookingSettingsLoading;
-  
+
   // Use filtered appointments directly from hook (centralized logic)
   const confirmedAppointments = useMemo(() => {
     // Sort by scheduled time - hook already filters valid statuses
-    return upcomingAppointments.sort((a, b) => 
+    return upcomingAppointments.sort((a, b) =>
       new Date(a.scheduled_time).getTime() - new Date(b.scheduled_time).getTime()
     );
   }, [upcomingAppointments]);
-  
+
   const historicalAppointments = useMemo(() => {
     // Hook already separates past appointments correctly
     return pastAppointments;
   }, [pastAppointments]);
-  
+
   const nextAppointment = useMemo(() => confirmedAppointments[0] ?? null, [confirmedAppointments]);
 
   // Filter logic centralized in useStudentAppointments hook
-  
+
   // ✅ Use ref to avoid infinite loop with availability
   const availabilityRef = useRef(availability);
-  
+
   // Sync ref with availability
   useEffect(() => {
     availabilityRef.current = availability;
@@ -91,22 +91,22 @@ export default function Agenda() {
       setAvailableSlots([]);
       return;
     }
-    
+
     // ✅ Use ref to get current availability without causing re-render
     const currentAvailability = availabilityRef.current;
     const selectedWeekday = selectedDate.getDay();
-    
+
     // Tentar pegar do availability do dia específico
     const availabilityForDay = currentAvailability.find(av => av.weekday === selectedWeekday);
-    
+
     // Se não encontrar, pegar o primeiro slot_minutes disponível de qualquer dia
     const firstAvailableSlot = currentAvailability.length > 0 ? currentAvailability[0] : null;
-    
+
     // Usar: dia específico > primeiro disponível > 60 padrão
-    const slotMinutes = availabilityForDay?.slot_minutes || 
-                        firstAvailableSlot?.slot_minutes || 
-                        60;
-    
+    const slotMinutes = availabilityForDay?.slot_minutes ||
+      firstAvailableSlot?.slot_minutes ||
+      60;
+
     console.log('📅 Carregando slots:', {
       teacherId,
       date: selectedDate.toISOString(),
@@ -115,7 +115,7 @@ export default function Agenda() {
       availabilityCount: currentAvailability.length,
       availabilityForDay: !!availabilityForDay
     });
-    
+
     try {
       const slots = await getAvailableSlots(teacherId, selectedDate, slotMinutes);
       console.log('✅ Slots carregados:', slots.length);
@@ -170,16 +170,16 @@ export default function Agenda() {
   const handleOpenBookingDialog = async (slot: AvailableSlot) => {
     // Validação prévia: verificar se o slot ainda está disponível
     if (!teacherId) return;
-    
+
     try {
       // Pequeno delay para garantir sincronização
       await new Promise(resolve => setTimeout(resolve, 300));
-      
+
       const currentSlots = await getAvailableSlots(teacherId, selectedDate, slot.slot_minutes);
-      const stillAvailable = currentSlots.some(s => 
+      const stillAvailable = currentSlots.some(s =>
         s.slot_start === slot.slot_start && s.slot_end === slot.slot_end
       );
-      
+
       if (!stillAvailable) {
         toast({
           title: 'Horário não disponível',
@@ -189,7 +189,7 @@ export default function Agenda() {
         loadAvailableSlots(); // Recarrega slots
         return;
       }
-      
+
       setSelectedSlot(slot);
       setShowBookingDialog(true);
     } catch (error) {
@@ -238,13 +238,13 @@ export default function Agenda() {
       if (result) {
         setShowBookingDialog(false);
         setSelectedSlot(null);
-        
+
         // Refresh data
         await Promise.all([
           refreshAppointments(),
           loadAvailableSlots()
         ]);
-        
+
         toast({
           title: 'Agendamento confirmado',
           description: 'Seu agendamento foi criado com sucesso!',
@@ -252,7 +252,7 @@ export default function Agenda() {
       }
     } catch (error: any) {
       console.error('Error in handleConfirmBooking:', error);
-      
+
       // Tratamento específico para diferentes tipos de erro
       if (error?.message?.includes('not available')) {
         toast({
@@ -280,15 +280,15 @@ export default function Agenda() {
           variant: 'destructive',
         });
       }
-      
+
       setShowBookingDialog(false);
       setSelectedSlot(null);
-      
+
       // Sempre recarrega slots após erro para garantir sincronização
       setTimeout(() => {
         loadAvailableSlots();
       }, 500);
-      
+
       // Re-throw para que o dialog também possa tratar se necessário
       throw error;
     }
@@ -366,8 +366,8 @@ export default function Agenda() {
         <TabsContent value="disponiveis" className="space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-0">
             <h3 className="text-base sm:text-lg font-semibold text-foreground">
-              Horários para {selectedDate.toLocaleDateString('pt-BR', { 
-                day: '2-digit', 
+              Horários para {selectedDate.toLocaleDateString('pt-BR', {
+                day: '2-digit',
                 month: 'short',
                 ...(window.innerWidth >= 640 && { year: 'numeric' })
               })}
@@ -391,20 +391,19 @@ export default function Agenda() {
               <p className="text-sm text-muted-foreground">Carregando horários do professor...</p>
             </div>
           ) : !hasActiveSubscription ? (
-            <Card className="p-6 text-center border border-warning/20 bg-warning/5">
+            <Card className="p-6 text-center border border-primary/20 bg-primary/5">
               <div className="space-y-3">
-                <div className="w-16 h-16 bg-warning/10 rounded-full flex items-center justify-center mx-auto">
-                  <Calendar size={32} className="text-warning" />
+                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
+                  <Calendar size={32} className="text-primary" />
                 </div>
                 <div>
-                  <h4 className="font-semibold text-foreground mb-2">Consultoria Necessária</h4>
-                  <p className="text-sm text-muted-foreground mb-4">{statusMessage}</p>
-                  <Button 
-                    className="btn-primary"
-                    onClick={() => navigate("/assinaturas-planos")}
-                  >
-                    Ver Planos Disponíveis
-                  </Button>
+                  <h4 className="font-semibold text-foreground mb-2">Aguardando Ativação</h4>
+                  <p className="text-sm text-muted-foreground mb-2">
+                    Seu acesso ao agendamento será liberado em breve.
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Entre em contato com seu professor para mais informações.
+                  </p>
                 </div>
               </div>
             </Card>
@@ -412,7 +411,7 @@ export default function Agenda() {
             <p className="text-sm text-muted-foreground">Aguardando designação de professor...</p>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                  {slotsLoading ? (
+              {slotsLoading ? (
                 <p className="col-span-full text-sm text-muted-foreground text-center py-4">Carregando horários...</p>
               ) : (
                 <>
@@ -423,15 +422,15 @@ export default function Agenda() {
                     >
                       <div className="text-center space-y-2">
                         <div className="flex items-center justify-center gap-1 mb-1">
-                           <Clock size={14} className="sm:size-4 text-primary" />
-                           <span className={`font-medium text-foreground text-sm sm:text-base`}>
-                             {formatTime(slot.slot_start)} - {formatTime(slot.slot_end)}
-                           </span>
-                         </div>
-                         <div className="text-xs text-muted-foreground mb-1">
-                           {slot.slot_minutes} minutos
-                         </div>
-                         <span className={`text-xs text-success`}>Disponível</span>
+                          <Clock size={14} className="sm:size-4 text-primary" />
+                          <span className={`font-medium text-foreground text-sm sm:text-base`}>
+                            {formatTime(slot.slot_start)} - {formatTime(slot.slot_end)}
+                          </span>
+                        </div>
+                        <div className="text-xs text-muted-foreground mb-1">
+                          {slot.slot_minutes} minutos
+                        </div>
+                        <span className={`text-xs text-success`}>Disponível</span>
                         <Button
                           size="sm"
                           onClick={() => handleOpenBookingDialog(slot)}
@@ -450,7 +449,7 @@ export default function Agenda() {
                         Nenhum horário disponível para {formatDate(selectedDate)}
                       </p>
                       <p className="text-xs sm:text-sm text-muted-foreground mb-4">
-                        {availability.some(av => av.weekday === selectedDate.getDay()) ? 
+                        {availability.some(av => av.weekday === selectedDate.getDay()) ?
                           `Os horários podem não estar disponíveis devido ao tempo mínimo de antecedência (${formatMinutesToHoursAndMinutes(minimumAdvanceMinutes)}) ou já estarem ocupados.` :
                           'O professor não tem disponibilidade configurada para este dia.'
                         }
@@ -495,13 +494,12 @@ export default function Agenda() {
                 <div className="flex-1 min-w-0">
                   <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-1">
                     <h4 className="font-medium text-foreground text-sm sm:text-base truncate">{agendamento.title ?? agendamento.type ?? 'Sessão'}</h4>
-                    <span className={`text-xs px-2 py-1 rounded-full ${
-                      agendamento.status === 'confirmed' || agendamento.status === 'confirmado'
+                    <span className={`text-xs px-2 py-1 rounded-full ${agendamento.status === 'confirmed' || agendamento.status === 'confirmado'
                         ? 'bg-success/10 text-success'
                         : 'bg-warning/10 text-warning'
-                    }`}>
-                      {agendamento.status === 'confirmed' || agendamento.status === 'confirmado' 
-                        ? 'Confirmado' 
+                      }`}>
+                      {agendamento.status === 'confirmed' || agendamento.status === 'confirmado'
+                        ? 'Confirmado'
                         : 'Agendado'}
                     </span>
                   </div>
@@ -528,16 +526,16 @@ export default function Agenda() {
                 </div>
 
                 <div className="flex flex-row sm:flex-col gap-2 sm:gap-1 w-full sm:w-auto">
-                  <Button 
-                    size="sm" 
-                    variant="outline" 
+                  <Button
+                    size="sm"
+                    variant="outline"
                     className="flex-1 sm:flex-none text-xs sm:text-sm"
                     disabled={isOptimistic(agendamento.id)}
                   >
                     {isOptimistic(agendamento.id) ? 'Processando...' : 'Editar'}
                   </Button>
-                  <Button 
-                    size="sm" 
+                  <Button
+                    size="sm"
                     variant="destructive"
                     onClick={() => handleCancel(agendamento.id)}
                     disabled={isOptimistic(agendamento.id)}
@@ -578,11 +576,10 @@ export default function Agenda() {
                     </div>
                   </div>
 
-                  <span className={`text-xs px-2 py-1 rounded-full ${
-                    item.status === 'cancelled'
+                  <span className={`text-xs px-2 py-1 rounded-full ${item.status === 'cancelled'
                       ? 'bg-destructive/10 text-destructive'
                       : 'bg-success/10 text-success'
-                  }`}>
+                    }`}>
                     {item.status === 'cancelled' ? 'Cancelado' : 'Concluído'}
                   </span>
                 </div>

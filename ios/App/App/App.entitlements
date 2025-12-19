@@ -4,10 +4,16 @@
 <dict>
 	<key>com.apple.developer.associated-domains</key>
 	<array>
-		<string>applinks:d46ecb0f-56a1-441d-a5d5-bac293c0288a.lovableproject.com</string>
-		<string>applinks:shapepro.site</string>
+		<string>applinks:painel.metodocod.com</string>
+		<string>applinks:metodocod.com</string>
 	</array>
 	<key>aps-environment</key>
 	<string>production</string>
+	<key>com.apple.developer.healthkit</key>
+	<true/>
+	<key>com.apple.developer.healthkit.access</key>
+	<array>
+		<string>health-records</string>
+	</array>
 </dict>
 </plist>

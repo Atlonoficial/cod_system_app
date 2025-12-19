@@ -25,7 +25,7 @@ export const parseAuthParams = (searchParams: URLSearchParams): AuthActionData =
   // If no type found in search params, check URL fragment (hash)
   if (!authData.type && window.location.hash) {
     const fragmentParams = new URLSearchParams(window.location.hash.substring(1));
-    
+
     authData = {
       type: fragmentParams.get('type') || 'recovery', // Default to recovery for fragment tokens
       token_hash: fragmentParams.get('access_token') || fragmentParams.get('token_hash') || undefined,
@@ -48,7 +48,7 @@ export const calculateIntelligentRedirect = (metadata: any, userType?: 'student'
   // Determinar user type final (prioriza o parâmetro, depois metadata)
   const metadataUserType = metadata?.user_type;
   const finalUserType = userType || metadataUserType;
-  
+
   console.log('👤 Tipo de usuário final:', finalUserType);
 
   // Prioridade 1: Professor → Dashboard
@@ -66,12 +66,12 @@ export const getRedirectPath = async (userType?: 'student' | 'teacher'): Promise
   try {
     const { data: { user } } = await supabase.auth.getUser();
     console.log('🔍 getRedirectPath: Buscando dados do usuário:', user?.id);
-    
+
     if (user) {
       // Buscar metadados de origem armazenados no signup
       const metadata = user.user_metadata;
       console.log('📦 getRedirectPath: Metadados do usuário:', metadata);
-      
+
       // Se não tiver userType passado, buscar do profile
       let finalUserType = userType;
       if (!finalUserType) {
@@ -80,11 +80,11 @@ export const getRedirectPath = async (userType?: 'student' | 'teacher'): Promise
           .select('user_type')
           .eq('id', user.id)
           .single();
-        
+
         finalUserType = profile?.user_type as 'student' | 'teacher';
         console.log('👤 getRedirectPath: Tipo de usuário do profile:', finalUserType);
       }
-      
+
       // Usar função de cálculo inteligente
       return calculateIntelligentRedirect(metadata, finalUserType);
     }
@@ -123,18 +123,18 @@ export const processAuthAction = async (actionData: AuthActionData) => {
 
       if (verifyError) {
         // ✅ BUILD 35: Detectar OTP expirado especificamente
-        if (verifyError.message?.includes('expired') || 
-            verifyError.message?.includes('otp_expired') ||
-            verifyError.message?.includes('invalid') ||
-            verifyError.status === 401) {
+        if (verifyError.message?.includes('expired') ||
+          verifyError.message?.includes('otp_expired') ||
+          verifyError.message?.includes('invalid') ||
+          verifyError.status === 401) {
           throw new Error('Link de confirmação expirado ou inválido. Solicite um novo email de confirmação.');
         }
-        
+
         console.error('❌ processAuthAction: Erro ao verificar OTP:', verifyError);
         throw verifyError;
       }
       console.log('✅ processAuthAction: Email confirmado com sucesso');
-      
+
       // 🔄 FASE 1: Esperar sessão ser estabelecida (até 5 segundos)
       console.log('⏳ processAuthAction: Aguardando sessão ser estabelecida...');
       let sessionFound = false;
@@ -151,7 +151,7 @@ export const processAuthAction = async (actionData: AuthActionData) => {
         console.log(`⏳ processAuthAction: Tentativa ${i + 1}/10 - aguardando sessão...`);
         await new Promise(resolve => setTimeout(resolve, 500));
       }
-      
+
       if (!sessionFound) {
         console.warn('⚠️ processAuthAction: Sessão não estabelecida automaticamente após verifyOtp');
       }
@@ -220,10 +220,69 @@ export const getActionDescription = (type: string): string => {
     case 'email_change':
       return 'Seu email foi alterado com sucesso!';
     case 'invite':
-      return 'Convite aceito! Bem-vindo à Shape Pro!';
+      return 'Convite aceito! Bem-vindo ao COD SYSTEM!';
     case 'magiclink':
       return 'Login realizado com sucesso!';
     default:
       return 'Processando sua solicitação...';
+  }
+};
+
+/**
+ * Processa o token de convite para vincular aluno ao professor
+ * Chama a função RPC accept_invite_token do banco de dados
+ */
+export interface InviteTokenResult {
+  success: boolean;
+  teacherId?: string;
+  planId?: string;
+  error?: string;
+}
+
+export const processInviteToken = async (token: string): Promise<InviteTokenResult> => {
+  console.log('🔗 processInviteToken: Processando token de convite:', token);
+
+  if (!token) {
+    console.warn('⚠️ processInviteToken: Token vazio');
+    return { success: false, error: 'Token de convite não fornecido' };
+  }
+
+  try {
+    // Chamar a função RPC que vincula o aluno ao professor
+    // Nota: accept_invite_token existe no banco mas não está tipado no types.ts
+    const { data, error } = await (supabase as any).rpc('accept_invite_token', {
+      token_input: token
+    });
+
+    if (error) {
+      console.error('❌ processInviteToken: Erro ao processar convite:', error);
+
+      // Tratar erros específicos
+      if (error.message?.includes('Not authenticated')) {
+        return { success: false, error: 'Você precisa estar autenticado para aceitar o convite' };
+      }
+      if (error.message?.includes('Invalid or expired')) {
+        return { success: false, error: 'Convite inválido ou expirado' };
+      }
+
+      return { success: false, error: error.message || 'Erro ao processar convite' };
+    }
+
+    console.log('✅ processInviteToken: Convite processado com sucesso:', data);
+
+    // O retorno da função é um JSONB com success, plan_id, teacher_id
+    if (data?.success) {
+      return {
+        success: true,
+        teacherId: data.teacher_id,
+        planId: data.plan_id
+      };
+    }
+
+    return { success: false, error: 'Falha ao processar convite' };
+
+  } catch (error: any) {
+    console.error('❌ processInviteToken: Exceção ao processar convite:', error);
+    return { success: false, error: error.message || 'Erro inesperado ao processar convite' };
   }
 };

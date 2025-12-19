@@ -18,9 +18,9 @@ export const RegistrarRefeicao = () => {
 
   const handleMealToggle = async (mealId: string, isCompleted: boolean) => {
     if (!user?.id) return;
-    
+
     setLoadingMeals(prev => new Set([...prev, mealId]));
-    
+
     try {
       await logMeal(mealId, !isCompleted);
       toast({
@@ -72,23 +72,15 @@ export const RegistrarRefeicao = () => {
             <p className="text-sm text-muted-foreground">Registre suas refeições de hoje</p>
           </div>
         </div>
-        
+
         <div className="text-center py-12">
           <p className="text-muted-foreground">Nenhuma refeição programada para hoje.</p>
           <p className="text-sm text-muted-foreground mt-2">
-            {hasNutritionAccess ? 
+            {hasNutritionAccess ?
               'Aguarde seu nutricionista programar suas refeições!' :
-              'Para acessar o controle nutricional, você precisa de uma consultoria ativa.'
+              'Entre em contato com seu professor para ativar seu acesso.'
             }
           </p>
-          {!hasNutritionAccess && (
-            <Button 
-              className="mt-4"
-              onClick={() => navigate("/assinaturas-planos")}
-            >
-              Ver Planos Disponíveis
-            </Button>
-          )}
         </div>
       </div>
     );
@@ -125,14 +117,14 @@ export const RegistrarRefeicao = () => {
             <Target size={24} className="text-white" />
           </div>
         </div>
-        
+
         <div className="w-full bg-muted rounded-full h-3 mb-4">
-          <div 
+          <div
             className="bg-gradient-to-r from-warning to-warning/80 h-3 rounded-full transition-all duration-300"
             style={{ width: `${Math.min(target.calories > 0 ? (consumed.calories / target.calories) * 100 : 0, 100)}%` }}
           ></div>
         </div>
-        
+
         <div className="text-center">
           <span className="text-sm font-medium text-foreground">
             Restam {Math.round(Math.max(target.calories - consumed.calories, 0))} kcal
@@ -140,23 +132,23 @@ export const RegistrarRefeicao = () => {
         </div>
       </Card>
 
-        <div className="space-y-4">
+      <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold text-foreground">Refeições de Hoje</h3>
-          <Button 
-            size="sm" 
-            className="btn-primary" 
+          <Button
+            size="sm"
+            className="btn-primary"
             onClick={() => setShowAddMealDialog(true)}
           >
             <Plus size={16} className="mr-1" />
             Adicionar
           </Button>
         </div>
-        
-{todaysMeals && todaysMeals.length > 0 ? (
+
+        {todaysMeals && todaysMeals.length > 0 ? (
           todaysMeals.map((meal, index) => {
             const isLoading = loadingMeals.has(meal.meal_plan_item_id);
-            
+
             return (
               <Card key={meal.meal_plan_item_id || index} className="card-gradient p-4 border border-border/50">
                 <div className="flex items-center justify-between">
@@ -170,7 +162,7 @@ export const RegistrarRefeicao = () => {
                         </div>
                       )}
                     </div>
-                    
+
                     <div className="flex items-center gap-4">
                       <span className="text-sm text-warning font-medium">{meal.calories || 0} kcal</span>
                       {meal.is_logged && (
@@ -179,7 +171,7 @@ export const RegistrarRefeicao = () => {
                         </span>
                       )}
                     </div>
-                    
+
                     {meal.foods && Array.isArray(meal.foods) && meal.foods.length > 0 && (
                       <div className="mt-2">
                         <p className="text-xs text-muted-foreground">
@@ -188,7 +180,7 @@ export const RegistrarRefeicao = () => {
                       </div>
                     )}
                   </div>
-                  
+
                   <div className="flex items-center gap-2">
                     {isLoading ? (
                       <Loader2 size={20} className="animate-spin text-muted-foreground" />
@@ -202,8 +194,8 @@ export const RegistrarRefeicao = () => {
                         Concluído
                       </Button>
                     ) : (
-                      <Button 
-                        size="sm" 
+                      <Button
+                        size="sm"
                         variant="outline"
                         onClick={() => handleMealToggle(meal.meal_plan_item_id, false)}
                       >

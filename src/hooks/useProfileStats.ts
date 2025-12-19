@@ -4,7 +4,7 @@ import { useAuthContext } from '@/components/auth/AuthProvider';
 import { useRealtimeManager } from './useRealtimeManager';
 
 interface ProfileStats {
-  points: number;
+
   sessionsCount: number;
   activeDays: number;
   examCount: number;
@@ -17,7 +17,7 @@ interface ProfileStats {
 export const useProfileStats = (): ProfileStats => {
   const { user } = useAuthContext();
   const [stats, setStats] = useState<Omit<ProfileStats, 'loading' | 'error'>>({
-    points: 0,
+
     sessionsCount: 0,
     activeDays: 0,
     examCount: 0,
@@ -47,12 +47,7 @@ export const useProfileStats = (): ProfileStats => {
           photosResult,
           assessmentsResult
         ] = await Promise.all([
-          // User points
-          supabase
-            .from('user_points')
-            .select('total_points')
-            .eq('user_id', user.id)
-            .maybeSingle(),
+
 
           // Workout sessions count
           supabase
@@ -97,7 +92,7 @@ export const useProfileStats = (): ProfileStats => {
         );
 
         setStats({
-          points: pointsResult.data?.total_points || 0,
+
           sessionsCount: sessionsResult.count || 0,
           activeDays: activeDaysResult.count || 0, // Count from user_daily_activity
           examCount: examsResult.count || 0,
@@ -119,23 +114,7 @@ export const useProfileStats = (): ProfileStats => {
   // Centralized realtime subscriptions
   useRealtimeManager({
     subscriptions: user?.id ? [
-      {
-        table: 'user_points',
-        event: '*',
-        filter: `user_id=eq.${user.id}`,
-        callback: async () => {
-          // Refetch stats when points change
-          const pointsResult = await supabase
-            .from('user_points')
-            .select('total_points')
-            .eq('user_id', user.id)
-            .maybeSingle();
 
-          if (pointsResult.data) {
-            setStats(prev => ({ ...prev, points: pointsResult.data.total_points || 0 }));
-          }
-        },
-      },
       {
         table: 'workout_sessions',
         event: '*',
@@ -170,6 +149,7 @@ export const useProfileStats = (): ProfileStats => {
           }));
         },
       },
+
     ] : [],
     enabled: !!user?.id,
     channelName: 'profile-stats-realtime',

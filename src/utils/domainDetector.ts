@@ -6,28 +6,28 @@
 
 export interface OriginMetadata {
   // Informações básicas de origem
-  origin_domain: string;        // e.g., "shapepro.site", "admin.shapepro.site", "academia-fit.com.br"
+  origin_domain: string;        // e.g., "coodsystem.com.br", "admin.coodsystem.com.br", "academia-fit.com.br"
   origin_url: string;           // URL completa de origem
-  origin_protocol: string;      // "https", "http", "shapepro"
+  origin_protocol: string;      // "https", "http", "coodsystem"
   origin_port: string | null;   // porta se houver
-  
+
   // Tipo de plataforma
   signup_platform: 'web' | 'mobile' | 'custom_domain';
   is_custom_domain: boolean;
   is_mobile: boolean;
   is_admin_dashboard: boolean;
   is_student_app: boolean;
-  
+
   // Informações de tenant (se aplicável)
   tenant_id?: string;
   tenant_slug?: string;
-  
+
   // Tipo de usuário (detectado pelo contexto da rota/signup)
   user_type?: 'student' | 'teacher';
-  
+
   // URL de redirecionamento calculada
   redirect_url: string;
-  
+
   // Timestamp da detecção
   detected_at: string;
 }
@@ -43,22 +43,22 @@ export const detectOrigin = (
   tenantId?: string
 ): OriginMetadata => {
   // Detectar se é ambiente mobile (Capacitor)
-  const isMobile = typeof window !== 'undefined' && 
+  const isMobile = typeof window !== 'undefined' &&
     (window as any).Capacitor !== undefined;
 
   // Obter informações do hostname e pathname atual
-  const hostname = typeof window !== 'undefined' 
-    ? window.location.hostname 
+  const hostname = typeof window !== 'undefined'
+    ? window.location.hostname
     : '';
-  
+
   const pathname = typeof window !== 'undefined'
     ? window.location.pathname
     : '';
-  
+
   const protocol = typeof window !== 'undefined'
     ? window.location.protocol.replace(':', '')
     : 'https';
-  
+
   const port = typeof window !== 'undefined' && window.location.port
     ? window.location.port
     : null;
@@ -68,12 +68,12 @@ export const detectOrigin = (
     : '';
 
   // Domínio principal do sistema
-  const MAIN_DOMAIN = 'shapepro.site';
+  const MAIN_DOMAIN = 'coodsystem.com.br';
   const LOVABLE_DOMAINS = ['lovable.dev', 'lovableproject.com', 'lovable.app'];
   const KNOWN_DOMAINS = [MAIN_DOMAIN, 'localhost', '127.0.0.1'];
 
   // Detectar se é preview do Lovable
-  const isLovablePreview = LOVABLE_DOMAINS.some(d => 
+  const isLovablePreview = LOVABLE_DOMAINS.some(d =>
     hostname === d || hostname.endsWith(`.${d}`)
   );
 
@@ -93,14 +93,14 @@ export const detectOrigin = (
   // Calcular URL de redirecionamento inteligente baseado na ROTA
   let redirectUrl = '';
   const srcParam = isAdminDashboard ? 'dashboard' : 'app';
-  
+
   if (isMobile) {
     // Mobile: usar deep link com src
-    redirectUrl = `shapepro://auth/confirm?src=${srcParam}`;
+    redirectUrl = `coodsystem://auth/confirm?src=${srcParam}`;
   } else if (isLovablePreview) {
-    // 🔧 Lovable preview: FORÇAR produção
-    redirectUrl = `https://${MAIN_DOMAIN}/auth/confirm?src=${srcParam}`;
-    console.log('🔧 [Domain Detector] Lovable preview → forcing production', {
+    // 🔧 Lovable preview: Allow preview on Lovable domains
+    redirectUrl = `${fullUrl}/auth/confirm?src=${srcParam}`;
+    console.log('🔧 [Domain Detector] Lovable preview detected', {
       hostname,
       redirectUrl
     });
@@ -109,7 +109,12 @@ export const detectOrigin = (
     redirectUrl = `${fullUrl}/auth/confirm?src=${srcParam}`;
   } else {
     // ✅ PADRÃO: Sempre redirecionar para /auth/confirm (página de processamento)
-    redirectUrl = `https://${MAIN_DOMAIN}/auth/confirm?src=${srcParam}`;
+    // Se for localhost, manter localhost
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+      redirectUrl = `${fullUrl}/auth/confirm?src=${srcParam}`;
+    } else {
+      redirectUrl = `https://${MAIN_DOMAIN}/auth/confirm?src=${srcParam}`;
+    }
   }
 
   // Construir metadados
@@ -118,13 +123,13 @@ export const detectOrigin = (
     origin_url: fullUrl,
     origin_protocol: protocol,
     origin_port: port,
-    
+
     signup_platform: signupPlatform,
     is_custom_domain: isCustomDomain,
     is_mobile: isMobile,
     is_admin_dashboard: isAdminDashboard,
     is_student_app: isStudentApp,
-    
+
     redirect_url: redirectUrl,
     detected_at: new Date().toISOString(),
   };

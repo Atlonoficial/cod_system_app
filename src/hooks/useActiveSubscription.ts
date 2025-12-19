@@ -162,44 +162,51 @@ export const useActiveSubscription = () => {
         }
       }
 
-      // Priority 3: Check plan_subscriptions table (fallback)
-      const { data: planSub, error: planSubError } = await supabase
-        .from('plan_subscriptions')
-        .select(`
-          id, plan_id, status, start_at, end_at, teacher_id,
-          plan_catalog (
-            name, price, currency, interval, features
-          )
-        `)
-        .eq('student_user_id', user.id)
-        .in('status', ['active', 'pending'])
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
+      // Priority 3: Check plan_subscriptions table (fallback) - with error handling
+      try {
+        const { data: planSub, error: planSubError } = await supabase
+          .from('plan_subscriptions')
+          .select('id, plan_id, status, start_at, end_at, teacher_id')
+          .eq('student_user_id', user.id)
+          .in('status', ['active', 'pending'])
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
 
-      if (planSub?.plan_catalog && planSub.status === 'active') {
-        const daysRemaining = calculateDaysRemaining(planSub.end_at);
-        const expirationStatus = getExpirationStatus(daysRemaining);
+        if (!planSubError && planSub && planSub.status === 'active') {
+          const daysRemaining = calculateDaysRemaining(planSub.end_at);
+          const expirationStatus = getExpirationStatus(daysRemaining);
 
-        console.log('✅ [useActiveSubscription] Using plan subscription as fallback source');
+          // Fetch plan catalog details separately to avoid JOIN 400 errors
+          const { data: catalogData } = await supabase
+            .from('plan_catalog')
+            .select('name, price, currency, interval, features')
+            .eq('id', planSub.plan_id)
+            .maybeSingle();
 
-        setSubscription({
-          id: planSub.id,
-          plan_id: planSub.plan_id,
-          teacher_id: planSub.teacher_id,
-          status: planSub.status,
-          start_at: planSub.start_at,
-          end_at: planSub.end_at,
-          plan_name: planSub.plan_catalog.name,
-          plan_features: Array.isArray(planSub.plan_catalog.features) ? planSub.plan_catalog.features : [],
-          plan_price: planSub.plan_catalog.price,
-          plan_currency: planSub.plan_catalog.currency,
-          plan_interval: planSub.plan_catalog.interval,
-          daysRemaining,
-          expirationStatus
-        });
-        setLoading(false);
-        return;
+          console.log('✅ [useActiveSubscription] Using plan subscription as fallback source');
+
+          setSubscription({
+            id: planSub.id,
+            plan_id: planSub.plan_id,
+            teacher_id: planSub.teacher_id,
+            status: planSub.status,
+            start_at: planSub.start_at,
+            end_at: planSub.end_at,
+            plan_name: catalogData?.name || 'Unknown Plan',
+            plan_features: Array.isArray(catalogData?.features) ? catalogData.features : [],
+            plan_price: catalogData?.price,
+            plan_currency: catalogData?.currency,
+            plan_interval: catalogData?.interval,
+            daysRemaining,
+            expirationStatus
+          });
+          setLoading(false);
+          return;
+        }
+      } catch (planSubError) {
+        // Silently ignore plan_subscriptions errors - table may not exist or column missing
+        console.warn('[useActiveSubscription] plan_subscriptions fallback skipped:', planSubError);
       }
 
       // ETAPA 2: Final fallback - if no subscription but student has teacher_id

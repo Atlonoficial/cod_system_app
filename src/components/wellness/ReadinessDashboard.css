@@ -1,0 +1,194 @@
+/* Readiness Dashboard Styles */
+
+/* Compact Version */
+.readiness-compact {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    border: 1px solid;
+    cursor: pointer;
+}
+
+.readiness-emoji {
+    font-size: 1.5rem;
+}
+
+.readiness-compact-info {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.readiness-compact-title {
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.readiness-compact-score {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.checkin-chip {
+    --background: #6366f1;
+    --color: white;
+    font-size: 0.75rem;
+}
+
+/* Full Card */
+.readiness-card {
+    background: var(--card-bg, rgba(255, 255, 255, 0.05));
+    border: 1px solid var(--card-border, rgba(255, 255, 255, 0.1));
+    border-radius: 16px;
+    margin: 0;
+}
+
+.readiness-card.needs-checkin {
+    background: rgba(99, 102, 241, 0.1);
+    border-color: rgba(99, 102, 241, 0.3);
+    cursor: pointer;
+}
+
+/* Header */
+.readiness-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.readiness-icon {
+    color: #6366f1;
+    font-size: 1.25rem;
+}
+
+.readiness-header h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* Check-in Prompt */
+.checkin-prompt {
+    text-align: center;
+    padding: 1rem 0;
+}
+
+.checkin-prompt p {
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 1rem;
+}
+
+.checkin-button {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 0.875rem 2rem;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.checkin-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+}
+
+/* Main Display */
+.readiness-main {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.readiness-circle {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 3px solid;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.readiness-emoji-large {
+    font-size: 1.5rem;
+    margin-bottom: 0.25rem;
+}
+
+.readiness-score {
+    font-size: 1.75rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.readiness-max {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.readiness-info {
+    flex: 1;
+}
+
+.readiness-info h4 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.125rem;
+    font-weight: 700;
+}
+
+.readiness-advice {
+    margin: 0;
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.readiness-message {
+    margin: 0.5rem 0 0 0;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.5);
+    font-style: italic;
+}
+
+/* Metrics Grid */
+.readiness-metrics {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.metric {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.metric ion-icon {
+    font-size: 1.25rem;
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 0.25rem;
+}
+
+.metric-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #fff;
+}
+
+.metric-label {
+    font-size: 0.675rem;
+    color: rgba(255, 255, 255, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}

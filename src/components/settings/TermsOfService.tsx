@@ -32,7 +32,7 @@ export const TermsOfService = ({ onBack }: TermsOfServiceProps) => {
             </div>
             <div className="space-y-3 text-sm text-muted-foreground">
               <p>
-                Ao usar o Shape Pro, você concorda com os seguintes termos e condições:
+                Ao usar o COD SYSTEM, você concorda com os seguintes termos e condições:
               </p>
               <ul className="list-disc list-inside space-y-1 ml-4">
                 <li>O uso do aplicativo é destinado para fins de fitness e bem-estar</li>
@@ -92,10 +92,8 @@ export const TermsOfService = ({ onBack }: TermsOfServiceProps) => {
           <CardContent className="p-6">
             <h3 className="text-lg font-semibold text-foreground mb-3">Entre em Contato</h3>
             <div className="space-y-2 text-sm text-muted-foreground">
-              <p>Dúvidas sobre nossos termos? Fale conosco:</p>
-              <p>📧 contato@shapepro.app</p>
-              <p>📱 (11) 99999-9999</p>
-              <p>🌐 www.shapepro.app</p>
+              <p>Dúvidas sobre nossos termos?</p>
+              <p className="mt-2">Entre em contato diretamente com seu Treinador para mais informações sobre o serviço contratado.</p>
             </div>
           </CardContent>
         </Card>

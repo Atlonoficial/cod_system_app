@@ -5,11 +5,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Trophy, Camera, Calendar, Activity, Target, CalendarDays, CreditCard, ClipboardList, Stethoscope, Images, Ruler, Shield, Cog, Bell } from "lucide-react";
+import { Trophy, Camera, Calendar, CreditCard, ClipboardList, Stethoscope, Images, Ruler, Shield, Cog, Target, Heart, Activity } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { useHapticFeedback } from "@/hooks/useHapticFeedback";
-import { PointsWidget } from "@/components/gamification/PointsWidget";
 import { TeacherCard } from "./TeacherCard";
 import { DynamicBadge } from "@/components/ui/DynamicBadge";
 import { useViewedItems } from "@/hooks/useViewedItems";
@@ -30,8 +29,11 @@ export const Profile = () => {
   const { markAsViewed } = useViewedItems(user?.id);
   const profileCompletion = useProfileCompletion();
   const anamneseCompletion = useAnamneseCompletion();
-  const { points, sessionsCount, activeDays, examCount, photoCount, assessmentCount, loading: statsLoading } = useProfileStats();
+  const { sessionsCount, activeDays, examCount, photoCount, assessmentCount, loading: statsLoading } = useProfileStats();
   const { avatarUrl, memberSince, displayName, avatarFallback } = useOptimizedAvatar();
+
+  // Points are no longer tracked since gamification was removed
+  const points = sessionsCount * 10; // Simple calculation based on sessions
 
   // Statistics are now handled by useProfileStats hook
 
@@ -105,14 +107,6 @@ export const Profile = () => {
     navigate(path);
   };
 
-  const goToRewards = () => {
-    navigate("/recompensas");
-  };
-
-  const goToGamification = () => {
-    navigate({ pathname: "/", search: "?tab=gamification" });
-  };
-
   return (
     <div className="p-4 sm:p-6 pt-6 sm:pt-8 max-w-4xl mx-auto">
       {/* Header */}
@@ -160,7 +154,7 @@ export const Profile = () => {
 
         <div className="mt-3 flex items-center gap-2 animate-fade-up stagger-delay-2">
           <Trophy className="w-5 h-5 sm:w-6 sm:h-6 text-warning" />
-          <span className="font-semibold text-base sm:text-lg text-foreground">{points.toLocaleString("pt-BR")} pontos</span>
+          <span className="font-semibold text-base sm:text-lg text-foreground">{(points || 0).toLocaleString("pt-BR")} pontos</span>
         </div>
       </div>
 
@@ -174,29 +168,6 @@ export const Profile = () => {
 
       {/* Teacher Profile */}
       <TeacherCard />
-
-      {/* Rewards CTA */}
-      <Card className="mb-6">
-        <CardContent className="p-5">
-          <div className="flex items-start justify-between gap-3">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-warning/15 flex items-center justify-center">
-                <Trophy className="w-5 h-5 text-warning" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-foreground">Loja de Recompensas</h3>
-                <p className="text-sm text-muted-foreground">Troque seus pontos por prêmios</p>
-              </div>
-            </div>
-            <Button onClick={goToRewards}>Acessar Loja</Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Points Widget - Moved from Dashboard */}
-      <div className="mb-6">
-        <PointsWidget onClick={goToGamification} />
-      </div>
 
       {/* Meus Dados */}
       <h2 className="text-base sm:text-lg font-semibold mb-3 mt-6 text-foreground tracking-tight">Meus Dados</h2>
@@ -266,8 +237,32 @@ export const Profile = () => {
               <CreditCard className="w-5 h-5 text-primary" />
             </div>
             <div className="flex-1">
-              <p className="font-medium">Assinaturas & Planos</p>
-              <p className="text-sm text-muted-foreground">Gerencie sua assinatura</p>
+              <p className="font-medium">Meu Acesso</p>
+              <p className="text-sm text-muted-foreground">Status da consultoria</p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card role="button" onClick={() => navigate("/conexoes-saude")} className="hover:bg-muted/40 transition-colors">
+          <CardContent className="p-4 flex items-center gap-4">
+            <div className="w-10 h-10 rounded-full bg-red-500/15 flex items-center justify-center">
+              <Heart className="w-5 h-5 text-red-500" />
+            </div>
+            <div className="flex-1">
+              <p className="font-medium">Conexões de Saúde</p>
+              <p className="text-sm text-muted-foreground">Apple Health, Google Fit</p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card role="button" onClick={() => navigate("/wellness-history")} className="hover:bg-muted/40 transition-colors border-green-500/30 bg-green-500/5">
+          <CardContent className="p-4 flex items-center gap-4">
+            <div className="w-10 h-10 rounded-full bg-green-500/15 flex items-center justify-center">
+              <Activity className="w-5 h-5 text-green-500" />
+            </div>
+            <div className="flex-1">
+              <p className="font-medium">Histórico de Bem-Estar</p>
+              <p className="text-sm text-muted-foreground">Seus check-ins dos últimos 7 dias</p>
             </div>
           </CardContent>
         </Card>

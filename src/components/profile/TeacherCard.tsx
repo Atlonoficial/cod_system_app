@@ -1,10 +1,8 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { NotificationBadge } from "@/components/ui/notification-badge";
-import { MessageCircle, Instagram, Facebook, Phone, Youtube, Users } from "lucide-react";
+import { Instagram, Facebook, Phone, Youtube, Users } from "lucide-react";
 import { useTeacherProfile } from "@/hooks/useTeacherProfile";
-import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthContext } from "@/components/auth/AuthProvider";
@@ -14,7 +12,7 @@ import { Capacitor } from "@capacitor/core";
 
 export const TeacherCard = () => {
   const { teacher, loading } = useTeacherProfile();
-  const unreadCount = useUnreadMessages();
+
   const navigate = useNavigate();
   const { user } = useAuthContext();
   const viewTracked = useRef(false);
@@ -78,10 +76,7 @@ export const TeacherCard = () => {
     );
   }
 
-  const handleChatClick = () => {
-    // Navigate to teacher-student chat
-    navigate('/teacher-chat');
-  };
+
 
   const handleInstagramClick = () => {
     if (teacher.instagram_url) {
@@ -186,16 +181,6 @@ export const TeacherCard = () => {
                 </Button>
               )}
             </div>
-
-            <Button
-              onClick={handleChatClick}
-              size="sm"
-              className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground relative"
-            >
-              <MessageCircle className="h-4 w-4" />
-              Chat
-              <NotificationBadge count={unreadCount} />
-            </Button>
           </div>
         </CardContent>
       </Card>

@@ -61,47 +61,49 @@ const ContaSeguranca = () => {
 
   const handleDeleteAccountRequest = async () => {
     try {
-      // 1. Criar ticket de suporte
-      const { error: ticketError } = await supabase
-        .from('support_tickets')
-        .insert({
-          email: user?.email || '',
-          name: student?.name || 'Usuário',
-          subject: 'Solicitação de Exclusão de Conta (App)',
-          message: `Solicitação de exclusão de conta enviada pelo app. User ID: ${user?.id}`,
-          status: 'open'
-        });
+      // Get current session for authentication
+      const { data: { session } } = await supabase.auth.getSession();
 
-      if (ticketError) {
-        console.error('Erro ao criar ticket:', ticketError);
-        // Fallback se falhar o ticket (ex: erro de permissão)
-        throw new Error('Erro ao registrar solicitação');
+      if (!session?.access_token) {
+        throw new Error('Sessão inválida. Por favor, faça login novamente.');
       }
 
-      // 2. Feedback ao usuário
+      // Call the delete-own-account Edge Function
+      const supabaseUrl = (supabase as any).supabaseUrl || 'https://swvpuadolibssbhiozje.supabase.co';
+      const response = await fetch(`${supabaseUrl}/functions/v1/delete-own-account`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({})
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Erro ao excluir conta');
+      }
+
+      // Feedback ao usuário
       toast({
-        title: "Solicitação Recebida",
-        description: "Sua conta foi agendada para exclusão. Você será desconectado agora.",
+        title: "Conta Excluída",
+        description: "Sua conta foi excluída permanentemente. Você será desconectado.",
         duration: 5000,
       });
 
-      // 3. Deslogar usuário (Simula a "perda de acesso" imediata exigida pela Apple)
+      // Deslogar e redirecionar
       setTimeout(async () => {
         await supabase.auth.signOut();
         navigate("/auth");
       }, 2000);
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro na exclusão:', error);
 
-      // Fallback seguro: Email
-      const subject = encodeURIComponent("Solicitação de Exclusão de Conta");
-      const body = encodeURIComponent(`Gostaria de solicitar a exclusão da minha conta associada ao email: ${user?.email}`);
-      window.open(`mailto:suporte@shapepro.site?subject=${subject}&body=${body}`, '_system');
-
       toast({
-        title: "Atenção",
-        description: "Não foi possível processar automaticamente. Por favor, envie o email que abrimos para você.",
+        title: "Erro ao excluir conta",
+        description: error.message || "Não foi possível excluir sua conta. Tente novamente.",
         variant: "destructive"
       });
     }
