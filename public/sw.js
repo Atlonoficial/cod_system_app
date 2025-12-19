@@ -1,4 +1,4 @@
-const CACHE_NAME = 'shape-pro-v1';
+const CACHE_NAME = 'cod-system-v1';
 const urlsToCache = [
   '/',
   '/static/js/bundle.js',
@@ -6,24 +6,24 @@ const urlsToCache = [
   '/manifest.json'
 ];
 
-self.addEventListener('install', function(event) {
+self.addEventListener('install', function (event) {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then(function(cache) {
+      .then(function (cache) {
         return cache.addAll(urlsToCache);
       })
   );
 });
 
-self.addEventListener('fetch', function(event) {
+self.addEventListener('fetch', function (event) {
   event.respondWith(
     caches.match(event.request)
-      .then(function(response) {
+      .then(function (response) {
         if (response) {
           return response;
         }
         return fetch(event.request);
       }
-    )
+      )
   );
 });
