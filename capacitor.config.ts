@@ -47,8 +47,11 @@ const config: CapacitorConfig = {
     backgroundColor: "#000000",
     allowsLinkPreview: false,
     handleApplicationNotifications: false,
-    CFBundleVersion: '1',
+    CFBundleVersion: '2',
     CFBundleShortVersionString: "1.0.0",
+
+    // ✅ Desabilitar bounce/overscroll nativo do iOS
+    scrollEnabled: false,
 
     // Tudo aqui vira Info.plist do app (garantido a cada build)
     plist: {
@@ -62,14 +65,11 @@ const config: CapacitorConfig = {
       NSUserTrackingUsageDescription:
         "Este app usa dados de atividade para personalizar sua experiência de treino e fornecer conteúdo relevante.",
 
-      // ---- Localização (ITMS-90683) ----
+      // ---- Localização ----
       NSLocationWhenInUseUsageDescription:
-        "Usamos sua localização apenas para enviar notificações relevantes sobre treinos próximos a você.",
+        "Usamos sua localização para melhorar sua experiência no app.",
       NSLocationAlwaysAndWhenInUseUsageDescription:
-        "Usamos sua localização apenas para enviar notificações relevantes sobre treinos próximos a você.",
-
-      // Push em background (OneSignal)
-      UIBackgroundModes: ["remote-notification"],
+        "Usamos sua localização para melhorar sua experiência no app.",
 
       // Criptografia
       ITSAppUsesNonExemptEncryption: false,
@@ -90,10 +90,7 @@ const config: CapacitorConfig = {
 
       // *** Versões (garantem sincronização em todos os builds)
       CFBundleShortVersionString: "1.0.0",
-      CFBundleVersion: "1",
-
-      // ---- OneSignal App ID ----
-      OneSignal_app_id: "be1bd1f4-bd4f-4dc9-9c33-7b9f7fe5dc82",
+      CFBundleVersion: "2",
     },
   },
 
@@ -107,15 +104,11 @@ const config: CapacitorConfig = {
     hideLogs: true,
     cleartext: true,
     networkSecurityConfig: true,
-    versionCode: 1,
+    versionCode: 2,
     versionName: "1.0.0"
   },
 
   plugins: {
-    OneSignal: {
-      appId: "be1bd1f4-bd4f-4dc9-9c33-7b9f7fe5dc82",
-    },
-    PushNotifications: { presentationOptions: ["badge", "sound", "alert"] },
     SplashScreen: {
       launchAutoHide: true,
       launchShowDuration: 0,

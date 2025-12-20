@@ -62,16 +62,8 @@
 	<string>Usamos dados do Apple Health para monitorar seu progresso de treino, passos, calorias e atividade física.</string>
 	<key>NSHealthUpdateUsageDescription</key>
 	<string>Registramos dados de exercícios concluídos para acompanhamento do seu progresso.</string>
-	<key>UIBackgroundModes</key>
-	<array>
-		<string>remote-notification</string>
-	</array>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
-	<key>OneSignal_app_id</key>
-	<string>your_onesignal_app_id</string>
-	<key>OneSignal_APNS_Environment</key>
-	<string>production</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>

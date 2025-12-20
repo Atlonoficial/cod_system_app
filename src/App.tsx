@@ -10,7 +10,7 @@ import { TermsGuard } from "@/components/auth/TermsGuard";
 import { SecurityProvider } from "@/components/security/SecurityProvider";
 import { ErrorBoundary } from "@/components/common/ErrorBoundary";
 import { NativeIntegration } from "@/components/native/NativeIntegration";
-import { NotificationPermissionModal } from "@/components/notifications/NotificationPermissionModal";
+// NotificationPermissionModal removed - notifications disabled
 import { NetworkStatus } from "@/components/ui/NetworkStatus";
 import { AuthGuard } from "@/components/auth/AuthGuard";
 import { SubscriptionGuard } from "@/components/auth/SubscriptionGuard";
@@ -191,7 +191,7 @@ const App = () => {
               <BrowserRouter>
                 <AuthProvider>
                   <NativeIntegration />
-                  <NotificationPermissionModal />
+                  {/* NotificationPermissionModal removed */}
                   <NetworkStatus />
                   <AuthenticatedApp />
                 </AuthProvider>
