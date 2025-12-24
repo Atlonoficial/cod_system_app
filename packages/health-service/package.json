@@ -1,0 +1,23 @@
+{
+    "name": "cood-health-service",
+    "version": "1.0.0",
+    "description": "Local HealthService plugin for COD System",
+    "main": "dist/plugin.cjs.js",
+    "module": "dist/esm/index.js",
+    "types": "dist/esm/index.d.ts",
+    "unpkg": "dist/plugin.js",
+    "files": [
+        "dist/",
+        "ios/"
+    ],
+    "author": "Atlon Tech",
+    "license": "MIT",
+    "peerDependencies": {
+        "@capacitor/core": "^7.0.0"
+    },
+    "capacitor": {
+        "ios": {
+            "src": "ios"
+        }
+    }
+}

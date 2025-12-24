@@ -2,18 +2,6 @@ import Foundation
 import Capacitor
 import HealthKit
 
-/**
- * COD System - HealthService Plugin (iOS)
- *
- * Native plugin for HealthKit integration.
- * Provides sleep, HRV, and heart rate data to the web layer.
- *
- * SETUP REQUIRED:
- * 1. Enable HealthKit capability in Xcode
- * 2. Add to App.entitlements: HealthKit
- * 3. Register this plugin in AppDelegate.swift
- */
-
 @objc(HealthServicePlugin)
 public class HealthServicePlugin: CAPPlugin, CAPBridgedPlugin {
     public let identifier = "HealthServicePlugin"

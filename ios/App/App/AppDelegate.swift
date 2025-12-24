@@ -17,8 +17,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         bootStartTime = Date()
         
         // ✅ Registrar plugin HealthService para integração com Apple Health
-        let bridge = (self.window?.rootViewController as? CAPBridgeViewController)?.bridge
-        bridge?.registerPluginInstance(HealthServicePlugin())
+        // let bridge = (self.window?.rootViewController as? CAPBridgeViewController)?.bridge
+        // bridge?.registerPluginInstance(HealthServicePlugin())
         
         // ✅ BUILD 49: Usar OSLog para logs estruturados
         os_log(.info, log: bootLogger, "🚀 COD SYSTEM launching - Build 49")

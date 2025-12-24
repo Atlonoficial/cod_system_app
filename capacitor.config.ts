@@ -37,9 +37,6 @@ const config: CapacitorConfig = {
     ]
   },
 
-  deepLinkingConfig: {
-    customURLScheme: 'codsystem'
-  },
 
   ios: {
     scheme: "codsystem",
@@ -47,57 +44,13 @@ const config: CapacitorConfig = {
     backgroundColor: "#000000",
     allowsLinkPreview: false,
     handleApplicationNotifications: false,
-    CFBundleVersion: '3',
-    CFBundleShortVersionString: "1.0.0",
+
+
 
     // ✅ Desabilitar bounce/overscroll nativo do iOS
     scrollEnabled: false,
 
-    // Tudo aqui vira Info.plist do app (garantido a cada build)
-    plist: {
-      // ---- Privacidade (evita ITMS-90683) ----
-      NSPhotoLibraryUsageDescription:
-        "Este app precisa acessar suas fotos para permitir que você adicione fotos de progresso e compartilhe conquistas.",
-      NSPhotoLibraryAddUsageDescription:
-        "Precisamos salvar imagens na sua galeria quando você exporta ou baixa mídias pelo app.",
-      NSCameraUsageDescription:
-        "Precisamos da câmera para tirar fotos dentro do app.",
-      NSUserTrackingUsageDescription:
-        "Este app usa dados de atividade para personalizar sua experiência de treino e fornecer conteúdo relevante.",
 
-      // ---- Localização ----
-      NSLocationWhenInUseUsageDescription:
-        "Usamos sua localização para melhorar sua experiência no app.",
-      NSLocationAlwaysAndWhenInUseUsageDescription:
-        "Usamos sua localização para melhorar sua experiência no app.",
-
-      // ---- HealthKit (COD System - Biometric Sync) ----
-      NSHealthShareUsageDescription:
-        "Usamos dados de sono e frequência cardíaca do Apple Health para personalizar seu treino e acompanhar sua recuperação.",
-      NSHealthUpdateUsageDescription:
-        "Registramos suas sessões de treino no Apple Health para manter um histórico completo.",
-
-      // Criptografia
-      ITSAppUsesNonExemptEncryption: false,
-
-      // FASE 4: Block landscape on iPhone, allow on iPad for multitasking
-      UISupportedInterfaceOrientations: [
-        "UIInterfaceOrientationPortrait",
-      ],
-      "UISupportedInterfaceOrientations~ipad": [
-        "UIInterfaceOrientationPortrait",
-        "UIInterfaceOrientationPortraitUpsideDown",
-        "UIInterfaceOrientationLandscapeLeft",
-        "UIInterfaceOrientationLandscapeRight",
-      ],
-
-      // Launch screen baseado em storyboard (exigido pelo iPad multitasking)
-      UILaunchStoryboardName: "LaunchScreen",
-
-      // *** Versões (garantem sincronização em todos os builds)
-      CFBundleShortVersionString: "1.0.0",
-      CFBundleVersion: "3",
-    },
   },
 
   android: {
@@ -107,11 +60,10 @@ const config: CapacitorConfig = {
     webContentsDebuggingEnabled: false,
     appendUserAgent: "COD SYSTEM/1.0",
     overrideUserAgent: "[APP_NAME]/1.0 Mobile App",
-    hideLogs: true,
-    cleartext: true,
-    networkSecurityConfig: true,
-    versionCode: 3,
-    versionName: "1.0.0"
+
+
+
+
   },
 
   plugins: {
