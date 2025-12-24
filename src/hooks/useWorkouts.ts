@@ -10,8 +10,11 @@ export interface Exercise {
   sets: string;
   reps: number;
   weight?: number;
+  load_unit?: 'kg' | '%' | 'lbs';  // NOVO: Unidade de carga
   duration?: number;
   rest_time: number;
+  cycles?: number;                 // NOVO: Número de ciclos
+  tempo_cadence?: string;          // NOVO: Cadência (ex: "3-0-X-0")
   notes?: string;
   muscle_groups?: string[];
   equipment?: string[];
@@ -72,8 +75,11 @@ export const useWorkouts = () => {
                 sets: ex.sets || '3',
                 reps: ex.reps || 12,
                 weight: ex.weight,
+                load_unit: ex.load_unit,
                 duration: ex.duration,
                 rest_time: ex.rest_time || ex.rest_seconds || 60,
+                cycles: ex.cycles,
+                tempo_cadence: ex.tempo_cadence,
                 notes: ex.notes || ex.instructions,
                 muscle_groups: ex.muscle_groups || [],
                 equipment: ex.equipment || [],
@@ -104,8 +110,11 @@ export const useWorkouts = () => {
               sets: ex.sets || '3',
               reps: ex.reps || 12,
               weight: ex.weight,
+              load_unit: ex.load_unit,
               duration: ex.duration,
               rest_time: ex.rest_time || ex.rest_seconds || 60,
+              cycles: ex.cycles,
+              tempo_cadence: ex.tempo_cadence,
               notes: ex.notes || ex.instructions,
               muscle_groups: ex.muscle_groups || [],
               equipment: ex.equipment || [],

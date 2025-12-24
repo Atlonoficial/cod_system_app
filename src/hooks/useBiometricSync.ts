@@ -1,15 +1,15 @@
 /**
  * COD System - Phase 2: Biometric Sync Hook
  * 
- * Provides integration with HealthKit (iOS) and Google Fit (Android)
+ * Provides integration with HealthKit (iOS) and Health Connect (Android)
  * for automatic syncing of sleep and HRV data into the Wellness Check-in.
  * 
- * This hook only provides REAL data from device health APIs.
- * When running on web or without proper permissions, returns null.
+ * Uses HealthService for native platform communication.
  */
 
 import { useState, useCallback, useEffect } from 'react';
 import { Capacitor } from '@capacitor/core';
+import { HealthService, type HealthDataResponse } from '@/services/HealthService';
 
 // Types for health data
 export interface SleepData {
@@ -20,7 +20,7 @@ export interface SleepData {
     awakeMinutes?: number;
     sleepStart?: string;
     sleepEnd?: string;
-    source: 'healthkit' | 'google_fit';
+    source: 'healthkit' | 'google_fit' | 'manual';
 }
 
 export interface HRVData {
@@ -28,7 +28,7 @@ export interface HRVData {
     minHRV?: number;
     maxHRV?: number;
     restingHeartRate?: number;
-    source: 'healthkit' | 'google_fit';
+    source: 'healthkit' | 'google_fit' | 'manual';
 }
 
 export interface BiometricData {
@@ -81,45 +81,104 @@ export const useBiometricSync = (): UseBiometricSyncResult => {
                 return;
             }
 
-            // For now, mark as unavailable until health plugin is installed
-            // To enable real HealthKit/Google Fit sync:
-            // 1. npm install @niceplugins/capacitor-health
-            // 2. npx cap sync
-            // 3. Configure iOS/Android permissions
-            console.log('[BiometricSync] Native platform detected - health plugin integration ready');
-            setBiometricData(prev => ({ ...prev, isNativeAvailable: false }));
+            try {
+                const available = await HealthService.isAvailable();
+                console.log('[BiometricSync] Native health available:', available);
+                setBiometricData(prev => ({ ...prev, isNativeAvailable: available }));
+            } catch (err) {
+                console.error('[BiometricSync] Error checking availability:', err);
+                setBiometricData(prev => ({ ...prev, isNativeAvailable: false }));
+            }
         };
 
         checkNativeAvailability();
     }, [isNative]);
 
-    // Request health data permissions (no-op when native APIs unavailable)
+    // Request health data permissions
     const requestPermissions = useCallback(async (): Promise<boolean> => {
-        if (!isNative || !biometricData.isNativeAvailable) {
-            console.log('[BiometricSync] Cannot request permissions - native APIs not available');
+        if (!isNative) {
+            console.log('[BiometricSync] Cannot request permissions - not native');
             return false;
         }
 
-        // Real implementation when health plugin is installed:
-        // const { Health } = await import('@niceplugins/capacitor-health');
-        // const result = await Health.requestAuthorization({...});
+        try {
+            setLoading(true);
+            setError(null);
 
-        return false;
-    }, [isNative, biometricData.isNativeAvailable]);
+            const granted = await HealthService.requestPermissions();
+            console.log('[BiometricSync] Permissions granted:', granted);
+            setHasHealthPermission(granted);
 
-    // Sync health data from device (no-op when native APIs unavailable)
+            if (granted) {
+                // Auto-sync after permissions granted
+                await syncHealthDataInternal();
+            }
+
+            return granted;
+        } catch (err) {
+            console.error('[BiometricSync] Permission request failed:', err);
+            setError('Falha ao solicitar permissões de saúde');
+            return false;
+        } finally {
+            setLoading(false);
+        }
+    }, [isNative]);
+
+    // Internal sync function
+    const syncHealthDataInternal = async () => {
+        try {
+            const { sleep, hrv } = await HealthService.getAllHealthData();
+
+            const source = platform === 'ios' ? 'healthkit' : 'google_fit';
+
+            // Convert HealthDataResponse to SleepData
+            const sleepData: SleepData | null = sleep ? {
+                sleepHours: sleep.sleepDuration,
+                sleepQuality: sleep.sleepQuality,
+                deepSleepMinutes: sleep.deepSleepMinutes,
+                remSleepMinutes: sleep.remSleepMinutes,
+                source: source as 'healthkit' | 'google_fit'
+            } : null;
+
+            // Convert to HRVData
+            const hrvData: HRVData | null = hrv ? {
+                avgHRV: hrv.avgHRV,
+                restingHeartRate: hrv.restingHeartRate,
+                source: source as 'healthkit' | 'google_fit'
+            } : null;
+
+            setBiometricData(prev => ({
+                ...prev,
+                sleep: sleepData,
+                hrv: hrvData,
+                lastSyncedAt: new Date()
+            }));
+
+            console.log('[BiometricSync] Data synced:', { sleepData, hrvData });
+        } catch (err) {
+            console.error('[BiometricSync] Sync failed:', err);
+            throw err;
+        }
+    };
+
+    // Sync health data from device
     const syncHealthData = useCallback(async () => {
         if (!biometricData.isNativeAvailable) {
             console.log('[BiometricSync] Health APIs not available - manual input required');
             return;
         }
 
-        // Real implementation when health plugin is installed:
-        // const { Health } = await import('@niceplugins/capacitor-health');
-        // const sleepData = await Health.querySampleType({...});
-
-        console.log('[BiometricSync] Would sync real health data here when plugin is installed');
-    }, [biometricData.isNativeAvailable]);
+        try {
+            setLoading(true);
+            setError(null);
+            await syncHealthDataInternal();
+        } catch (err) {
+            console.error('[BiometricSync] Sync failed:', err);
+            setError('Falha ao sincronizar dados de saúde');
+        } finally {
+            setLoading(false);
+        }
+    }, [biometricData.isNativeAvailable, platform]);
 
     // Calculate sleep quality score - returns null if no real data
     const getSleepQualityScore = useCallback((): number | null => {

@@ -21,8 +21,11 @@ export interface WorkoutPlan {
       sets: string;
       reps: number;
       weight?: number;
+      load_unit?: 'kg' | '%' | 'lbs';
       duration?: number;
       rest_time: number;
+      cycles?: number;
+      tempo_cadence?: string;
       notes?: string;
     }>;
   }>;
@@ -54,14 +57,14 @@ export const useWorkoutPlans = () => {
 
     if (!forceRefresh && cacheRef.current) {
       const hasInvalidVersion = !cacheRef.current.version || cacheRef.current.version !== CACHE_VERSION;
-      
+
       if (hasInvalidVersion) {
         cacheRef.current = null;
       } else {
         const cacheAge = Date.now() - cacheRef.current.timestamp;
         const isEmpty = cacheRef.current.data.length === 0;
         const cacheValid = isEmpty ? cacheAge < 10000 : cacheAge < CACHE_DURATION;
-        
+
         if (cacheValid) {
           setWorkoutPlans(cacheRef.current.data);
           setLoading(false);
@@ -72,7 +75,7 @@ export const useWorkoutPlans = () => {
 
     try {
       setError(null);
-      
+
       let { data, error: queryError } = await supabase
         .rpc('get_user_workout_plans', {
           p_user_id: user.id
@@ -123,27 +126,27 @@ export const useWorkoutPlans = () => {
       setLoading(false);
       return;
     }
-    
+
     console.log('🔄 [useWorkoutPlans] Mount with user:', user.id);
-    
+
     // ✅ Limpar cache para forçar RPC
     cacheRef.current = null;
-    
+
     // ✅ Chamar RPC diretamente sem dependência de fetchWorkoutPlans
     (async () => {
       try {
         setError(null);
         console.log('📞 [useWorkoutPlans] Calling RPC get_user_workout_plans');
-        
+
         let { data, error: queryError } = await supabase
           .rpc('get_user_workout_plans', {
             p_user_id: user.id
           });
 
-        console.log('📦 [useWorkoutPlans] RPC result:', { 
-          hasData: !!data, 
+        console.log('📦 [useWorkoutPlans] RPC result:', {
+          hasData: !!data,
           length: data?.length || 0,
-          hasError: !!queryError 
+          hasError: !!queryError
         });
 
         if (queryError || !data || data.length === 0) {
@@ -171,7 +174,7 @@ export const useWorkoutPlans = () => {
         console.log('✅ [useWorkoutPlans] Setting plans:', formatted.length);
         cacheRef.current = { data: formatted, timestamp: Date.now(), version: CACHE_VERSION };
         setWorkoutPlans(formatted);
-        
+
       } catch (err) {
         console.error('[useWorkoutPlans] Unexpected error:', err);
         setError('Erro inesperado ao carregar planos');
@@ -180,13 +183,13 @@ export const useWorkoutPlans = () => {
         setLoading(false);
       }
     })();
-    
+
   }, [user?.id]); // ✅ APENAS user?.id como dependência
 
   // ✅ BUILD 54: Escutar eventos de realtime global
   useEffect(() => {
     if (!user?.id) return;
-    
+
     const handleWorkoutPlansUpdate = () => {
       console.log('📡 [useWorkoutPlans] Evento realtime recebido - refreshing');
       cacheRef.current = null; // Limpar cache antes do refresh
@@ -194,7 +197,7 @@ export const useWorkoutPlans = () => {
     };
 
     window.addEventListener('workout-plans-updated', handleWorkoutPlansUpdate);
-    
+
     return () => {
       window.removeEventListener('workout-plans-updated', handleWorkoutPlansUpdate);
     };
@@ -202,7 +205,7 @@ export const useWorkoutPlans = () => {
 
   // Get active plans for current user
   const activePlans = workoutPlans.filter(plan => plan.status === 'active');
-  
+
   // Get current plan (most recent active plan)
   const currentPlan = activePlans.length > 0 ? activePlans[0] : null;
 

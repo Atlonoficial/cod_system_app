@@ -1,6 +1,7 @@
 import UIKit
 import Capacitor
 import OSLog
+import HealthKit
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -9,14 +10,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var bootStartTime: Date?
     
     // ✅ BUILD 49: Logs estruturados com OSLog (aparecem no Xcode Organizer)
-    let bootLogger = OSLog(subsystem: "com.atlontech.shapepro.aluno", category: "Boot")
+    let bootLogger = OSLog(subsystem: "com.atlontech.codsystem.app", category: "Boot")
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
         bootStartTime = Date()
         
+        // ✅ Registrar plugin HealthService para integração com Apple Health
+        let bridge = (self.window?.rootViewController as? CAPBridgeViewController)?.bridge
+        bridge?.registerPluginInstance(HealthServicePlugin())
+        
         // ✅ BUILD 49: Usar OSLog para logs estruturados
-        os_log(.info, log: bootLogger, "🚀 Shape Pro launching - Build 49")
+        os_log(.info, log: bootLogger, "🚀 COD SYSTEM launching - Build 49")
         os_log(.info, log: bootLogger, "Bundle: %{public}@", Bundle.main.bundleIdentifier ?? "unknown")
         os_log(.info, log: bootLogger, "Version: %{public}@", Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown")
         os_log(.info, log: bootLogger, "Build: %{public}@", Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "unknown")

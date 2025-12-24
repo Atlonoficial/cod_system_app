@@ -47,7 +47,7 @@ const config: CapacitorConfig = {
     backgroundColor: "#000000",
     allowsLinkPreview: false,
     handleApplicationNotifications: false,
-    CFBundleVersion: '2',
+    CFBundleVersion: '3',
     CFBundleShortVersionString: "1.0.0",
 
     // ✅ Desabilitar bounce/overscroll nativo do iOS
@@ -71,6 +71,12 @@ const config: CapacitorConfig = {
       NSLocationAlwaysAndWhenInUseUsageDescription:
         "Usamos sua localização para melhorar sua experiência no app.",
 
+      // ---- HealthKit (COD System - Biometric Sync) ----
+      NSHealthShareUsageDescription:
+        "Usamos dados de sono e frequência cardíaca do Apple Health para personalizar seu treino e acompanhar sua recuperação.",
+      NSHealthUpdateUsageDescription:
+        "Registramos suas sessões de treino no Apple Health para manter um histórico completo.",
+
       // Criptografia
       ITSAppUsesNonExemptEncryption: false,
 
@@ -90,7 +96,7 @@ const config: CapacitorConfig = {
 
       // *** Versões (garantem sincronização em todos os builds)
       CFBundleShortVersionString: "1.0.0",
-      CFBundleVersion: "2",
+      CFBundleVersion: "3",
     },
   },
 
@@ -104,7 +110,7 @@ const config: CapacitorConfig = {
     hideLogs: true,
     cleartext: true,
     networkSecurityConfig: true,
-    versionCode: 2,
+    versionCode: 3,
     versionName: "1.0.0"
   },
 
