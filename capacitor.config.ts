@@ -19,9 +19,7 @@ const config: CapacitorConfig = {
   appId: "com.atlontech.codsystem.app",
   appName: "COD SYSTEM",
   webDir: "dist",
-  bundledWebRuntime: false,
   backgroundColor: "#000000",
-  version: "1.0.0",
 
   // Em PROD/CI não terá server.url
   ...maybeServer,
