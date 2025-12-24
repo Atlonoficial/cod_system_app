@@ -11,7 +11,7 @@ Pod::Spec.new do |s|
   s.author = package['author']
   s.source = { :git => 'https://github.com/Atlonoficial/cod_system_app.git', :tag => s.version.to_s }
   s.source_files = 'ios/Sources/**/*.{swift,h,m,c,cc,mm,cpp}'
-  s.ios.deployment_target  = '14.0'
+  s.ios.deployment_target  = '16.0'
   s.dependency 'Capacitor'
   s.dependency 'CapacitorCordova'
   s.swift_version = '5.9'

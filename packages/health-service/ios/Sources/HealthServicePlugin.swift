@@ -16,7 +16,7 @@ public class HealthServicePlugin: CAPPlugin {
     
     // MARK: - Request permissions
     
-    @objc func requestPermissions(_ call: CAPPluginCall) {
+    @objc func requestHealthPermissions(_ call: CAPPluginCall) {
         guard HKHealthStore.isHealthDataAvailable() else {
             call.resolve(["granted": false])
             return

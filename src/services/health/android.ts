@@ -29,12 +29,12 @@ class AndroidHealthPlugin implements HealthPluginInterface {
         }
     }
 
-    async requestPermissions(): Promise<{ granted: boolean }> {
+    async requestHealthPermissions(): Promise<{ granted: boolean }> {
         try {
             // @ts-ignore - Native method injected by Capacitor
             if (window.Capacitor?.Plugins?.HealthService) {
                 // @ts-ignore
-                return await window.Capacitor.Plugins.HealthService.requestPermissions();
+                return await window.Capacitor.Plugins.HealthService.requestHealthPermissions();
             }
             return { granted: false };
         } catch {

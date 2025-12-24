@@ -26,7 +26,7 @@ export interface HealthDataResponse {
 
 export interface HealthPluginInterface {
     isAvailable(): Promise<{ available: boolean }>;
-    requestPermissions(): Promise<{ granted: boolean }>;
+    requestHealthPermissions(): Promise<{ granted: boolean }>;
     getSleepData(options: { startDate: string; endDate: string }): Promise<HealthDataResponse>;
     getHeartRateData(options: { startDate: string; endDate: string }): Promise<{
         avgHRV: number;
@@ -41,7 +41,7 @@ class MockHealthPlugin implements HealthPluginInterface {
         return { available: false };
     }
 
-    async requestPermissions(): Promise<{ granted: boolean }> {
+    async requestHealthPermissions(): Promise<{ granted: boolean }> {
         console.log('[HealthService] Mock plugin - cannot request permissions');
         return { granted: false };
     }
@@ -99,7 +99,7 @@ class HealthServiceImpl {
     async requestPermissions(): Promise<boolean> {
         if (!this.isNative) return false;
         try {
-            const { granted } = await this.plugin.requestPermissions();
+            const { granted } = await this.plugin.requestHealthPermissions();
             return granted;
         } catch (error) {
             console.error('[HealthService] Permission request failed:', error);
