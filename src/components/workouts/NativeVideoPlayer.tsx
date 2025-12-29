@@ -60,6 +60,8 @@ export default function NativeVideoPlayer({ videoUrl, posterUrl, autoPlay = fals
                     controls
                     playsInline
                     autoPlay={autoPlay}
+                    loop={true}
+                    muted={false}
                     onLoadedData={handleLoadedData}
                     onError={handleError}
                     controlsList="nodownload"

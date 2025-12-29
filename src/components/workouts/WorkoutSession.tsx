@@ -344,8 +344,8 @@ export const WorkoutSession = ({ workout, onFinish, onExit }: WorkoutSessionProp
         </div>
       </div>
 
-      {/* Stats unificados */}
-      <div className="grid grid-cols-3 gap-2.5 px-4 -mt-4 mb-4 relative z-10">
+      {/* Stats unificados - BUILD 58: Corrigido grid para 2 colunas */}
+      <div className="grid grid-cols-2 gap-2.5 px-4 -mt-4 mb-4 relative z-10">
         <Card className="bg-accent/10 border-accent/20 backdrop-blur-sm">
           <CardContent className="p-2.5 flex items-center gap-2">
             <Target className="w-4 h-4 text-primary flex-shrink-0" />

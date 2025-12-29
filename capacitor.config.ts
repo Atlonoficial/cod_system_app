@@ -39,7 +39,9 @@ const config: CapacitorConfig = {
   ios: {
     scheme: "codsystem",
     contentInset: "automatic",
-    backgroundColor: "#000000",
+    // ✅ BUILD 57: Cor do background do app para safe area profissional
+    // hsl(214.3, 36.8%, 7.5%) = #0d1117 (dark blue matching app theme)
+    backgroundColor: "#0d1117",
     allowsLinkPreview: false,
     handleApplicationNotifications: false,
 
@@ -49,7 +51,8 @@ const config: CapacitorConfig = {
   },
 
   android: {
-    backgroundColor: "#000000",
+    // ✅ BUILD 57: Cor do background consistente com iOS
+    backgroundColor: "#0d1117",
     allowMixedContent: true,
     captureInput: true,
     webContentsDebuggingEnabled: false,
@@ -65,7 +68,8 @@ const config: CapacitorConfig = {
     SplashScreen: {
       launchAutoHide: true,
       launchShowDuration: 0,
-      backgroundColor: "#000000",
+      // ✅ BUILD 57: Cor consistente com o tema do app
+      backgroundColor: "#0d1117",
       androidSplashResourceName: "splash",
       androidScaleType: "CENTER_CROP",
       showSpinner: false,
@@ -73,7 +77,7 @@ const config: CapacitorConfig = {
       spinnerColor: "#999999",
     },
     Keyboard: { resize: "native", style: "dark", resizeOnFullScreen: true },
-    StatusBar: { style: "dark", backgroundColor: "#000000" },
+    StatusBar: { style: "dark", backgroundColor: "#0d1117" },
     Camera: { permissions: ["camera", "photos"] },
   },
 };

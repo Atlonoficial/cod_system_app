@@ -39,9 +39,11 @@ export const BottomNavigation = ({ activeTab, onTabChange }: BottomNavigationPro
         bottom: 0,
         left: 0,
         right: 0,
-        zIndex: 50, // Reduzido de 999999 para um valor sensato, mas acima de conteúdo normal
+        zIndex: 50,
         touchAction: 'none',
-        paddingBottom: 'env(safe-area-inset-bottom)', // Garante padding nativo
+        paddingBottom: 'env(safe-area-inset-bottom)',
+        // BUILD 58: Cor sólida para evitar faixa preta ao navegar
+        backgroundColor: 'hsl(214.3 36.8% 10%)',
       }}
       className="
         bottom-nav-container

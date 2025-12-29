@@ -689,6 +689,9 @@
     overscroll-behavior-y: contain;
     /* Evita propagação de scroll */
     scroll-behavior: smooth;
+    /* BUILD 58: Otimização de touch e performance */
+    touch-action: pan-y pinch-zoom;
+    contain: layout style;
     /* Padding para não sobrepor bottom nav (via inline style no componente) */
   }
 
