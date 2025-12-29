@@ -43,11 +43,8 @@ const config: CapacitorConfig = {
     allowsLinkPreview: false,
     handleApplicationNotifications: false,
 
-
-
-    // ✅ Desabilitar bounce/overscroll nativo do iOS
-    scrollEnabled: false,
-
+    // ✅ BUILD 04: Scroll nativo habilitado para permitir scroll do conteúdo
+    // Header e footer permanecem fixos via CSS (position: fixed)
 
   },
 

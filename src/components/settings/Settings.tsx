@@ -7,6 +7,10 @@ import { AboutApp } from "./AboutApp";
 import { TermsOfService } from "./TermsOfService";
 import { StravaIntegrationSettings } from "./StravaIntegrationSettings";
 
+// 🔒 FEATURE FLAG: Strava integration
+// Set to true when Strava app credentials are configured
+const STRAVA_ENABLED = false;
+
 const settingsCategories = [
 
   {
@@ -78,8 +82,8 @@ export const Settings = () => {
 
       {/* Settings Categories */}
       <div className="space-y-6">
-        {/* Strava Integration */}
-        <StravaIntegrationSettings />
+        {/* Strava Integration - BLOCKED until credentials configured */}
+        {STRAVA_ENABLED && <StravaIntegrationSettings />}
 
         {settingsCategories.map((category, categoryIndex) => (
           <div key={categoryIndex}>

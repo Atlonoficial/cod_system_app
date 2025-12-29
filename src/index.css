@@ -636,7 +636,9 @@
     display: flex;
     flex-direction: column;
     position: relative;
-    overflow: hidden;
+    /* ✅ BUILD 55: Removido overflow:hidden que bloqueava scroll interno */
+    overflow-x: hidden; /* Apenas horizontal para evitar scroll lateral */
+    overflow-y: visible; /* Permitir scroll vertical */
   }
 
   /* Fixed Header with Logo */
