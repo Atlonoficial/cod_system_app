@@ -42,12 +42,14 @@ export const BottomNavigation = ({ activeTab, onTabChange }: BottomNavigationPro
         zIndex: 50,
         touchAction: 'none',
         paddingBottom: 'env(safe-area-inset-bottom)',
-        // BUILD 58: Cor sólida para evitar faixa preta ao navegar
+        // BUILD 62: Cor sólida única - sem conflito com classes CSS
         backgroundColor: 'hsl(214.3 36.8% 10%)',
+        // Garante que o background preencha TODO o padding
+        boxSizing: 'border-box',
       }}
       className="
         bottom-nav-container
-        bg-card/95 backdrop-blur-lg
+        backdrop-blur-lg
         border-t border-border
         w-full
         shadow-lg
