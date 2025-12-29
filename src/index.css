@@ -628,26 +628,34 @@
 
   /* ============================================
      APP LAYOUT - Fixed Header and Footer
+     BUILD 56: Arquitetura de scroll corrigida
      ============================================ */
-  
+
+  /* Container principal - viewport fixo */
   .app-layout {
-    min-height: 100vh;
-    min-height: 100dvh;
+    height: 100vh;
+    height: 100dvh;
+    /* Dynamic viewport for mobile browsers */
+    width: 100%;
     display: flex;
     flex-direction: column;
-    position: relative;
-    /* ✅ BUILD 55: Removido overflow:hidden que bloqueava scroll interno */
-    overflow-x: hidden; /* Apenas horizontal para evitar scroll lateral */
-    overflow-y: visible; /* Permitir scroll vertical */
-  }
-
-  /* Fixed Header with Logo */
-  .app-header {
     position: fixed;
+    /* Fixo na viewport */
     top: 0;
     left: 0;
     right: 0;
-    z-index: 999998;
+    bottom: 0;
+    overflow: hidden;
+    /* NÃO permite scroll no container principal */
+  }
+
+  /* Fixed Header with Logo - Posição relativa no flex container */
+  .app-header {
+    position: relative;
+    /* Relativo dentro do flex */
+    flex-shrink: 0;
+    /* Não encolhe */
+    z-index: 100;
     background: linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--background) / 0.95) 100%);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
@@ -669,13 +677,19 @@
     object-fit: contain;
   }
 
-  /* Scrollable Content Area */
+  /* Scrollable Content Area - ÚNICO elemento com scroll */
   .app-content {
     flex: 1;
+    /* Ocupa todo espaço restante */
     overflow-y: auto;
+    /* SCROLL apenas aqui */
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
+    /* Smooth scroll no iOS */
+    overscroll-behavior-y: contain;
+    /* Evita propagação de scroll */
     scroll-behavior: smooth;
+    /* Padding para não sobrepor bottom nav (via inline style no componente) */
   }
 
   /* Hide scrollbar in app-content on mobile */
@@ -683,6 +697,7 @@
     .app-content::-webkit-scrollbar {
       display: none;
     }
+
     .app-content {
       scrollbar-width: none;
       -ms-overflow-style: none;

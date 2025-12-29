@@ -33,7 +33,7 @@ export const AppLayout = ({
 }: AppLayoutProps) => {
     return (
         <div className="app-layout">
-            {/* Fixed Header */}
+            {/* Header - Relative position in flex container */}
             {showHeader && (
                 <header className="app-header">
                     <div className="app-header-content">
@@ -46,18 +46,18 @@ export const AppLayout = ({
                 </header>
             )}
 
-            {/* Scrollable Content Area */}
+            {/* Scrollable Content Area - ÚNICO elemento com scroll */}
             <main
                 className="app-content"
                 style={{
-                    paddingTop: showHeader ? 'calc(60px + env(safe-area-inset-top))' : 'env(safe-area-inset-top)',
+                    // Padding inferior para não sobrepor a bottom nav (que é position: fixed)
                     paddingBottom: showBottomNav ? 'calc(80px + env(safe-area-inset-bottom))' : 'env(safe-area-inset-bottom)',
                 }}
             >
                 {children}
             </main>
 
-            {/* Fixed Bottom Navigation */}
+            {/* Fixed Bottom Navigation - position: fixed via inline styles */}
             {showBottomNav && (
                 <BottomNavigation
                     activeTab={activeTab}
