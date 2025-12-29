@@ -139,13 +139,28 @@
       radial-gradient(circle at top left, hsl(215.4 71.8% 33.3% / 0.15), transparent 40%),
       radial-gradient(circle at bottom right, hsl(140.3 66.5% 37.5% / 0.15), transparent 40%);
     background-attachment: fixed;
-    /* FASE 1: Touch optimization - remove 300ms delay */
-    touch-action: manipulation;
+    /* BUILD 61: Previne scroll no body - apenas .app-content deve scrollar */
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    touch-action: none;
     -webkit-tap-highlight-color: transparent;
-    /* BUILD 60: Desabilita bounce/overscroll completamente */
-    -webkit-overflow-scrolling: touch;
     overscroll-behavior: none;
     -webkit-overscroll-behavior: none;
+  }
+
+  html {
+    /* BUILD 61: HTML também fixo para prevenir qualquer scroll */
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    overscroll-behavior: none;
   }
 }
 
@@ -664,7 +679,8 @@
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border-bottom: 1px solid hsl(var(--border) / 0.5);
-    /* BUILD 59: Removido padding-top duplicado - iOS já trata safe area via Capacitor */
+    /* BUILD 61: Restaurado padding-top para safe area do iOS */
+    padding-top: env(safe-area-inset-top);
   }
 
   .app-header-content {
