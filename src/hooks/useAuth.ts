@@ -159,6 +159,21 @@ export const useAuth = () => {
     refreshProfile: async () => {
       if (userRef.current) {
         fetchingProfileRef.current = true;
+
+        // ✅ CRITICAL FIX: Atualizar userRef com a sessão mais recente do Supabase
+        // Isso garante que os dados de metadata (terms_accepted_at, etc.) estejam atualizados
+        try {
+          const { supabase } = await import('@/integrations/supabase/client');
+          const { data: { session } } = await supabase.auth.getSession();
+          if (session?.user) {
+            userRef.current = session.user;
+            setUser(session.user);
+            logger.info('useAuth', '🔄 Session refreshed in refreshProfile');
+          }
+        } catch (e) {
+          logger.warn('useAuth', '⚠️ Failed to refresh session during refreshProfile', e);
+        }
+
         const profile = await getUserProfile(userRef.current.id);
         if (profile) {
           // ✅ MERGE: Aplicar mesma lógica de merge do handleAuthChange

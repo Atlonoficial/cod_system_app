@@ -111,6 +111,9 @@ export const AcceptTerms = () => {
         await refreshProfile();
       }
 
+      // ✅ FIX: Aguardar propagação do estado antes de navegar
+      // Isso evita que o TermsGuard redirecione de volta antes do estado ser atualizado
+      await new Promise(resolve => setTimeout(resolve, 150));
       navigate('/', { replace: true });
     } catch (error) {
       console.error('[AcceptTerms] Erro ao atualizar perfil:', error);
@@ -125,7 +128,7 @@ export const AcceptTerms = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4 overflow-y-auto" style={{ paddingTop: 'max(env(safe-area-inset-top), 16px)', paddingBottom: 'max(env(safe-area-inset-bottom), 24px)' }}>
       <Card className="w-full max-w-2xl">
         <CardHeader className="text-center space-y-4">
           <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">

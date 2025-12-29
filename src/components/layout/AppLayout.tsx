@@ -50,8 +50,9 @@ export const AppLayout = ({
             <main
                 className="app-content"
                 style={{
-                    // BUILD 62: Padding apenas para altura da nav (72px nav + safe area é tratado pela própria nav)
-                    paddingBottom: showBottomNav ? 'calc(72px + env(safe-area-inset-bottom))' : '0',
+                    // BUILD 63: Safe-area é tratado EXCLUSIVAMENTE pela bottom-nav
+                    // Aqui apenas adicionamos a altura da navegação (72px)
+                    paddingBottom: showBottomNav ? '72px' : '0',
                 }}
             >
                 {children}
