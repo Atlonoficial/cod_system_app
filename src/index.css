@@ -142,9 +142,10 @@
     /* FASE 1: Touch optimization - remove 300ms delay */
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
-    /* FASE 4: Smooth scroll with bounce */
+    /* BUILD 60: Desabilita bounce/overscroll completamente */
     -webkit-overflow-scrolling: touch;
-    overscroll-behavior-y: contain;
+    overscroll-behavior: none;
+    -webkit-overscroll-behavior: none;
   }
 }
 
@@ -647,6 +648,9 @@
     bottom: 0;
     overflow: hidden;
     /* NÃO permite scroll no container principal */
+    /* BUILD 60: Previne bounce/overscroll que causa faixa preta */
+    overscroll-behavior: none;
+    -webkit-overscroll-behavior: none;
   }
 
   /* Fixed Header with Logo - Posição relativa no flex container */
