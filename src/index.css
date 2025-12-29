@@ -660,7 +660,7 @@
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border-bottom: 1px solid hsl(var(--border) / 0.5);
-    padding-top: env(safe-area-inset-top);
+    /* BUILD 59: Removido padding-top duplicado - iOS já trata safe area via Capacitor */
   }
 
   .app-header-content {
