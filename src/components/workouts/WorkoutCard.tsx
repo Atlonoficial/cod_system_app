@@ -10,6 +10,7 @@ interface WorkoutCardProps {
   image?: string;
   isCompleted?: boolean;
   onClick?: () => void;
+  highlighted?: boolean;
 }
 
 export const WorkoutCard = ({
@@ -20,7 +21,8 @@ export const WorkoutCard = ({
   muscleGroup,
   image,
   isCompleted = false,
-  onClick
+  onClick,
+  highlighted = false
 }: WorkoutCardProps) => {
   // Estado vazio quando não há dados de treino
   if (!name || name.trim() === '') {
@@ -48,7 +50,10 @@ export const WorkoutCard = ({
 
   return (
     <Card
-      className="bg-card/50 border-border/50 overflow-hidden transition-all duration-300 rounded-2xl hover:bg-card/70 cursor-pointer"
+      className={`relative overflow-hidden group cursor-pointer border-transparent hover:border-sidebar-primary/50 transition-all duration-300 rounded-2xl ${highlighted
+        ? 'bg-gradient-to-br from-accent/5 to-card border-accent/30 shadow-[0_0_15px_-3px_rgba(235,255,0,0.15)] scale-[1.01]'
+        : 'bg-card/40 hover:bg-card/60 border-border/50'
+        }`}
       onClick={onClick}
     >
       <CardContent className="p-0">
@@ -85,12 +90,16 @@ export const WorkoutCard = ({
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <Clock className="w-4 h-4 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">{duration}min</span>
+              <span className="text-sm text-muted-foreground">
+                {isNaN(duration) || duration <= 0 ? '-' : `${Math.round(duration)}min`}
+              </span>
             </div>
 
             <div className="flex items-center gap-2">
               <Flame className="w-4 h-4 text-orange-400" />
-              <span className="text-sm text-muted-foreground">{calories} cal</span>
+              <span className="text-sm text-muted-foreground">
+                {isNaN(calories) || calories <= 0 ? '-' : `${calories} cal`}
+              </span>
             </div>
           </div>
 

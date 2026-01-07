@@ -7,6 +7,8 @@ import { useAuthContext } from "@/components/auth/AuthProvider";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { AddProgressPhotoDialog } from "@/components/progress/AddProgressPhotoDialog";
+import { RequestNotificationBanner } from "@/components/notifications/RequestNotificationBanner";
+import { useStudentRequests } from "@/hooks/useStudentRequests";
 
 interface ProgressPhoto {
   id: string;
@@ -24,11 +26,12 @@ export const FotosProgresso = () => {
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [showAddDialog, setShowAddDialog] = useState(false);
+  const { photoRequests, markAsCompleted } = useStudentRequests();
 
   useEffect(() => {
     const fetchPhotos = async () => {
       if (!user?.id) return;
-      
+
       try {
         const { data, error } = await (supabase as any)
           .from("progress_photos")
@@ -52,7 +55,7 @@ export const FotosProgresso = () => {
   const handleAddSuccess = () => {
     const fetchPhotos = async () => {
       if (!user?.id) return;
-      
+
       try {
         const { data, error } = await (supabase as any)
           .from("progress_photos")
@@ -68,6 +71,12 @@ export const FotosProgresso = () => {
       }
     };
     fetchPhotos();
+
+    // Mark any pending photo requests as completed
+    if (photoRequests.length > 0) {
+      markAsCompleted(photoRequests[0].id);
+      toast.success("Solicitação atendida! ✅ Seu treinador foi notificado.");
+    }
   };
 
   return (
@@ -75,8 +84,8 @@ export const FotosProgresso = () => {
       {/* Header */}
       <div className="p-4 pt-8 border-b border-border/30">
         <div className="flex items-center gap-3 mb-4">
-          <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             size="icon"
             onClick={() => navigate("/?tab=profile")}
             className="text-foreground"
@@ -124,9 +133,16 @@ export const FotosProgresso = () => {
           </CardContent>
         </Card>
 
+        {/* Request Banner */}
+        <RequestNotificationBanner
+          requests={photoRequests}
+          type="photo"
+          onActionClick={() => setShowAddDialog(true)}
+        />
+
         {/* Add Photo Button */}
-        <Button 
-          className="w-full mb-4" 
+        <Button
+          className="w-full mb-4"
           variant="outline"
           onClick={() => setShowAddDialog(true)}
         >

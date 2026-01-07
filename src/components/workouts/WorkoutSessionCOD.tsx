@@ -4,6 +4,16 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
@@ -13,6 +23,8 @@ import { VideoPlayer } from "./VideoPlayer";
 import { AGTTimer } from "@/components/workout/AGTTimer";
 import { SetLogger } from "@/components/workout/SetLogger";
 import { PostWorkoutCheckout, CheckoutData } from "@/components/workout/PostWorkoutCheckout";
+import { ResumeWorkoutDialog } from "@/components/workout/ResumeWorkoutDialog";
+import { useWorkoutSessionPersistence } from "@/hooks/useWorkoutSessionPersistence";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
@@ -78,6 +90,22 @@ export const WorkoutSessionCOD = ({ workout, onFinish, onExit }: WorkoutSessionC
     const [totalVolume, setTotalVolume] = useState(0);
     const [isVideoCollapsed, setIsVideoCollapsed] = useState(true);
 
+    // Persistence states
+    const [showResumeDialog, setShowResumeDialog] = useState(false);
+    const [sessionRestored, setSessionRestored] = useState(false);
+    const [showEarlyFinishConfirm, setShowEarlyFinishConfirm] = useState(false);
+
+    // Ref to track if we are in the finish flow to prevent auto-saves
+    const isFinishFlow = useRef(false);
+    const {
+        savedSession,
+        hasActiveSession,
+        saveSession,
+        clearSession,
+        getSessionAge,
+        isLoading: isLoadingSession
+    } = useWorkoutSessionPersistence(user?.id);
+
     // Current exercise with adaptations
     const currentExercise = workout.exercises[currentExerciseIndex];
 
@@ -127,6 +155,139 @@ export const WorkoutSessionCOD = ({ workout, onFinish, onExit }: WorkoutSessionC
         }
         return () => clearInterval(interval);
     }, [isRunning, showTimer]);
+
+    // Check for saved session on mount
+    useEffect(() => {
+        if (!isLoadingSession && hasActiveSession && savedSession && !sessionRestored) {
+            // Check if it's the same workout
+            if (savedSession.workoutId === workout.id) {
+                setShowResumeDialog(true);
+                setIsRunning(false); // Pause until user decides
+            }
+        }
+    }, [isLoadingSession, hasActiveSession, savedSession, workout.id, sessionRestored]);
+
+    // Restore session handler
+    const handleResumeSession = useCallback(() => {
+        if (!savedSession) return;
+
+        // Restore state from saved session
+        setTime(savedSession.elapsedTime);
+        setCurrentExerciseIndex(savedSession.currentExerciseIndex);
+        setCurrentSetNumber(savedSession.currentSetNumber);
+        setTotalVolume(savedSession.totalVolume);
+
+        // Restore exercise logs (convert object back to Map)
+        const restoredLogs = new Map<number, SetLog[]>();
+        Object.entries(savedSession.exerciseLogs || {}).forEach(([key, value]) => {
+            restoredLogs.set(parseInt(key), value as SetLog[]);
+        });
+        setExerciseLogs(restoredLogs);
+
+        setSessionRestored(true);
+        setShowResumeDialog(false);
+        setIsRunning(true);
+
+        toast.success('Treino restaurado! Continuando de onde parou 💪');
+    }, [savedSession]);
+
+    // Start new session handler  
+    const handleStartNewSession = useCallback(async () => {
+        await clearSession();
+        setSessionRestored(true);
+        setShowResumeDialog(false);
+        setIsRunning(true);
+
+        toast.info('Iniciando novo treino');
+    }, [clearSession]);
+
+    // Auto-save session after each set
+    const autoSaveSession = useCallback(() => {
+        if (!user?.id) return;
+
+        // Convert Map to object for serialization
+        const logsObject: Record<number, SetLog[]> = {};
+        exerciseLogs.forEach((value, key) => {
+            logsObject[key] = value;
+        });
+
+        saveSession({
+            workoutId: workout.id,
+            workoutName: workout.name,
+            userId: user.id,
+            currentExerciseIndex,
+            currentSetNumber,
+            exerciseLogs: logsObject,
+            totalVolume,
+            elapsedTime: time,
+            startedAt: new Date(Date.now() - time * 1000).toISOString(),
+            readinessLevel: readinessLevel || 'green',
+            modifiers: modifiers || { volume: 1, intensity: 1, rest: 1 }
+        });
+    }, [user?.id, workout, currentExerciseIndex, currentSetNumber, exerciseLogs, totalVolume, time, readinessLevel, modifiers, saveSession]);
+
+    // Refs to hold latest state for unmount saving
+    const stateRef = useRef({
+        exerciseLogs,
+        time,
+        currentExerciseIndex,
+        currentSetNumber,
+        totalVolume,
+        readinessLevel,
+        modifiers,
+        user,
+        workout,
+        saveSession
+    });
+
+    // Update refs on every render
+    useEffect(() => {
+        stateRef.current = {
+            exerciseLogs,
+            time,
+            currentExerciseIndex,
+            currentSetNumber,
+            totalVolume,
+            readinessLevel,
+            modifiers,
+            user,
+            workout,
+            saveSession
+        };
+    }, [exerciseLogs, time, currentExerciseIndex, currentSetNumber, totalVolume, readinessLevel, modifiers, user, workout, saveSession]);
+
+    // Save session ONLY when component unmounts (user leaves workout)
+    useEffect(() => {
+        return () => {
+            const current = stateRef.current;
+            const hasMadeProgress = current.exerciseLogs.size > 0 || current.time > 60;
+
+            // Only save if:
+            // 1. User has made progress
+            // 2. We are NOT in the finish flow (prevents race condition with clearSession)
+            if (hasMadeProgress && !isFinishFlow.current && current.user?.id) {
+                // Manually trigger save with latest ref data
+                const logsObject: Record<number, SetLog[]> = {};
+                current.exerciseLogs.forEach((value, key) => {
+                    logsObject[key] = value;
+                });
+
+                current.saveSession({
+                    workoutId: current.workout.id,
+                    workoutName: current.workout.name,
+                    userId: current.user.id,
+                    currentExerciseIndex: current.currentExerciseIndex,
+                    currentSetNumber: current.currentSetNumber,
+                    exerciseLogs: logsObject,
+                    totalVolume: current.totalVolume,
+                    elapsedTime: current.time,
+                    startedAt: new Date(Date.now() - current.time * 1000).toISOString(),
+                    readinessLevel: current.readinessLevel || 'green',
+                    modifiers: current.modifiers || { volume: 1, intensity: 1, rest: 1 }
+                });
+            }
+        };
+    }, []);
 
     const formatTime = (seconds: number): string => {
         const mins = Math.floor(seconds / 60);
@@ -179,6 +340,9 @@ export const WorkoutSessionCOD = ({ workout, onFinish, onExit }: WorkoutSessionC
             setShowSetLogger(false);
             setShowTimer(true);
         }
+
+        // Auto-save after each set
+        setTimeout(() => autoSaveSession(), 500);
     };
 
     const handleTimerComplete = async () => {
@@ -218,7 +382,25 @@ export const WorkoutSessionCOD = ({ workout, onFinish, onExit }: WorkoutSessionC
         }
     };
 
+    // Handle finish request - shows confirmation if not complete
+    const handleFinishRequest = async () => {
+        const completed = currentExerciseIndex === workout.exercises.length - 1 &&
+            (exerciseLogs.get(currentExerciseIndex)?.length || 0) >= adaptedSets;
+        if (completed) {
+            handleFinish();
+        } else {
+            setShowEarlyFinishConfirm(true);
+        }
+    };
+
+    // Handle confirmed early finish
+    const handleConfirmEarlyFinish = async () => {
+        setShowEarlyFinishConfirm(false);
+        handleFinish();
+    };
+
     const handleFinish = async () => {
+        isFinishFlow.current = true; // Mark as finishing to block auto-save
         setIsRunning(false);
         // Show checkout modal instead of saving directly
         setShowCheckout(true);
@@ -231,6 +413,10 @@ export const WorkoutSessionCOD = ({ workout, onFinish, onExit }: WorkoutSessionC
         try {
             await haptics.success();
             await saveWorkoutSession(checkoutData);
+
+            // Clear persisted session after successful save
+            await clearSession();
+
             toast.success('Treino finalizado com sucesso! 🎉');
             onFinish();
         } catch (error) {
@@ -344,6 +530,8 @@ export const WorkoutSessionCOD = ({ workout, onFinish, onExit }: WorkoutSessionC
     const completedSetsCount = exerciseLogs.get(currentExerciseIndex)?.length || 0;
     // Display the actual completed sets, capped at adaptedSets
     const displaySetsCount = Math.min(completedSetsCount, adaptedSets);
+    // Check if workout is complete
+    const isWorkoutComplete = currentExerciseIndex === workout.exercises.length - 1 && completedSetsCount >= adaptedSets;
     // Clamp progress to max 100%
     const progressPercent = Math.min(
         100,
@@ -377,7 +565,7 @@ export const WorkoutSessionCOD = ({ workout, onFinish, onExit }: WorkoutSessionC
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                             <DropdownMenuItem
-                                onClick={handleFinish}
+                                onClick={handleFinishRequest}
                                 disabled={isSaving}
                                 className="text-destructive focus:text-destructive"
                             >
@@ -535,6 +723,35 @@ export const WorkoutSessionCOD = ({ workout, onFinish, onExit }: WorkoutSessionC
                 )}
             </div>
 
+            {/* Fixed Finish Button - Shows when workout is COMPLETE (last exercise, all sets done) */}
+            {isWorkoutComplete && !showCheckout && (
+                <div className="fixed bottom-0 left-0 right-0 p-4 pb-safe bg-gradient-to-t from-background via-background to-transparent z-40">
+                    <Button
+                        onClick={handleFinish}
+                        disabled={isSaving}
+                        className="w-full h-14 text-lg font-bold bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg shadow-green-500/30 animate-pulse"
+                    >
+                        <Flag className="w-5 h-5 mr-2" />
+                        {isSaving ? 'Salvando...' : '🎉 Finalizar Treino'}
+                    </Button>
+                </div>
+            )}
+
+            {/* Finish button visible when workout has started but NOT complete */}
+            {!isWorkoutComplete && completedSetsCount > 0 && !showCheckout && !showTimer && (
+                <div className="fixed bottom-0 left-0 right-0 p-4 pb-safe bg-gradient-to-t from-background to-transparent z-40">
+                    <Button
+                        variant="outline"
+                        onClick={handleFinishRequest}
+                        disabled={isSaving}
+                        className="w-full h-12 border-amber-500/50 text-amber-400 hover:bg-amber-500/10"
+                    >
+                        <Flag className="w-4 h-4 mr-2" />
+                        Finalizar Treino Antecipado
+                    </Button>
+                </div>
+            )}
+
             {/* Post-Workout Checkout Modal */}
             <PostWorkoutCheckout
                 isOpen={showCheckout}
@@ -551,6 +768,40 @@ export const WorkoutSessionCOD = ({ workout, onFinish, onExit }: WorkoutSessionC
                     totalExercises: workout.exercises.length
                 }}
             />
+
+            {/* Resume Workout Dialog */}
+            <ResumeWorkoutDialog
+                isOpen={showResumeDialog}
+                session={savedSession}
+                sessionAge={getSessionAge()}
+                onResume={handleResumeSession}
+                onStartNew={handleStartNewSession}
+            />
+
+            {/* Early Finish Confirmation Dialog */}
+            <AlertDialog open={showEarlyFinishConfirm} onOpenChange={setShowEarlyFinishConfirm}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Finalizar treino antecipadamente?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Você ainda não completou todos os exercícios. Tem certeza que deseja finalizar o treino agora?
+                            <br /><br />
+                            <strong>Progresso atual:</strong>
+                            <br />• Exercício {currentExerciseIndex + 1} de {workout.exercises.length}
+                            <br />• Séries completadas: {completedSetsCount}/{adaptedSets}
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Continuar Treinando</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={handleConfirmEarlyFinish}
+                            className="bg-amber-500 hover:bg-amber-600"
+                        >
+                            Sim, Finalizar
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 };

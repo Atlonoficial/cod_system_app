@@ -74,13 +74,21 @@ export const AGTTimer: React.FC<AGTTimerProps> = ({
                     if (prev <= 1) {
                         setIsRunning(false);
                         setIsComplete(true);
-                        // Vibrate on complete
+                        // Vibrate on complete - long pattern
                         if ('vibrate' in navigator) {
-                            navigator.vibrate([200, 100, 200]);
+                            navigator.vibrate([200, 100, 200, 100, 300]);
                         }
                         onComplete();
                         return 0;
                     }
+
+                    // Vibrate on last 5 seconds - increasing intensity
+                    if (prev <= 5 && 'vibrate' in navigator) {
+                        // Intensity increases as time decreases: 50ms at 5s, 100ms at 1s
+                        const vibrationDuration = 50 + ((5 - prev) * 15);
+                        navigator.vibrate(vibrationDuration);
+                    }
+
                     return prev - 1;
                 });
             }, 1000);

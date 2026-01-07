@@ -45,7 +45,8 @@ export const Dashboard = ({ onWorkoutClick }: DashboardProps) => {
   const { addWeightEntry, shouldShowWeightModal, error: weightError, clearError } = useWeightProgress(user?.id || '');
 
   // COD System - Wellness Check-in (gracefully degrades if tables don't exist)
-  const { needsCheckin, readinessLevel, tableExists: codTablesExist } = useWellnessCheckin();
+  // BUILD 64: Adicionado 'refresh' para atualização instantânea após check-in
+  const { needsCheckin, readinessLevel, tableExists: codTablesExist, refresh: refreshWellness } = useWellnessCheckin();
   const [showWellnessModal, setShowWellnessModal] = useState(false);
 
   // COD System Phase 2 - Workout Evolution Data
@@ -236,12 +237,8 @@ export const Dashboard = ({ onWorkoutClick }: DashboardProps) => {
 
 
 
-      {/* Stats Overview */}
-      <DashboardStats
-        workouts={currentSession ? [{ name: currentSession.sessionName }] : []}
-        progress={progress}
-        loading={workoutSessionLoading || progressLoading}
-      />
+      {/* Stats Overview - BUILD 64: Agora busca dados internamente via useWorkoutStats */}
+      <DashboardStats />
 
 
       {hasWorkoutPlan && currentSession && (
@@ -322,7 +319,11 @@ export const Dashboard = ({ onWorkoutClick }: DashboardProps) => {
       {/* COD System - Wellness Check-in Modal */}
       <WellnessCheckinModal
         isOpen={showWellnessModal}
-        onComplete={() => setShowWellnessModal(false)}
+        onComplete={() => {
+          setShowWellnessModal(false);
+          // BUILD 64: Força refresh do ReadinessDashboard para atualização instantânea
+          refreshWellness();
+        }}
       />
     </div>
   );

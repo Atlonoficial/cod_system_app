@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { useKeyboardState } from "@/hooks/useKeyboardState";
 import { useBottomNavGestures } from "@/hooks/useBottomNavGestures";
 import { useIsMobileApp } from "@/hooks/useIsMobileApp";
+import { usePendingRequestsCount } from "@/hooks/usePendingRequestsCount";
 
 const navItems = [
   { id: 'home', icon: Home, label: 'Início' },
@@ -18,6 +19,7 @@ interface BottomNavigationProps {
 export const BottomNavigation = ({ activeTab, onTabChange }: BottomNavigationProps) => {
   const { isVisible: keyboardVisible } = useKeyboardState();
   const { isMobileApp } = useIsMobileApp();
+  const { count: pendingRequestsCount } = usePendingRequestsCount();
   const gestures = useBottomNavGestures({
     activeTab,
     tabs: navItems,
@@ -32,20 +34,12 @@ export const BottomNavigation = ({ activeTab, onTabChange }: BottomNavigationPro
   }
 
   return (
+    // BUILD 64: Inline styles simplificados - posicionamento via CSS em .bottom-nav-container
     <nav
       {...(isMobileApp ? gestures : {})}
       style={{
-        position: 'fixed',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        zIndex: 50,
-        touchAction: 'none',
-        paddingBottom: 'env(safe-area-inset-bottom)',
-        // BUILD 62: Cor sólida única - sem conflito com classes CSS
+        // Apenas background color como inline style (não conflita com CSS)
         backgroundColor: 'hsl(214.3 36.8% 10%)',
-        // Garante que o background preencha TODO o padding
-        boxSizing: 'border-box',
       }}
       className="
         bottom-nav-container
@@ -91,14 +85,21 @@ export const BottomNavigation = ({ activeTab, onTabChange }: BottomNavigationPro
                 aria-current={isActive ? 'page' : undefined}
                 tabIndex={0}
               >
-                <Icon
-                  size={22}
-                  className={`
+                <div className="relative">
+                  <Icon
+                    size={22}
+                    className={`
                     transition-all duration-300
                     ${isActive ? 'text-primary scale-110' : 'text-muted-foreground'}
                   `}
-                  aria-hidden="true"
-                />
+                    aria-hidden="true"
+                  />
+                  {item.id === 'profile' && pendingRequestsCount > 0 && (
+                    <span className="absolute -top-1.5 -right-1.5 min-w-[16px] h-4 px-1 text-[10px] font-bold bg-destructive text-destructive-foreground rounded-full flex items-center justify-center border-2 border-card">
+                      {pendingRequestsCount > 9 ? '9+' : pendingRequestsCount}
+                    </span>
+                  )}
+                </div>
                 <span
                   className={`
                     text-[10px] xs:text-[11px] font-medium

@@ -10,6 +10,8 @@ export interface CurrentWorkoutSession {
   totalExercises: number;
   dayOfWeek: number;
   sessionIndex: number;
+  mode?: 'fixed' | 'flexible';
+  allSessions?: any[];
 }
 
 export const useCurrentWorkoutSession = () => {
@@ -25,45 +27,79 @@ export const useCurrentWorkoutSession = () => {
     const sessionsPerWeek = currentPlan.sessions_per_week || 3;
     const totalSessions = currentPlan.exercises_data.length;
 
+    const schedulingMode = currentPlan.scheduling_mode || 'flexible';
+
     // Calculate which session should be performed today
     // Monday = 1, Tuesday = 2, Wednesday = 3, Thursday = 4, Friday = 5, Saturday = 6, Sunday = 0
     const workoutDays = getWorkoutDays(sessionsPerWeek);
-    
+
     // Find if today is a workout day
     const todayWorkoutIndex = workoutDays.indexOf(dayOfWeek);
-    
-    if (todayWorkoutIndex === -1) {
-      // Today is not a workout day, get the next workout day
-      const nextWorkoutDay = getNextWorkoutDay(dayOfWeek, workoutDays);
-      const nextSessionIndex = workoutDays.indexOf(nextWorkoutDay) % totalSessions;
-      const session = currentPlan.exercises_data[nextSessionIndex];
-      
+
+    // Logic for Fixed Mode (Legacy/Strict)
+    if (schedulingMode === 'fixed') {
+      if (todayWorkoutIndex === -1) {
+        // Today is not a workout day, get the next workout day
+        const nextWorkoutDay = getNextWorkoutDay(dayOfWeek, workoutDays);
+        const nextSessionIndex = workoutDays.indexOf(nextWorkoutDay) % totalSessions;
+        const session = currentPlan.exercises_data[nextSessionIndex];
+
+        return {
+          sessionName: session?.name || `Sessão ${nextSessionIndex + 1}`,
+          sessionLabel: `Treino ${String.fromCharCode(65 + nextSessionIndex)}`,
+          exercises: session?.exercises || [],
+          estimatedDuration: calculateSessionDuration(session?.exercises || []),
+          difficulty: currentPlan.difficulty,
+          totalExercises: session?.exercises?.length || 0,
+          dayOfWeek: nextWorkoutDay,
+          sessionIndex: nextSessionIndex,
+          mode: 'fixed'
+        };
+      }
+
+      // Today is a workout day, get current session
+      const sessionIndex = todayWorkoutIndex % totalSessions;
+      const session = currentPlan.exercises_data[sessionIndex];
+
       return {
-        sessionName: session?.name || `Sessão ${nextSessionIndex + 1}`,
-        sessionLabel: `Treino ${String.fromCharCode(65 + nextSessionIndex)}`, // A, B, C, etc.
+        sessionName: session?.name || `Sessão ${sessionIndex + 1}`,
+        sessionLabel: `Treino ${String.fromCharCode(65 + sessionIndex)}`,
         exercises: session?.exercises || [],
         estimatedDuration: calculateSessionDuration(session?.exercises || []),
         difficulty: currentPlan.difficulty,
         totalExercises: session?.exercises?.length || 0,
-        dayOfWeek: nextWorkoutDay,
-        sessionIndex: nextSessionIndex,
+        dayOfWeek,
+        sessionIndex,
+        mode: 'fixed'
       };
     }
 
-    // Today is a workout day, get current session
-    const sessionIndex = todayWorkoutIndex % totalSessions;
-    const session = currentPlan.exercises_data[sessionIndex];
+    // Logic for Flexible Mode (Default/New)
+    // Suggests the next session in sequence (A -> B -> C -> A)
+    // But allows user to select any
+
+    // TODO: Implement better tracking of last completed session from history
+    // For now, we suggest based on day of week to keep rotation, or just stick to sequence
+    // A simple rotation based on day of year or just sequential index relative to week
+    const suggestedIndex = todayWorkoutIndex !== -1
+      ? todayWorkoutIndex % totalSessions
+      : 0; // Default to first if not a scheduled day, or logic can be better
+
+    const suggestedSession = currentPlan.exercises_data[suggestedIndex];
 
     return {
-      sessionName: session?.name || `Sessão ${sessionIndex + 1}`,
-      sessionLabel: `Treino ${String.fromCharCode(65 + sessionIndex)}`, // A, B, C, etc.
-      exercises: session?.exercises || [],
-      estimatedDuration: calculateSessionDuration(session?.exercises || []),
+      sessionName: suggestedSession?.name || `Sessão ${suggestedIndex + 1}`,
+      sessionLabel: `Treino ${String.fromCharCode(65 + suggestedIndex)}`,
+      exercises: suggestedSession?.exercises || [],
+      estimatedDuration: calculateSessionDuration(suggestedSession?.exercises || []),
       difficulty: currentPlan.difficulty,
-      totalExercises: session?.exercises?.length || 0,
-      dayOfWeek,
-      sessionIndex,
+      totalExercises: suggestedSession?.exercises?.length || 0,
+      dayOfWeek, // irrelevant for flexible but kept for type compat
+      sessionIndex: suggestedIndex,
+      mode: 'flexible',
+      allSessions: currentPlan.exercises_data
     };
+
   }, [currentPlan]);
 
   return {
@@ -109,11 +145,19 @@ function calculateSessionDuration(exercises: any[]): number {
     return 0;
   }
 
-  return exercises.reduce((total, exercise) => {
+  const totalSeconds = exercises.reduce((total, exercise) => {
     const sets = parseInt(exercise.sets) || 3;
-    const restTime = exercise.rest_time || 60;
-    const exerciseTime = exercise.duration || 30; // Default 30 seconds per set
-    
+    const restTime = parseInt(exercise.rest_time) || 60;
+    const exerciseTime = parseInt(exercise.duration) || 30; // Default 30 seconds per set
+
+    // Ensure all values are valid numbers
+    if (isNaN(sets) || isNaN(restTime) || isNaN(exerciseTime)) {
+      return total;
+    }
+
     return total + (sets * exerciseTime) + ((sets - 1) * restTime);
-  }, 0) / 60; // Convert to minutes
+  }, 0);
+
+  const result = totalSeconds / 60; // Convert to minutes
+  return isNaN(result) ? 0 : result;
 }

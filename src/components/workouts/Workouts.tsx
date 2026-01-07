@@ -8,6 +8,7 @@ import { useHapticFeedback } from "@/hooks/useHapticFeedback";
 import { useActiveSubscription } from "@/hooks/useActiveSubscription";
 import { useWellnessCheckin } from "@/hooks/useWellnessCheckin";
 import { useWorkoutHistory } from "@/hooks/useWorkoutHistory";
+import { useCurrentWorkoutSession } from "@/hooks/useCurrentWorkoutSession";
 import { WorkoutCard } from "./WorkoutCard";
 import { WorkoutDetail } from "./WorkoutDetail";
 import { ExerciseDetail } from "./ExerciseDetail";
@@ -38,6 +39,9 @@ export const Workouts = () => {
   const [currentView, setCurrentView] = useState<ViewState>('list');
   const [selectedWorkout, setSelectedWorkout] = useState<any>(null);
   const [selectedExercise, setSelectedExercise] = useState<any>(null);
+
+  // Dual Mode Support
+  const { currentSession, loading: sessionLoading } = useCurrentWorkoutSession();
 
   // Expanded mesocycle sections
   const [expandedMesocycles, setExpandedMesocycles] = useState<Set<string>>(new Set());
@@ -444,19 +448,138 @@ export const Workouts = () => {
         </div>
       ) : (
         /* Flat Workout List (Legacy/Fallback) */
-        <div className="grid grid-cols-1 gap-4">
-          {workouts.map((workout) => (
-            <WorkoutCard
-              key={workout.id}
-              name={workout.name}
-              duration={estimateWorkoutDuration(workout)}
-              difficulty={difficultyPt(workout.difficulty)}
-              calories={estimateCalories(workout)}
-              muscleGroup={getWorkoutMuscleGroups(workout).join(', ') || 'Geral'}
-              isCompleted={isCompletedToday(workout.id)}
-              onClick={() => handleWorkoutSelect(workout)}
-            />
-          ))}
+        /* Flat Workout List (Legacy/Fallback) */
+        /* Modified for Dual Mode: Fixed vs Flexible */
+        <div className="space-y-6">
+          {workouts.map((workout) => {
+            const mode = workout.scheduling_mode || 'flexible';
+
+            // FLEXIBLE MODE: Show all sessions as a grid
+            if (mode === 'flexible') {
+              return (
+                <div key={workout.id} className="space-y-4">
+                  {currentSession?.sessionIndex !== undefined && (
+                    <div className="bg-gradient-to-br from-accent/10 to-transparent p-4 rounded-2xl border border-accent/20">
+                      <h3 className="text-sm font-semibold text-accent mb-3 flex items-center gap-2">
+                        <Target className="w-4 h-4" />
+                        Sugestão para Hoje
+                      </h3>
+                      <WorkoutCard
+                        name={currentSession.sessionName}
+                        duration={currentSession.estimatedDuration || 0}
+                        difficulty={difficultyPt(currentSession.difficulty)}
+                        calories={isNaN(currentSession.estimatedDuration) ? 0 : Math.round((currentSession.estimatedDuration || 0) * 8)} // Estimate
+                        muscleGroup={workout.sessions?.[currentSession.sessionIndex]?.exercises?.[0]?.muscle_groups?.join(', ') || 'Geral'}
+                        isCompleted={false} // Todo: check history
+                        onClick={() => {
+                          // Construct a workout object that represents this session
+                          const session = workout.sessions[currentSession.sessionIndex];
+                          const sessionWorkout = {
+                            ...workout,
+                            name: session.name,
+                            sessions: [session] // Explicitly set only this session
+                          };
+                          handleWorkoutSelect(sessionWorkout);
+                        }}
+                        highlighted
+                      />
+                    </div>
+                  )}
+
+                  <div>
+                    <h3 className="text-sm text-muted-foreground mb-3 uppercase tracking-wider font-medium">Todos os Treinos</h3>
+                    <div className="grid grid-cols-1 gap-3">
+                      {workout.sessions.map((session, idx) => (
+                        <div
+                          key={session.id}
+                          onClick={() => {
+                            const sessionWorkout = {
+                              ...workout,
+                              name: session.name,
+                              sessions: [session]
+                            };
+                            handleWorkoutSelect(sessionWorkout);
+                          }}
+                          className="flex items-center gap-4 p-4 bg-card/50 rounded-2xl border border-border/50 hover:bg-card hover:border-accent/30 transition-all cursor-pointer"
+                        >
+                          <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center text-foreground font-bold text-lg">
+                            {String.fromCharCode(65 + idx)}
+                          </div>
+                          <div className="flex-1">
+                            <h4 className="font-semibold text-foreground">{session.name}</h4>
+                            <p className="text-xs text-muted-foreground flex items-center gap-2 mt-1">
+                              <span>{session.exercises.length} exercícios</span>
+                              <span>•</span>
+                              <span>~{estimateWorkoutDuration({ sessions: [session] })} min</span>
+                            </p>
+                          </div>
+                          <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              );
+            }
+
+            // FIXED MODE: Show only the relevant session (or Plan card but behaving strictly)
+            else {
+              // Use currentSession to determine which one to show
+              // If there is a current session due today
+              if (currentSession && currentSession.mode === 'fixed') {
+                // Check if it's the workout of the day
+                const sessionIndex = currentSession.sessionIndex;
+                const session = workout.sessions[sessionIndex];
+
+                // Fallback if session calculation mismatches or plan differs
+                if (!session) return null;
+
+                return (
+                  <div key={workout.id}>
+                    <h3 className="text-sm text-muted-foreground mb-3 uppercase tracking-wider font-medium flex items-center gap-2">
+                      <CalendarDays className="w-4 h-4" />
+                      Treino do Dia
+                    </h3>
+                    <WorkoutCard
+                      name={session.name}
+                      duration={estimateWorkoutDuration({ sessions: [session] })}
+                      difficulty={difficultyPt(workout.difficulty)}
+                      calories={Math.round(estimateWorkoutDuration({ sessions: [session] }) * 8)}
+                      muscleGroup={session.exercises?.[0]?.muscle_groups?.join(', ') || 'Geral'}
+                      isCompleted={false} // Todo history check
+                      onClick={() => {
+                        const sessionWorkout = {
+                          ...workout,
+                          name: session.name,
+                          sessions: [session]
+                        };
+                        handleWorkoutSelect(sessionWorkout);
+                      }}
+                      highlighted
+                    />
+
+                    <div className="mt-6 p-4 bg-muted/20 rounded-xl text-center">
+                      <p className="text-sm text-muted-foreground">
+                        Seu plano é fixo por dias da semana.
+                        <br />Volte amanhã para o próximo treino!
+                      </p>
+                    </div>
+                  </div>
+                );
+              }
+
+              // Fallback normal rendering if no current session found (e.g. rest day)
+              return (
+                <div key={workout.id} className="text-center py-12">
+                  <div className="w-16 h-16 bg-muted/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <CalendarDays className="w-8 h-8 text-muted-foreground" />
+                  </div>
+                  <h3 className="text-lg font-semibold mb-2">Descanso</h3>
+                  <p className="text-muted-foreground">Hoje não há treino agendado.</p>
+                </div>
+              );
+            }
+          })}
         </div>
       )}
     </div>

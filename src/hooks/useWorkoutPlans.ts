@@ -33,7 +33,9 @@ export interface WorkoutPlan {
   sessions_per_week: number;
   tags: string[];
   notes?: string;
+  notes?: string;
   is_template: boolean;
+  scheduling_mode?: 'fixed' | 'flexible'; // Novo campo
   created_at: string;
   updated_at: string;
 }
@@ -99,7 +101,8 @@ export const useWorkoutPlans = () => {
         ...plan,
         status: plan.status as 'active' | 'inactive' | 'draft',
         difficulty: plan.difficulty as 'beginner' | 'intermediate' | 'advanced',
-        exercises_data: Array.isArray(plan.exercises_data) ? plan.exercises_data as any[] : []
+        exercises_data: Array.isArray(plan.exercises_data) ? plan.exercises_data as any[] : [],
+        scheduling_mode: (plan as any).scheduling_mode || 'flexible' // Default
       }));
 
       // ✅ BUILD 52: Retry automático se vazio (máx 3 tentativas)
@@ -168,7 +171,8 @@ export const useWorkoutPlans = () => {
           ...plan,
           status: plan.status as 'active' | 'inactive' | 'draft',
           difficulty: plan.difficulty as 'beginner' | 'intermediate' | 'advanced',
-          exercises_data: Array.isArray(plan.exercises_data) ? plan.exercises_data as any[] : []
+          exercises_data: Array.isArray(plan.exercises_data) ? plan.exercises_data as any[] : [],
+          scheduling_mode: (plan as any).scheduling_mode || 'flexible' // Default
         }));
 
         console.log('✅ [useWorkoutPlans] Setting plans:', formatted.length);

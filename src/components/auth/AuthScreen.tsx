@@ -208,28 +208,35 @@ export const AuthScreen = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        <div className="text-center mb-8">
+        {/* Logo Section */}
+        <div className="text-center mb-10">
           <img
             src="/cod-logo.png"
             alt="COD System"
-            className="h-32 w-auto mx-auto mb-4"
+            className="h-20 w-auto mx-auto"
           />
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Fazer Login</CardTitle>
-            <CardDescription>
-              Entre com sua conta para acessar seus treinos
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSignIn} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <div className="relative">
+        {/* Login Card with Glassmorphism */}
+        <div className="relative">
+          {/* Glow Effect */}
+          <div className="absolute -inset-1 bg-gradient-to-r from-blue-600/20 to-green-500/20 rounded-2xl blur-xl"></div>
+
+          {/* Card */}
+          <Card className="relative bg-slate-900/40 backdrop-blur-xl border-white/10 shadow-2xl">
+            <CardHeader className="space-y-1 pb-4">
+              <CardTitle className="text-2xl font-bold text-white">Bem-vindo de volta</CardTitle>
+              <CardDescription className="text-slate-400">
+                Acesse sua conta para continuar
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleSignIn} className="space-y-4">
+                {/* Email Input */}
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="text-sm text-slate-300">E-mail</Label>
                   <Input
                     id="email"
                     type="email"
@@ -237,78 +244,91 @@ export const AuthScreen = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
+                    className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-blue-500/20"
                   />
                 </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password">Senha</Label>
-                <div className="relative">
-                  <Input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
+                {/* Password Input */}
+                <div className="space-y-2">
+                  <Label htmlFor="password" className="text-sm text-slate-300">Senha</Label>
+                  <div className="relative">
+                    <Input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="••••••••"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-blue-500/20 pr-10"
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent text-slate-400 hover:text-slate-300"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </div>
+                </div>
+                {/* Forgot Password Link */}
+                <div className="flex justify-end">
                   <Button
                     type="button"
-                    variant="ghost"
+                    variant="link"
                     size="sm"
-                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                    onClick={() => setShowPassword(!showPassword)}
+                    onClick={handleResetPassword}
+                    disabled={resetLoading || resetCooldown > 0}
+                    className="flex items-center gap-2 text-blue-400 hover:text-blue-300 p-0 h-auto"
                   >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4" />
+                    {resetLoading ? (
+                      <>
+                        <div className="h-3 w-3 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                        Enviando...
+                      </>
+                    ) : resetCooldown > 0 ? (
+                      <>
+                        <Mail className="h-3 w-3" />
+                        Aguarde {resetCooldown}s
+                      </>
                     ) : (
-                      <Eye className="h-4 w-4" />
+                      <>
+                        <Mail className="h-3 w-3" />
+                        Esqueceu a senha?
+                      </>
                     )}
                   </Button>
                 </div>
-              </div>
-              <div className="flex justify-end">
+                {/* Submit Button */}
                 <Button
-                  type="button"
-                  variant="link"
-                  size="sm"
-                  onClick={handleResetPassword}
-                  disabled={resetLoading || resetCooldown > 0}
-                  className="flex items-center gap-2"
+                  type="submit"
+                  className="w-full bg-gradient-to-r from-blue-600 to-green-500 hover:from-blue-700 hover:to-green-600 text-white shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
+                  disabled={loading}
                 >
-                  {resetLoading ? (
-                    <>
-                      <div className="h-3 w-3 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                      Enviando...
-                    </>
-                  ) : resetCooldown > 0 ? (
-                    <>
-                      <Mail className="h-3 w-3" />
-                      Aguarde {resetCooldown}s
-                    </>
-                  ) : (
-                    <>
-                      <Mail className="h-3 w-3" />
-                      Esqueceu a senha?
-                    </>
-                  )}
+                  {loading ? "Entrando..." : "Entrar"}
                 </Button>
-              </div>
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? "Entrando..." : "Entrar"}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
+              </form>
+            </CardContent>
+          </Card>
+        </div>
 
-        <div className="mt-6 text-center space-y-2">
-          <p className="text-sm text-muted-foreground">
-            Não tem uma conta?
+        {/* Footer */}
+        <div className="mt-8 text-center space-y-3">
+          <p className="text-sm text-slate-400">
+            Não tem conta?{' '}
+            <span className="text-blue-400 font-medium">Cadastre-se</span>
           </p>
-          <div className="p-3 bg-muted/30 rounded-lg border border-border/50 text-sm text-muted-foreground">
-            <p>
-              Este aplicativo é exclusivo para alunos convidados.
-              <br />
-              <strong>Peça o convite para seu Personal Trainer.</strong>
+          <div className="pt-4 border-t border-slate-800">
+            <p className="text-xs text-slate-500">
+              Esqueceu sua senha ou precisa de ajuda?
+            </p>
+            <p className="text-xs text-slate-500 mt-1">
+              Entre em contato com o{' '}
+              <span className="text-blue-400">suporte técnico</span>
             </p>
           </div>
         </div>

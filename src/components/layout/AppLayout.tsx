@@ -47,14 +47,8 @@ export const AppLayout = ({
             )}
 
             {/* Scrollable Content Area - ÚNICO elemento com scroll */}
-            <main
-                className="app-content"
-                style={{
-                    // BUILD 63: Safe-area é tratado EXCLUSIVAMENTE pela bottom-nav
-                    // Aqui apenas adicionamos a altura da navegação (72px)
-                    paddingBottom: showBottomNav ? '72px' : '0',
-                }}
-            >
+            {/* BUILD 64: Usando classe CSS ao invés de inline style para considerar safe-area */}
+            <main className={`app-content ${showBottomNav ? 'has-bottom-nav' : ''}`}>
                 {children}
             </main>
 

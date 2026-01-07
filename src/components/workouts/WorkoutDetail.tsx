@@ -7,6 +7,7 @@ import { BottomNavigation } from "@/components/layout/BottomNavigation";
 import { useNavigate } from "react-router-dom";
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { Capacitor } from '@capacitor/core';
+import { RichTextRenderer } from '@/components/ui/RichTextRenderer';
 
 interface Exercise {
   id: number;
@@ -70,7 +71,7 @@ const ExerciseInfoDisplay = ({ exerciseName }: { exerciseName: string }) => {
       {exercise.instructions && (
         <div className="bg-primary/10 rounded-lg p-3 border border-primary/20">
           <p className="text-xs text-primary/80 mb-1 font-medium">Instruções</p>
-          <p className="text-sm text-foreground">{exercise.instructions}</p>
+          <RichTextRenderer content={exercise.instructions} className="text-foreground" />
         </div>
       )}
       {exercise.description && exercise.description !== exercise.instructions && (

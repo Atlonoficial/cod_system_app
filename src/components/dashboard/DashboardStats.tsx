@@ -1,20 +1,23 @@
 import { MetricCard } from "../ui/MetricCard";
-import { Flame, Target, Zap, Trophy } from "lucide-react";
+import { Flame, Target } from "lucide-react";
+import { useWorkoutStats } from "@/hooks/useWorkoutStats";
 
-
-interface DashboardStatsProps {
-  workouts: any[];
-  progress: any[];
-  loading?: boolean;
-}
-
-export const DashboardStats = ({ workouts, progress, loading }: DashboardStatsProps) => {
-
+/**
+ * DashboardStats - Exibe estatísticas de treinos do usuário
+ * BUILD 64: Agora busca dados reais via useWorkoutStats
+ */
+export const DashboardStats = () => {
+  const {
+    completedThisMonth,
+    todayCalories,
+    estimatedCalories,
+    loading
+  } = useWorkoutStats();
 
   if (loading) {
     return (
       <div className="grid grid-cols-2 gap-4 mb-6">
-        {[...Array(4)].map((_, i) => (
+        {[...Array(2)].map((_, i) => (
           <div key={i} className="metric-card animate-pulse">
             <div className="h-4 bg-muted rounded mb-2"></div>
             <div className="h-6 bg-muted rounded mb-1"></div>
@@ -25,43 +28,23 @@ export const DashboardStats = ({ workouts, progress, loading }: DashboardStatsPr
     );
   }
 
-  // Calculate real statistics from Supabase data
-
-  const thisMonthWorkouts = workouts.filter(w => {
-    const workoutDate = new Date(w.completedAt || w.createdAt);
-    const now = new Date();
-    return workoutDate.getMonth() === now.getMonth() && workoutDate.getFullYear() === now.getFullYear();
-  }).length;
-
-
-  const totalCalories = workouts.reduce((sum, w) => sum + (w.caloriesBurned || 0), 0);
-  const todayCalories = workouts.filter(w => {
-    const workoutDate = new Date(w.completedAt || w.createdAt);
-    const today = new Date();
-    return workoutDate.toDateString() === today.toDateString();
-  }).reduce((sum, w) => sum + (w.caloriesBurned || 0), 0);
-
-
-
   return (
     <div className="grid grid-cols-2 gap-4 mb-6">
       <MetricCard
         title="Calorias Queimadas"
         value={todayCalories.toString()}
-        subtitle={`Total: ${totalCalories}`}
+        subtitle={`Total mês: ${estimatedCalories}`}
         icon={<Flame size={20} />}
         trend={todayCalories > 0 ? "up" : "neutral"}
       />
 
       <MetricCard
         title="Treinos Concluídos"
-        value={thisMonthWorkouts.toString()}
+        value={completedThisMonth.toString()}
         subtitle="Este mês"
         icon={<Target size={20} />}
-        trend={thisMonthWorkouts > 0 ? "up" : "neutral"}
+        trend={completedThisMonth > 0 ? "up" : "neutral"}
       />
-
-
     </div>
   );
 };

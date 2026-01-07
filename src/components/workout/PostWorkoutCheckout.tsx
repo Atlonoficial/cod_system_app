@@ -145,35 +145,39 @@ export const PostWorkoutCheckout: React.FC<PostWorkoutCheckoutProps> = ({
                         </div>
                     </div>
 
-                    {/* RPE Slider - Clean */}
-                    <div className="space-y-2">
+                    {/* RPE Slider - iOS Compatible */}
+                    <div className="space-y-3">
                         <div className="flex items-baseline justify-between">
                             <label className="text-sm font-medium text-foreground">
                                 RPE Geral
                             </label>
                             <div className="flex items-baseline gap-1.5">
-                                <span className={`text-xl font-bold ${currentRpeLabel.color}`}>
+                                <span className={`text-2xl font-bold ${currentRpeLabel.color}`}>
                                     {overallRpe}
                                 </span>
-                                <span className={`text-xs ${currentRpeLabel.color}`}>
+                                <span className={`text-sm ${currentRpeLabel.color}`}>
                                     {currentRpeLabel.label}
                                 </span>
                             </div>
                         </div>
-                        <input
-                            type="range"
-                            min="1"
-                            max="10"
-                            value={overallRpe}
-                            onChange={(e) => setOverallRpe(parseInt(e.target.value))}
-                            className="w-full h-1.5 bg-gradient-to-r from-emerald-500 via-amber-500 to-red-500 rounded-full appearance-none cursor-pointer
-                                [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 
-                                [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white 
-                                [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-primary
-                                [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full 
-                                [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:shadow-md [&::-moz-range-thumb]:border-2 
-                                [&::-moz-range-thumb]:border-primary [&::-moz-range-thumb]:border-none"
-                        />
+                        <div className="py-2">
+                            <input
+                                type="range"
+                                min="1"
+                                max="10"
+                                step="1"
+                                value={overallRpe}
+                                onChange={(e) => setOverallRpe(parseInt(e.target.value))}
+                                className="rpe-slider"
+                                aria-label="RPE slider"
+                                title="Ajuste o RPE de 1 a 10"
+                            />
+                        </div>
+                        <div className="flex justify-between text-xs text-muted-foreground px-1">
+                            <span>Fácil</span>
+                            <span>Moderado</span>
+                            <span>Máximo</span>
+                        </div>
                     </div>
 
                     {/* Notes - Minimal */}

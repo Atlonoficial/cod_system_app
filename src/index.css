@@ -6,6 +6,109 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================
+   SLIDER TOUCH OPTIMIZATION - BUILD 64
+   Garante funcionamento correto em iOS/Android
+   ============================================ */
+
+/* Radix UI Slider - Touch-friendly adjustments */
+[data-radix-slider-root] {
+  touch-action: none;
+  /* Slider controla seus próprios gestos */
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+[data-radix-slider-track] {
+  touch-action: none;
+  cursor: pointer;
+}
+
+[data-radix-slider-thumb] {
+  touch-action: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  /* Visual feedback */
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* Aumentar área de toque invisível para 44px (Apple HIG) */
+[data-radix-slider-thumb]::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+}
+
+/* Feedback visual ao arrastar */
+[data-radix-slider-thumb][data-state="dragging"] {
+  transform: scale(1.15);
+  box-shadow: 0 0 12px hsl(var(--primary) / 0.5);
+}
+
+/* ============================================
+   NATIVE INPUT RANGE SLIDER - iOS Compatible
+   ============================================ */
+input[type="range"].rpe-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+  background: linear-gradient(to right, #10b981, #f59e0b, #ef4444);
+  outline: none;
+  touch-action: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Webkit (Chrome, Safari, iOS) */
+input[type="range"].rpe-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: white;
+  cursor: pointer;
+  border: 3px solid hsl(var(--primary));
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+input[type="range"].rpe-slider::-webkit-slider-thumb:active {
+  transform: scale(1.2);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+/* Firefox */
+input[type="range"].rpe-slider::-moz-range-thumb {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: white;
+  cursor: pointer;
+  border: 3px solid hsl(var(--primary));
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transition: transform 0.15s ease;
+}
+
+input[type="range"].rpe-slider::-moz-range-thumb:active {
+  transform: scale(1.2);
+}
+
+/* Firefox track */
+input[type="range"].rpe-slider::-moz-range-track {
+  height: 8px;
+  border-radius: 4px;
+  background: linear-gradient(to right, #10b981, #f59e0b, #ef4444);
+}
+
+
 /* COD SYSTEM Design System - Consultoria Online */
 
 @layer base {
@@ -139,27 +242,21 @@
       radial-gradient(circle at top left, hsl(215.4 71.8% 33.3% / 0.15), transparent 40%),
       radial-gradient(circle at bottom right, hsl(140.3 66.5% 37.5% / 0.15), transparent 40%);
     background-attachment: fixed;
-    /* BUILD 61: Previne scroll no body - apenas .app-content deve scrollar */
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    /* BUILD 64: Removido position: fixed - .app-layout controla o viewport */
+    margin: 0;
+    padding: 0;
     overflow: hidden;
-    touch-action: none;
+    /* Evita scroll no body, .app-content é o scroll container */
     -webkit-tap-highlight-color: transparent;
-    overscroll-behavior: none;
     -webkit-overscroll-behavior: none;
+    overscroll-behavior: none;
   }
 
   html {
-    /* BUILD 61: HTML também fixo para prevenir qualquer scroll */
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    /* BUILD 64: Removido position: fixed que conflitava com layout flex */
+    height: 100%;
     overflow: hidden;
+    -webkit-overscroll-behavior: none;
     overscroll-behavior: none;
   }
 }
@@ -292,6 +389,7 @@
   }
 
   /* ✅ BUILD 54: Bottom Navigation - Fix definitivo para scroll em native */
+  /* BUILD 64: Adicionado padding-bottom para safe-area */
   .bottom-nav-container {
     position: fixed !important;
     bottom: 0 !important;
@@ -300,14 +398,18 @@
     width: 100% !important;
     z-index: 999999 !important;
 
+    /* BUILD 64: Safe area bottom - ÚNICA fonte de verdade */
+    padding-bottom: env(safe-area-inset-bottom);
+    box-sizing: border-box;
+
     /* ✅ REMOVER transforms que criam stacking context */
     transform: none !important;
     -webkit-transform: none !important;
     will-change: auto !important;
 
     /* ✅ ADICIONAR overscroll-behavior para evitar bounce */
-    overscroll-behavior: none;
     -webkit-overscroll-behavior: none;
+    overscroll-behavior: none;
 
     /* ✅ GPU acceleration sem transform */
     -webkit-tap-highlight-color: transparent;
@@ -317,8 +419,8 @@
     isolation: isolate;
 
     /* ✅ Touch behavior otimizado */
-    touch-action: none;
     -webkit-touch-action: none;
+    touch-action: none;
   }
 
   /* ✅ BUILD 54: Prevenir scroll na bottom nav wrapper */
@@ -712,7 +814,14 @@
     /* BUILD 58: Otimização de touch e performance */
     touch-action: pan-y pinch-zoom;
     contain: layout style;
-    /* Padding para não sobrepor bottom nav (via inline style no componente) */
+    /* Padding base - pode ser overriden por .has-bottom-nav */
+    padding: 1rem;
+  }
+
+  /* BUILD 64: Padding quando tem bottom nav - considera safe-area-inset-bottom */
+  .app-content.has-bottom-nav {
+    /* 72px = altura da bottom nav, + safe-area para evitar duplicação */
+    padding-bottom: calc(72px + env(safe-area-inset-bottom));
   }
 
   /* Hide scrollbar in app-content on mobile */

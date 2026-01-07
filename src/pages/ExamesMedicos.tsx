@@ -5,6 +5,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AddMedicalExamDialog } from '@/components/medical/AddMedicalExamDialog';
+import { RequestNotificationBanner } from '@/components/notifications/RequestNotificationBanner';
+import { useStudentRequests } from '@/hooks/useStudentRequests';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
@@ -28,10 +30,11 @@ export const ExamesMedicos = () => {
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<'all' | 'blood' | 'cardiology' | 'imaging' | 'others'>('all');
   const { toast } = useToast();
+  const { examRequests, markAsCompleted } = useStudentRequests();
 
   const fetchExams = async () => {
     if (!user?.id) return;
-    
+
     try {
       const { data, error } = await supabase
         .from('medical_exams')
@@ -81,6 +84,14 @@ export const ExamesMedicos = () => {
 
   const handleAddSuccess = () => {
     fetchExams();
+    // Mark any pending exam requests as completed
+    if (examRequests.length > 0) {
+      markAsCompleted(examRequests[0].id);
+      toast({
+        title: "Solicitação atendida! ✅",
+        description: "Seu treinador foi notificado.",
+      });
+    }
   };
 
   // Calculate filtered exams based on selected category
@@ -96,8 +107,8 @@ export const ExamesMedicos = () => {
       {/* Header */}
       <div className="p-4 pt-8 border-b border-border/30">
         <div className="flex items-center gap-3 mb-4">
-          <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             size="icon"
             onClick={() => navigate("/?tab=profile")}
             className="text-foreground"
@@ -109,12 +120,19 @@ export const ExamesMedicos = () => {
       </div>
 
       <div className="p-6">
-        <Alert className="mb-6">
+        <Alert className="mb-4">
           <FileText className="h-4 w-4" />
           <AlertDescription>
             Seus exames médicos são atualizados em tempo real e ficam disponíveis para seu professor acompanhar sua evolução.
           </AlertDescription>
         </Alert>
+
+        {/* Request Banner */}
+        <RequestNotificationBanner
+          requests={examRequests}
+          type="exam"
+          onActionClick={() => setShowAddDialog(true)}
+        />
 
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-semibold">Meus Exames Médicos</h2>
@@ -126,7 +144,7 @@ export const ExamesMedicos = () => {
 
         {/* Category Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          <Card 
+          <Card
             className={`cursor-pointer transition-all ${selectedCategory === 'blood' ? 'ring-2 ring-red-500' : 'hover:shadow-md'}`}
             onClick={() => setSelectedCategory(selectedCategory === 'blood' ? 'all' : 'blood')}
           >
@@ -139,7 +157,7 @@ export const ExamesMedicos = () => {
             </CardContent>
           </Card>
 
-          <Card 
+          <Card
             className={`cursor-pointer transition-all ${selectedCategory === 'cardiology' ? 'ring-2 ring-pink-500' : 'hover:shadow-md'}`}
             onClick={() => setSelectedCategory(selectedCategory === 'cardiology' ? 'all' : 'cardiology')}
           >
@@ -152,7 +170,7 @@ export const ExamesMedicos = () => {
             </CardContent>
           </Card>
 
-          <Card 
+          <Card
             className={`cursor-pointer transition-all ${selectedCategory === 'imaging' ? 'ring-2 ring-blue-500' : 'hover:shadow-md'}`}
             onClick={() => setSelectedCategory(selectedCategory === 'imaging' ? 'all' : 'imaging')}
           >
@@ -165,7 +183,7 @@ export const ExamesMedicos = () => {
             </CardContent>
           </Card>
 
-          <Card 
+          <Card
             className={`cursor-pointer transition-all ${selectedCategory === 'others' ? 'ring-2 ring-gray-500' : 'hover:shadow-md'}`}
             onClick={() => setSelectedCategory(selectedCategory === 'others' ? 'all' : 'others')}
           >
@@ -181,8 +199,8 @@ export const ExamesMedicos = () => {
 
         {selectedCategory !== 'all' && (
           <div className="mb-4">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               size="sm"
               onClick={() => setSelectedCategory('all')}
             >
@@ -199,8 +217,8 @@ export const ExamesMedicos = () => {
           <div className="text-center py-8">
             <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
             <p className="text-muted-foreground">
-              {selectedCategory === 'all' 
-                ? 'Nenhum exame médico encontrado.' 
+              {selectedCategory === 'all'
+                ? 'Nenhum exame médico encontrado.'
                 : `Nenhum exame da categoria "${getCategoryName(selectedCategory)}" encontrado.`
               }
             </p>

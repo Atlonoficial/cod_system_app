@@ -81,9 +81,12 @@ export const HealthConnectionsScreen: React.FC<HealthConnectionsScreenProps> = (
     };
 
     return (
-        <div className="flex flex-col min-h-screen bg-background">
+        <div className="flex flex-col h-screen bg-background">
             {/* Header */}
-            <div className="flex items-center gap-3 p-4 border-b border-border">
+            <div
+                className="flex items-center gap-3 p-4 border-b border-border"
+                style={{ paddingTop: 'max(env(safe-area-inset-top), 16px)' }}
+            >
                 {onBack && (
                     <Button variant="ghost" size="icon" onClick={onBack}>
                         <ChevronLeft className="w-5 h-5" />

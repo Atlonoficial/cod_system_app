@@ -43,6 +43,7 @@ export interface Workout {
   notes?: string;
   created_at: string;
   updated_at: string;
+  scheduling_mode?: 'fixed' | 'flexible'; // Novo campo
 }
 
 export const useWorkouts = () => {
@@ -139,7 +140,8 @@ export const useWorkouts = () => {
       tags: plan.tags,
       notes: plan.notes,
       created_at: plan.created_at,
-      updated_at: plan.updated_at
+      updated_at: plan.updated_at,
+      scheduling_mode: plan.scheduling_mode // Propagar modo de agendamento
     };
   };
 

@@ -48,6 +48,7 @@ import CadastroCompleto from "./pages/CadastroCompleto";
 // Recompensas removed
 import { HealthConnectionsScreen } from "./components/settings/HealthConnectionsScreen";
 import WellnessHistoryPage from "./pages/WellnessHistoryPage";
+import { AssessmentPopup } from "@/components/physical-assessment/AssessmentPopup";
 
 
 
@@ -92,66 +93,67 @@ const AuthenticatedApp = () => {
   useGlobalRealtime();
 
   return (
-    // GamificationProvider removed
-    // GamificationIntegrator removed
-    <Routes>
-      {/* Public routes (no AuthGuard, no TermsGuard) */}
-      <Route path="/politica-privacidade" element={<PoliticaPrivacidade />} />
-      <Route path="/accept-terms" element={<AcceptTerms />} />
+    <>
+      <AssessmentPopup />
+      <Routes>
+        {/* Public routes (no AuthGuard, no TermsGuard) */}
+        <Route path="/politica-privacidade" element={<PoliticaPrivacidade />} />
+        <Route path="/accept-terms" element={<AcceptTerms />} />
 
-      {/* Authentication Routes */}
-      <Route path="/auth/confirm" element={<AuthConfirm />} />
+        {/* Authentication Routes */}
+        <Route path="/auth/confirm" element={<AuthConfirm />} />
 
-      {/* ✅ Aliases de compatibilidade (redireciona para /auth/confirm) */}
-      <Route path="/email/confirm" element={<RedirectToAuthConfirm />} />
-      <Route path="/auth/app/confirm.html" element={<RedirectToAuthConfirm />} />
+        {/* ✅ Aliases de compatibilidade (redireciona para /auth/confirm) */}
+        <Route path="/email/confirm" element={<RedirectToAuthConfirm />} />
+        <Route path="/auth/app/confirm.html" element={<RedirectToAuthConfirm />} />
 
-      <Route path="/auth/recovery" element={<AuthRecovery />} />
-      <Route path="/auth/invite" element={<AuthInvite />} />
-      <Route path="/auth/magic-link" element={<AuthMagicLink />} />
-      <Route path="/auth/change-email" element={<AuthChangeEmail />} />
-      <Route path="/auth/error" element={<AuthError />} />
-      <Route path="/auth/verify" element={<AuthVerify />} />
-      <Route path="/auth/verified" element={<AuthVerified />} />
+        <Route path="/auth/recovery" element={<AuthRecovery />} />
+        <Route path="/auth/invite" element={<AuthInvite />} />
+        <Route path="/auth/magic-link" element={<AuthMagicLink />} />
+        <Route path="/auth/change-email" element={<AuthChangeEmail />} />
+        <Route path="/auth/error" element={<AuthError />} />
+        <Route path="/auth/verify" element={<AuthVerify />} />
+        <Route path="/auth/verified" element={<AuthVerified />} />
 
-      {/* ✅ BUILD 37: Fallback para variações de URL de confirmação */}
-      <Route path="/auth/callback" element={<AuthConfirm />} />
+        {/* ✅ BUILD 37: Fallback para variações de URL de confirmação */}
+        <Route path="/auth/callback" element={<AuthConfirm />} />
 
-      {/* Protected routes (with TermsGuard) */}
-      <Route path="/" element={
-        <AuthGuard>
-          <TermsGuard>
-            <Index />
-          </TermsGuard>
-        </AuthGuard>
-      } />
+        {/* Protected routes (with TermsGuard) */}
+        <Route path="/" element={
+          <AuthGuard>
+            <TermsGuard>
+              <Index />
+            </TermsGuard>
+          </AuthGuard>
+        } />
 
-      <Route path="/cadastro-completo" element={<AuthGuard><TermsGuard><CadastroCompleto /></TermsGuard></AuthGuard>} />
-      <Route path="/anamnese" element={<AuthGuard><TermsGuard><Anamnese /></TermsGuard></AuthGuard>} />
+        <Route path="/cadastro-completo" element={<AuthGuard><TermsGuard><CadastroCompleto /></TermsGuard></AuthGuard>} />
+        <Route path="/anamnese" element={<AuthGuard><TermsGuard><Anamnese /></TermsGuard></AuthGuard>} />
 
-      {/* Rotas que requerem assinatura ativa */}
-      <Route path="/exames-medicos" element={<AuthGuard><TermsGuard><SubscriptionGuard><LazyExames /></SubscriptionGuard></TermsGuard></AuthGuard>} />
-      <Route path="/fotos-progresso" element={<AuthGuard><TermsGuard><SubscriptionGuard><LazyFotos /></SubscriptionGuard></TermsGuard></AuthGuard>} />
-      <Route path="/avaliacoes-fisicas" element={<AuthGuard><TermsGuard><SubscriptionGuard><LazyAvaliacoes /></SubscriptionGuard></TermsGuard></AuthGuard>} />
+        {/* Rotas que requerem assinatura ativa */}
+        <Route path="/exames-medicos" element={<AuthGuard><TermsGuard><SubscriptionGuard><LazyExames /></SubscriptionGuard></TermsGuard></AuthGuard>} />
+        <Route path="/fotos-progresso" element={<AuthGuard><TermsGuard><SubscriptionGuard><LazyFotos /></SubscriptionGuard></TermsGuard></AuthGuard>} />
+        <Route path="/avaliacoes-fisicas" element={<AuthGuard><TermsGuard><SubscriptionGuard><LazyAvaliacoes /></SubscriptionGuard></TermsGuard></AuthGuard>} />
 
-      {/* Configurações sempre acessíveis (para ver status do plano) */}
-      <Route path="/configuracoes" element={<AuthGuard><TermsGuard><LazySettings /></TermsGuard></AuthGuard>} />
-      <Route path="/conta-seguranca" element={<AuthGuard><TermsGuard><ContaSeguranca /></TermsGuard></AuthGuard>} />
-      <Route path="/assinaturas-planos" element={<AuthGuard><TermsGuard><AssinaturasPlanos /></TermsGuard></AuthGuard>} />
-      <Route path="/conexoes-saude" element={<AuthGuard><TermsGuard><HealthConnectionsScreen onBack={() => window.history.back()} /></TermsGuard></AuthGuard>} />
-      <Route path="/wellness-history" element={<AuthGuard><TermsGuard><WellnessHistoryPage /></TermsGuard></AuthGuard>} />
+        {/* Configurações sempre acessíveis (para ver status do plano) */}
+        <Route path="/configuracoes" element={<AuthGuard><TermsGuard><LazySettings /></TermsGuard></AuthGuard>} />
+        <Route path="/conta-seguranca" element={<AuthGuard><TermsGuard><ContaSeguranca /></TermsGuard></AuthGuard>} />
+        <Route path="/assinaturas-planos" element={<AuthGuard><TermsGuard><AssinaturasPlanos /></TermsGuard></AuthGuard>} />
+        <Route path="/conexoes-saude" element={<AuthGuard><TermsGuard><HealthConnectionsScreen onBack={() => window.history.back()} /></TermsGuard></AuthGuard>} />
+        <Route path="/wellness-history" element={<AuthGuard><TermsGuard><WellnessHistoryPage /></TermsGuard></AuthGuard>} />
 
-      {/* Rotas que requerem assinatura ativa */}
-      <Route path="/agenda" element={<AuthGuard><TermsGuard><SubscriptionGuard><LazyAgenda /></SubscriptionGuard></TermsGuard></AuthGuard>} />
-      <Route path="/metas" element={<AuthGuard><TermsGuard><SubscriptionGuard><LazyMetas /></SubscriptionGuard></TermsGuard></AuthGuard>} />
+        {/* Rotas que requerem assinatura ativa */}
+        <Route path="/agenda" element={<AuthGuard><TermsGuard><SubscriptionGuard><LazyAgenda /></SubscriptionGuard></TermsGuard></AuthGuard>} />
+        <Route path="/metas" element={<AuthGuard><TermsGuard><SubscriptionGuard><LazyMetas /></SubscriptionGuard></TermsGuard></AuthGuard>} />
 
-      {/* Chats permitidos para suporte */}
-      <Route path="/teacher-chat" element={<AuthGuard><TermsGuard><LazyTeacherStudentChat /></TermsGuard></AuthGuard>} />
+        {/* Chats permitidos para suporte */}
+        <Route path="/teacher-chat" element={<AuthGuard><TermsGuard><LazyTeacherStudentChat /></TermsGuard></AuthGuard>} />
 
 
 
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </>
   );
 };
 
