@@ -33,9 +33,11 @@ export interface WorkoutPlan {
   sessions_per_week: number;
   tags: string[];
   notes?: string;
-  notes?: string;
   is_template: boolean;
-  scheduling_mode?: 'fixed' | 'flexible'; // Novo campo
+  scheduling_mode?: 'fixed' | 'flexible';
+  // Build 14: Date-based visibility
+  start_date?: string | null;
+  end_date?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -102,7 +104,10 @@ export const useWorkoutPlans = () => {
         status: plan.status as 'active' | 'inactive' | 'draft',
         difficulty: plan.difficulty as 'beginner' | 'intermediate' | 'advanced',
         exercises_data: Array.isArray(plan.exercises_data) ? plan.exercises_data as any[] : [],
-        scheduling_mode: (plan as any).scheduling_mode || 'flexible' // Default
+        scheduling_mode: (plan as any).scheduling_mode || 'flexible',
+        // Build 14: Include dates for filtering
+        start_date: (plan as any).start_date || null,
+        end_date: (plan as any).end_date || null
       }));
 
       // ✅ BUILD 52: Retry automático se vazio (máx 3 tentativas)
@@ -172,7 +177,10 @@ export const useWorkoutPlans = () => {
           status: plan.status as 'active' | 'inactive' | 'draft',
           difficulty: plan.difficulty as 'beginner' | 'intermediate' | 'advanced',
           exercises_data: Array.isArray(plan.exercises_data) ? plan.exercises_data as any[] : [],
-          scheduling_mode: (plan as any).scheduling_mode || 'flexible' // Default
+          scheduling_mode: (plan as any).scheduling_mode || 'flexible',
+          // Build 14: Include dates for filtering
+          start_date: (plan as any).start_date || null,
+          end_date: (plan as any).end_date || null
         }));
 
         console.log('✅ [useWorkoutPlans] Setting plans:', formatted.length);
@@ -207,8 +215,30 @@ export const useWorkoutPlans = () => {
     };
   }, [user?.id]); // ✅ REMOVIDO fetchWorkoutPlans das dependências (causa re-render infinito)
 
-  // Get active plans for current user
-  const activePlans = workoutPlans.filter(plan => plan.status === 'active');
+  // Get active plans for current user with date filtering (Build 14)
+  const activePlans = workoutPlans.filter(plan => {
+    // Must be active status
+    if (plan.status !== 'active') return false;
+
+    const now = new Date();
+    now.setHours(0, 0, 0, 0); // Normalize to start of day
+
+    // Check start_date: if set, plan shouldn't show before this date
+    if (plan.start_date) {
+      const startDate = new Date(plan.start_date);
+      startDate.setHours(0, 0, 0, 0);
+      if (now < startDate) return false;
+    }
+
+    // Check end_date: if set, plan shouldn't show after this date
+    if (plan.end_date) {
+      const endDate = new Date(plan.end_date);
+      endDate.setHours(23, 59, 59, 999); // End of day
+      if (now > endDate) return false;
+    }
+
+    return true;
+  });
 
   // Get current plan (most recent active plan)
   const currentPlan = activePlans.length > 0 ? activePlans[0] : null;

@@ -97,7 +97,9 @@ export const EvolutionCharts: React.FC<EvolutionChartsProps> = ({
     }
 
     if (compact) {
-        // Compact view - just a mini sparkline
+        // Compact view - mini sparkline with improved empty state
+        const hasEnoughData = chartData.length >= 2;
+
         return (
             <Card>
                 <CardContent className="p-4">
@@ -106,31 +108,45 @@ export const EvolutionCharts: React.FC<EvolutionChartsProps> = ({
                             <TrendingUp className="w-4 h-4 text-primary" />
                             <span className="font-medium text-sm">Evolução de Volume</span>
                         </div>
-                        {stats && (
+                        {stats && hasEnoughData && (
                             <span className={`text-xs font-bold ${stats.volumeChange >= 0 ? 'text-green-500' : 'text-red-500'}`}>
                                 {stats.volumeChange >= 0 ? '+' : ''}{stats.volumeChange}%
                             </span>
                         )}
                     </div>
-                    <div className="h-16">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <AreaChart data={chartData.slice(-7)}>
-                                <defs>
-                                    <linearGradient id="volumeGradient" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3} />
-                                        <stop offset="95%" stopColor="var(--primary)" stopOpacity={0} />
-                                    </linearGradient>
-                                </defs>
-                                <Area
-                                    type="monotone"
-                                    dataKey="totalVolume"
-                                    stroke="var(--primary)"
-                                    fill="url(#volumeGradient)"
-                                    strokeWidth={2}
-                                />
-                            </AreaChart>
-                        </ResponsiveContainer>
-                    </div>
+
+                    {hasEnoughData ? (
+                        <div className="h-16">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <AreaChart data={chartData.slice(-7)}>
+                                    <defs>
+                                        <linearGradient id="volumeGradient" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3} />
+                                            <stop offset="95%" stopColor="var(--primary)" stopOpacity={0} />
+                                        </linearGradient>
+                                    </defs>
+                                    <Area
+                                        type="monotone"
+                                        dataKey="totalVolume"
+                                        stroke="var(--primary)"
+                                        fill="url(#volumeGradient)"
+                                        strokeWidth={2}
+                                    />
+                                </AreaChart>
+                            </ResponsiveContainer>
+                        </div>
+                    ) : (
+                        <div className="h-16 flex items-center justify-center">
+                            <div className="text-center">
+                                <Dumbbell className="w-5 h-5 mx-auto mb-1 text-muted-foreground/50" />
+                                <p className="text-xs text-muted-foreground">
+                                    {chartData.length === 0
+                                        ? 'Complete treinos para ver seu progresso'
+                                        : 'Mais 1 treino para comparação'}
+                                </p>
+                            </div>
+                        </div>
+                    )}
                 </CardContent>
             </Card>
         );

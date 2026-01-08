@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useCallback, useRef } from "react";
+﻿import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { ArrowLeft, MoreVertical, Flag, Activity, Play, ChevronUp, Clock, Zap, Target, TrendingUp, AlertTriangle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -87,7 +87,16 @@ export const WorkoutSessionCOD = ({ workout, onFinish, onExit }: WorkoutSessionC
     const [showSetLogger, setShowSetLogger] = useState(true);
     const [showCheckout, setShowCheckout] = useState(false);
     const [exerciseLogs, setExerciseLogs] = useState<Map<number, SetLog[]>>(new Map());
-    const [totalVolume, setTotalVolume] = useState(0);
+    // Calculate total volume dynamically from logs
+    const totalVolume = useMemo(() => {
+        let volume = 0;
+        exerciseLogs.forEach((logs) => {
+            logs.forEach(log => {
+                volume += log.reps * log.weight;
+            });
+        });
+        return volume;
+    }, [exerciseLogs]);
     const [isVideoCollapsed, setIsVideoCollapsed] = useState(true);
 
     // Persistence states
@@ -176,7 +185,7 @@ export const WorkoutSessionCOD = ({ workout, onFinish, onExit }: WorkoutSessionC
         setTime(savedSession.elapsedTime);
         setCurrentExerciseIndex(savedSession.currentExerciseIndex);
         setCurrentSetNumber(savedSession.currentSetNumber);
-        setTotalVolume(savedSession.totalVolume);
+        // Total volume is auto-calculated from restored logs
 
         // Restore exercise logs (convert object back to Map)
         const restoredLogs = new Map<number, SetLog[]>();
@@ -324,7 +333,7 @@ export const WorkoutSessionCOD = ({ workout, onFinish, onExit }: WorkoutSessionC
         });
 
         // Update total volume
-        setTotalVolume(prev => prev + (reps * weight));
+        // Total volume auto-updates via useMemo
 
         toast.success(`Série ${currentSetNumber} registrada! ${reps}×${weight}kg RPE:${rpe}`);
 

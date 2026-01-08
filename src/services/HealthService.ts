@@ -1,19 +1,19 @@
 /**
- * COD System - Native Health Service
+ * COD System - Health Service (Build 14)
  * 
- * Custom plugin bridge for HealthKit (iOS) and Health Connect (Android)
+ * Uses @capgo/capacitor-health plugin for unified access to:
+ * - iOS: Apple HealthKit
+ * - Android: Health Connect
  * 
- * This is a wrapper that will:
- * 1. Check platform capability
- * 2. Handle permissions
- * 3. Query health data
- * 
- * Note: Requires native implementation in iOS and Android projects
+ * Requirements:
+ * - npm install @capgo/capacitor-health
+ * - iOS: HealthKit capability enabled in Xcode
+ * - Android: Health Connect permissions in AndroidManifest.xml
  */
 
-import { Capacitor, registerPlugin } from '@capacitor/core';
+import { Capacitor } from '@capacitor/core';
 
-// Define plugin interface
+// Types
 export interface HealthDataResponse {
     sleepDuration: number;      // hours
     sleepQuality: number;       // 1-10 scale
@@ -24,60 +24,28 @@ export interface HealthDataResponse {
     lastUpdated: string;        // ISO date
 }
 
-export interface HealthPluginInterface {
-    isAvailable(): Promise<{ available: boolean }>;
-    requestHealthPermissions(): Promise<{ granted: boolean }>;
-    getSleepData(options: { startDate: string; endDate: string }): Promise<HealthDataResponse>;
-    getHeartRateData(options: { startDate: string; endDate: string }): Promise<{
-        avgHRV: number;
-        restingHeartRate: number
-    }>;
-}
+// Dynamic import for the health plugin
+let HealthPlugin: any = null;
 
-// Custom implementation for when native plugin is not available
-class MockHealthPlugin implements HealthPluginInterface {
-    async isAvailable(): Promise<{ available: boolean }> {
-        console.log('[HealthService] Mock plugin - health not available');
-        return { available: false };
-    }
+async function getHealthPlugin() {
+    if (HealthPlugin) return HealthPlugin;
 
-    async requestHealthPermissions(): Promise<{ granted: boolean }> {
-        console.log('[HealthService] Mock plugin - cannot request permissions');
-        return { granted: false };
-    }
-
-    async getSleepData(): Promise<HealthDataResponse> {
-        throw new Error('Health service not available on this platform');
-    }
-
-    async getHeartRateData(): Promise<{ avgHRV: number; restingHeartRate: number }> {
-        throw new Error('Health service not available on this platform');
+    try {
+        // Use dynamic import for the health plugin
+        const module = await import('@capgo/capacitor-health');
+        HealthPlugin = module.Health;
+        return HealthPlugin;
+    } catch (error) {
+        console.warn('[HealthService] @capgo/capacitor-health not installed:', error);
+        return null;
     }
 }
 
-// Create HealthService with fallback
 class HealthServiceImpl {
-    private plugin: HealthPluginInterface;
     private isNative: boolean;
 
     constructor() {
         this.isNative = Capacitor.isNativePlatform();
-
-        if (this.isNative) {
-            try {
-                // Try to register the native plugin
-                this.plugin = registerPlugin<HealthPluginInterface>('HealthService', {
-                    web: () => new MockHealthPlugin(),
-                    ios: () => import('./health/ios').then(m => m.default),
-                    android: () => import('./health/android').then(m => m.default),
-                });
-            } catch (error) {
-                console.warn('[HealthService] Native plugin not available, using mock');
-                this.plugin = new MockHealthPlugin();
-            }
-        } else {
-            this.plugin = new MockHealthPlugin();
-        }
     }
 
     /**
@@ -85,10 +53,15 @@ class HealthServiceImpl {
      */
     async isAvailable(): Promise<boolean> {
         if (!this.isNative) return false;
+
         try {
-            const { available } = await this.plugin.isAvailable();
-            return available;
-        } catch {
+            const plugin = await getHealthPlugin();
+            if (!plugin) return false;
+
+            const result = await plugin.isAvailable();
+            return result.available === true;
+        } catch (error) {
+            console.warn('[HealthService] Check availability failed:', error);
             return false;
         }
     }
@@ -98,9 +71,19 @@ class HealthServiceImpl {
      */
     async requestPermissions(): Promise<boolean> {
         if (!this.isNative) return false;
+
         try {
-            const { granted } = await this.plugin.requestHealthPermissions();
-            return granted;
+            const plugin = await getHealthPlugin();
+            if (!plugin) return false;
+
+            // Request read permissions for the data types we need
+            const result = await plugin.requestAuthorization({
+                read: ['heartRate', 'steps', 'calories', 'weight'],
+                write: []
+            });
+
+            // Check if authorization was successful
+            return result.status === 'authorized' || result.status === 'limited';
         } catch (error) {
             console.error('[HealthService] Permission request failed:', error);
             return false;
@@ -109,18 +92,53 @@ class HealthServiceImpl {
 
     /**
      * Get sleep data from last night
+     * Note: Sleep data may require additional permissions/setup
      */
     async getSleepData(): Promise<HealthDataResponse | null> {
         if (!this.isNative) return null;
 
         try {
+            const plugin = await getHealthPlugin();
+            if (!plugin) return null;
+
+            // For now, generate estimated sleep data based on available metrics
+            // Full sleep tracking requires Apple Watch or compatible device
+
+            // Try to get heart rate data as proxy for sleep quality
             const now = new Date();
             const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
-            return await this.plugin.getSleepData({
-                startDate: yesterday.toISOString(),
-                endDate: now.toISOString()
-            });
+            try {
+                const { samples } = await plugin.readSamples({
+                    dataType: 'heartRate',
+                    startDate: yesterday.toISOString(),
+                    endDate: now.toISOString(),
+                    limit: 100
+                });
+
+                if (samples && samples.length > 0) {
+                    // Calculate resting HR from samples (proxy for sleep quality)
+                    const values = samples.map((s: any) => s.value);
+                    const minHR = Math.min(...values);
+                    const avgHR = values.reduce((a: number, b: number) => a + b, 0) / values.length;
+
+                    // Estimate sleep quality based on heart rate variability
+                    // Lower resting HR typically indicates better recovery
+                    const sleepQuality = Math.min(10, Math.max(1, 10 - ((minHR - 50) / 5)));
+
+                    return {
+                        sleepDuration: 7.5, // Placeholder - needs Apple Watch
+                        sleepQuality: Math.round(sleepQuality),
+                        restingHeartRate: Math.round(minHR),
+                        lastUpdated: new Date().toISOString()
+                    };
+                }
+            } catch (e) {
+                console.log('[HealthService] Heart rate data unavailable:', e);
+            }
+
+            // No data available
+            return null;
         } catch (error) {
             console.error('[HealthService] Failed to get sleep data:', error);
             return null;
@@ -134,13 +152,43 @@ class HealthServiceImpl {
         if (!this.isNative) return null;
 
         try {
+            const plugin = await getHealthPlugin();
+            if (!plugin) return null;
+
             const now = new Date();
             const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
-            return await this.plugin.getHeartRateData({
-                startDate: yesterday.toISOString(),
-                endDate: now.toISOString()
-            });
+            let restingHR = 0;
+
+            // Get heart rate samples
+            try {
+                const { samples } = await plugin.readSamples({
+                    dataType: 'heartRate',
+                    startDate: yesterday.toISOString(),
+                    endDate: now.toISOString(),
+                    limit: 100
+                });
+
+                if (samples && samples.length > 0) {
+                    const values = samples.map((s: any) => s.value);
+                    restingHR = Math.round(Math.min(...values));
+                }
+            } catch (e) {
+                console.warn('[HealthService] Heart rate fetch failed:', e);
+            }
+
+            if (restingHR === 0) {
+                return null;
+            }
+
+            // HRV typically requires Apple Watch - estimate from resting HR
+            // Lower resting HR suggests higher HRV (better recovery)
+            const estimatedHRV = Math.max(20, 100 - restingHR);
+
+            return {
+                avgHRV: estimatedHRV,
+                restingHeartRate: restingHR
+            };
         } catch (error) {
             console.error('[HealthService] Failed to get HRV data:', error);
             return null;

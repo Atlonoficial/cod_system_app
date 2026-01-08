@@ -36,6 +36,7 @@ class RealtimeManager {
     private listeners = new Map<string, Set<ListenerCallback>>();
     private listenerMetadata = new Map<string, ListenerKey>();
     private nextListenerId = 0;
+    private isSubscribed = false; // Build 14: Prevenir subscriptions redundantes
 
     private constructor() {
         logger.info('RealtimeManager', 'Inicializado (Single Channel Mode)');
@@ -77,6 +78,7 @@ class RealtimeManager {
             this.addPostgresListener(channel, { table: meta.table, filter: meta.filter }, meta.event, meta.callback);
         });
 
+        this.isSubscribed = false; // Reset flag before reconnect
         this.subscribeToChannel(channel);
     }
 
@@ -94,14 +96,17 @@ class RealtimeManager {
     private subscribeToChannel(channel: RealtimeChannel) {
         channel.subscribe((status) => {
             if (status === 'SUBSCRIBED') {
+                this.isSubscribed = true; // Build 14: Marcar como conectado
                 logger.info('RealtimeManager', '✅ Channel Global conectado');
             } else if (status === 'CHANNEL_ERROR') {
+                this.isSubscribed = false; // Build 14: Reset flag
                 logger.error('RealtimeManager', '❌ Erro no Channel Global');
                 logger.warn('RealtimeManager', '⚠️ Tentando reconectar em 5s...');
                 setTimeout(() => {
                     this.reconnect();
                 }, 5000);
             } else if (status === 'TIMED_OUT') {
+                this.isSubscribed = false; // Build 14: Reset flag
                 logger.error('RealtimeManager', '⏱️ Timeout no Channel Global');
                 setTimeout(() => {
                     this.reconnect();
@@ -172,11 +177,10 @@ class RealtimeManager {
             const channel = this.getGlobalChannel();
             this.addPostgresListener(channel, { table, filter }, event, callback);
 
-            // Ensure connection is established AFTER adding the listener
-            // If it's a new channel, it won't be subscribed yet.
-            // If it's an existing channel, it might be subscribed or connecting.
-            // We can safely call subscribe() again, Supabase handles idempotency.
-            this.subscribeToChannel(channel);
+            // Build 14: Só subscribe se ainda não estiver subscrito
+            if (!this.isSubscribed) {
+                this.subscribeToChannel(channel);
+            }
         }
 
         this.listeners.get(key)!.add(callback);

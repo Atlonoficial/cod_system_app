@@ -7,9 +7,9 @@ import { supabase } from '@/integrations/supabase/client';
 
 export const logRealtimeStatus = () => {
   if (!import.meta.env.DEV) return;
-  
+
   const channels = supabase.getChannels();
-  
+
   console.log('📊 [RealtimeMonitor] Status:', {
     timestamp: new Date().toISOString(),
     totalChannels: channels.length,
@@ -33,7 +33,7 @@ export const logRealtimeStatus = () => {
 if (import.meta.env.DEV) {
   // Log imediato
   setTimeout(logRealtimeStatus, 5000);
-  
-  // Log a cada 30 segundos
-  setInterval(logRealtimeStatus, 30000);
+
+  // Log a cada 60 segundos (Build 14: reduzido de 30s)
+  setInterval(logRealtimeStatus, 60000);
 }
