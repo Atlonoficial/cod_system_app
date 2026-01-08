@@ -1,4 +1,4 @@
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Play, RotateCcw, Clock, Target, TrendingUp } from 'lucide-react';
@@ -36,6 +36,12 @@ export const ResumeWorkoutDialog = ({
     return (
         <Dialog open={isOpen}>
             <DialogContent className="sm:max-w-md bg-card border-border p-0 overflow-hidden">
+                {/* Accessible title - visually hidden but read by screen readers */}
+                <DialogTitle className="sr-only">Treino em Andamento</DialogTitle>
+                <DialogDescription className="sr-only">
+                    Você tem um treino não finalizado. Escolha continuar ou começar do zero.
+                </DialogDescription>
+
                 {/* Header with gradient */}
                 <div className="bg-gradient-to-br from-primary/20 to-primary/5 p-6 text-center border-b border-border/50">
                     <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/20 flex items-center justify-center">

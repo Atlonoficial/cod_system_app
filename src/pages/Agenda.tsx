@@ -309,7 +309,7 @@ export default function Agenda() {
   };
 
   return (
-    <div className="px-3 sm:px-4 pt-6 sm:pt-8 pb-safe-4xl max-w-7xl mx-auto">
+    <div className="px-3 sm:px-4 pt-safe pb-safe-4xl max-w-7xl mx-auto">
       {/* Header com botão de volta */}
       <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
         <Button
@@ -495,8 +495,8 @@ export default function Agenda() {
                   <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-1">
                     <h4 className="font-medium text-foreground text-sm sm:text-base truncate">{agendamento.title ?? agendamento.type ?? 'Sessão'}</h4>
                     <span className={`text-xs px-2 py-1 rounded-full ${agendamento.status === 'confirmed' || agendamento.status === 'confirmado'
-                        ? 'bg-success/10 text-success'
-                        : 'bg-warning/10 text-warning'
+                      ? 'bg-success/10 text-success'
+                      : 'bg-warning/10 text-warning'
                       }`}>
                       {agendamento.status === 'confirmed' || agendamento.status === 'confirmado'
                         ? 'Confirmado'
@@ -577,8 +577,8 @@ export default function Agenda() {
                   </div>
 
                   <span className={`text-xs px-2 py-1 rounded-full ${item.status === 'cancelled'
-                      ? 'bg-destructive/10 text-destructive'
-                      : 'bg-success/10 text-success'
+                    ? 'bg-destructive/10 text-destructive'
+                    : 'bg-success/10 text-success'
                     }`}>
                     {item.status === 'cancelled' ? 'Cancelado' : 'Concluído'}
                   </span>

@@ -8,7 +8,7 @@ interface AboutAppProps {
 
 export const AboutApp = ({ onBack }: AboutAppProps) => {
   return (
-    <div className="p-4 pt-8 pb-safe">
+    <div className="p-4 pt-safe pb-safe">
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
         <Button

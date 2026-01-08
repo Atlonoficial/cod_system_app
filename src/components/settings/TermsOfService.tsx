@@ -8,7 +8,7 @@ interface TermsOfServiceProps {
 
 export const TermsOfService = ({ onBack }: TermsOfServiceProps) => {
   return (
-    <div className="p-4 pt-8 pb-24">
+    <div className="p-4 pt-safe pb-24">
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
         <Button

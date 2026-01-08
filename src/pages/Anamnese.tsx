@@ -50,7 +50,7 @@ const Anamnese = () => {
   if (selectedRequest) {
     return (
       <div className="min-h-screen bg-background pb-20 fade-in">
-        <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b border-border/50 px-4 py-3 flex items-center gap-3">
+        <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b border-border/50 px-4 py-3 pt-safe flex items-center gap-3">
           <Button
             variant="ghost"
             size="icon"
@@ -60,12 +60,12 @@ const Anamnese = () => {
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div className="flex-1">
-            <h1 className="font-semibold text-lg line-clamp-1">{selectedRequest.template.title}</h1>
+            <h1 className="font-semibold text-lg line-clamp-1">{selectedRequest?.template?.title || 'Anamnese'}</h1>
           </div>
         </div>
 
         <div className="p-4 max-w-lg mx-auto">
-          {selectedRequest.template.description && (
+          {selectedRequest?.template?.description && (
             <div className="mb-6 p-4 bg-primary/5 rounded-xl border border-primary/10">
               <p className="text-sm text-foreground/80 leading-relaxed">
                 {selectedRequest.template.description}
@@ -74,7 +74,7 @@ const Anamnese = () => {
           )}
 
           <DynamicFormRenderer
-            questions={selectedRequest.template.questions || []}
+            questions={selectedRequest?.template?.questions || []}
             onSubmit={handleSubmit}
             loading={submitting}
           />
@@ -86,9 +86,20 @@ const Anamnese = () => {
   // View: List of pending requests
   return (
     <div className="min-h-screen bg-background pb-24 fade-in">
-      <div className="px-6 pt-8 pb-6">
-        <h1 className="text-2xl font-bold mb-2">Anamneses</h1>
-        <p className="text-muted-foreground">Responda aos questionários solicitados pelo seu treinador.</p>
+      {/* Header with back button */}
+      <div className="p-4 pt-safe border-b border-border/30">
+        <div className="flex items-center gap-3 mb-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate("/?tab=profile")}
+            className="text-foreground -ml-2"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </Button>
+          <h1 className="text-xl font-bold text-foreground">Anamneses</h1>
+        </div>
+        <p className="text-muted-foreground text-sm pl-10">Responda aos questionários solicitados pelo seu treinador.</p>
       </div>
 
       <div className="px-4 space-y-4 max-w-lg mx-auto">
@@ -120,12 +131,12 @@ const Anamnese = () => {
                   <div className="flex justify-between items-start">
                     <CardTitle className="text-base flex items-center gap-2">
                       <FileText className="w-4 h-4 text-primary" />
-                      {req.template.title}
+                      {req.template?.title || 'Anamnese'}
                     </CardTitle>
                   </div>
                 </CardHeader>
                 <CardContent className="pl-5">
-                  {req.template.description && (
+                  {req.template?.description && (
                     <CardDescription className="line-clamp-2 mb-3">
                       {req.template.description}
                     </CardDescription>

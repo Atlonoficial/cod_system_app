@@ -213,7 +213,7 @@ export const WorkoutDetail = ({ workout, onBack, onStartWorkout, onExerciseSelec
         {/* Stats section - separado do header */}
         <div className="px-4 py-4 bg-background">
           <div className="grid grid-cols-2 gap-2.5">
-            <div className="flex items-center gap-2.5 bg-card backdrop-blur-md border border-border px-3 py-2.5 rounded-xl">
+            <div className="flex items-center gap-2.5 bg-card/30 px-3 py-2.5 rounded-xl">
               <div className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center flex-shrink-0">
                 <Clock className="w-4.5 h-4.5 text-blue-400" />
               </div>
@@ -223,7 +223,7 @@ export const WorkoutDetail = ({ workout, onBack, onStartWorkout, onExerciseSelec
               </div>
             </div>
 
-            <div className="flex items-center gap-2.5 bg-card backdrop-blur-md border border-border px-3 py-2.5 rounded-xl">
+            <div className="flex items-center gap-2.5 bg-card/30 px-3 py-2.5 rounded-xl">
               <div className="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center flex-shrink-0">
                 <Dumbbell className="w-4.5 h-4.5 text-purple-400" />
               </div>
@@ -233,7 +233,7 @@ export const WorkoutDetail = ({ workout, onBack, onStartWorkout, onExerciseSelec
               </div>
             </div>
 
-            <div className="flex items-center gap-2.5 bg-card backdrop-blur-md border border-border px-3 py-2.5 rounded-xl">
+            <div className="flex items-center gap-2.5 bg-card/30 px-3 py-2.5 rounded-xl">
               <div className="w-8 h-8 rounded-lg bg-orange-500/20 flex items-center justify-center flex-shrink-0">
                 <Flame className="w-4.5 h-4.5 text-orange-400" />
               </div>
@@ -243,7 +243,7 @@ export const WorkoutDetail = ({ workout, onBack, onStartWorkout, onExerciseSelec
               </div>
             </div>
 
-            <div className="flex items-center gap-2.5 bg-card backdrop-blur-md border border-border px-3 py-2.5 rounded-xl">
+            <div className="flex items-center gap-2.5 bg-card/30 px-3 py-2.5 rounded-xl">
               <div className="w-8 h-8 rounded-lg bg-yellow-500/20 flex items-center justify-center flex-shrink-0">
                 <Zap className="w-4.5 h-4.5 text-yellow-400" />
               </div>
@@ -263,7 +263,7 @@ export const WorkoutDetail = ({ workout, onBack, onStartWorkout, onExerciseSelec
             {workout.exercises.map((exercise) => (
               <div
                 key={exercise.id}
-                className="bg-card/50 backdrop-blur-sm border border-border/30 rounded-2xl p-4 transition-all duration-300"
+                className="bg-card/20 rounded-2xl p-4 transition-all duration-300"
               >
                 {/* Header sempre visível */}
                 <div className="flex items-center justify-between mb-3">
@@ -323,7 +323,7 @@ export const WorkoutDetail = ({ workout, onBack, onStartWorkout, onExerciseSelec
         </div>
 
         {/* Start workout button - próximo à navbar */}
-        <div className="fixed bottom-0 left-0 right-0 px-4 pb-28 bg-gradient-to-t from-background via-background/98 to-transparent z-[9999]">
+        <div className="fixed bottom-0 left-0 right-0 px-4 pb-28 bg-gradient-to-t from-background/95 via-background/60 to-transparent z-[9999]">
           <button
             onClick={handleStartWorkout}
             className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground w-full h-12 text-base font-semibold rounded-xl transition-all duration-300 shadow-lg flex items-center justify-center hover:scale-[1.02] active:scale-[0.98]"

@@ -52,50 +52,11 @@ export const useActiveSubscription = () => {
       setError(null);
       console.log('🔍 [useActiveSubscription] Fetching subscription for user:', user.id);
 
-      // Priority 1: Check active_subscriptions table (new primary source)
-      const { data: activeSubData, error: activeSubError } = await supabase
-        .from('active_subscriptions')
-        .select('id, plan_id, status, start_date, end_date, teacher_id')
-        .eq('user_id', user.id)
-        .eq('status', 'active')
-        .gte('end_date', new Date().toISOString().split('T')[0])
-        .order('created_at', { ascending: false })
-        .maybeSingle();
-
-      if (activeSubData) {
-        // Fetch plan catalog data separately
-        const { data: planCatalogData, error: planCatalogError } = await supabase
-          .from('plan_catalog')
-          .select('name, price, currency, interval, features')
-          .eq('id', activeSubData.plan_id)
-          .eq('teacher_id', activeSubData.teacher_id)
-          .maybeSingle();
-
-        if (planCatalogData) {
-          const daysRemaining = calculateDaysRemaining(activeSubData.end_date);
-          const expirationStatus = getExpirationStatus(daysRemaining);
-
-          console.log('✅ [useActiveSubscription] Found active subscription from active_subscriptions:', activeSubData);
-
-          setSubscription({
-            id: activeSubData.id,
-            plan_id: activeSubData.plan_id,
-            teacher_id: activeSubData.teacher_id,
-            status: 'active',
-            start_at: activeSubData.start_date,
-            end_at: activeSubData.end_date,
-            plan_name: planCatalogData.name,
-            plan_features: Array.isArray(planCatalogData.features) ? planCatalogData.features : [],
-            plan_price: planCatalogData.price,
-            plan_currency: planCatalogData.currency,
-            plan_interval: planCatalogData.interval,
-            daysRemaining,
-            expirationStatus
-          });
-          setLoading(false);
-          return;
-        }
-      }
+      // ⚠️ DISABLED: active_subscriptions table has schema mismatch (columns don't exist)
+      // Going directly to students table as primary source
+      // The active_subscriptions table schema needs to be fixed in Supabase
+      // Original columns expected: id, plan_id, status, start_date, end_date, user_id, teacher_id
+      // These columns may not exist in the actual database
 
       // Priority 2: Check student membership data (legacy support)
       const { data: studentData, error: studentError } = await supabase

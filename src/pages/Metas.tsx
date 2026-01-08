@@ -53,7 +53,7 @@ export const Metas = () => {
 
   if (loading) {
     return (
-      <div className="p-4 pt-8 pb-safe-4xl">
+      <div className="p-4 pt-safe pb-safe-4xl">
         <div className="flex items-center gap-3 mb-6">
           <Button
             variant="ghost"
@@ -81,7 +81,7 @@ export const Metas = () => {
   }
 
   return (
-    <div className="p-4 pt-8 pb-safe-4xl">
+    <div className="p-4 pt-safe pb-safe-4xl">
       {/* Header com botão de volta */}
       <div className="flex items-center gap-3 mb-6">
         <Button

@@ -45,7 +45,7 @@ export const RegistrarRefeicao = () => {
 
   if (loading) {
     return (
-      <div className="p-4 pt-8 pb-safe-4xl flex items-center justify-center min-h-96">
+      <div className="p-4 pt-safe pb-safe-4xl flex items-center justify-center min-h-96">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="w-8 h-8 animate-spin text-accent" />
           <p className="text-muted-foreground">Carregando suas refeições...</p>
@@ -57,7 +57,7 @@ export const RegistrarRefeicao = () => {
   // CORRIGIDO: Verificar por todaysMeals ao invés de activePlan
   if (!hasNutritionAccess || todaysMeals.length === 0) {
     return (
-      <div className="p-4 pt-8 pb-safe-4xl">
+      <div className="p-4 pt-safe pb-safe-4xl">
         <div className="flex items-center gap-3 mb-6">
           <Button
             variant="ghost"
@@ -89,7 +89,7 @@ export const RegistrarRefeicao = () => {
   const { consumed, target } = dailyStats;
 
   return (
-    <div className="p-4 pt-8 pb-safe-4xl">
+    <div className="p-4 pt-safe pb-safe-4xl">
       {/* Header com botão de volta */}
       <div className="flex items-center gap-3 mb-6">
         <Button

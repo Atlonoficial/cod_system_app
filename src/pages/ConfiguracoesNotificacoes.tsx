@@ -11,12 +11,12 @@ import { Loader2 } from "lucide-react";
 const ConfiguracoesNotificacoes = () => {
   const navigate = useNavigate();
   const { user } = useAuthContext();
-  const { 
-    preferences, 
-    loading, 
+  const {
+    preferences,
+    loading,
     togglePush,
     updatePreferences,
-    permissionStatus 
+    permissionStatus
   } = useNotificationPreferences(user?.id);
 
   const notificationTypes = [
@@ -48,10 +48,10 @@ const ConfiguracoesNotificacoes = () => {
 
   const handleToggleType = async (key: keyof typeof preferences) => {
     if (!preferences) return;
-    
+
     try {
-      await updatePreferences({ 
-        [key]: !preferences[key] 
+      await updatePreferences({
+        [key]: !preferences[key]
       });
     } catch (error) {
       console.error("Erro ao atualizar preferência:", error);
@@ -63,10 +63,10 @@ const ConfiguracoesNotificacoes = () => {
   return (
     <div className="min-h-screen bg-background pb-safe-3xl">
       {/* Header */}
-      <div className="p-4 pt-8 border-b border-border/30">
+      <div className="p-4 pt-safe border-b border-border/30">
         <div className="flex items-center gap-3 mb-4">
-          <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             size="icon"
             onClick={() => navigate("/configuracoes")}
             className="text-foreground"
@@ -86,8 +86,8 @@ const ConfiguracoesNotificacoes = () => {
               <div>
                 <h3 className="font-semibold text-foreground">Notificações Push</h3>
                 <p className="text-sm text-muted-foreground">
-                  {preferences?.push_enabled 
-                    ? "Ativadas - Você receberá notificações" 
+                  {preferences?.push_enabled
+                    ? "Ativadas - Você receberá notificações"
                     : "Desativadas - Nenhuma notificação será enviada"}
                 </p>
                 {permissionStatus === 'denied' && (
@@ -101,7 +101,7 @@ const ConfiguracoesNotificacoes = () => {
               {loading ? (
                 <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
               ) : (
-                <Switch 
+                <Switch
                   checked={preferences?.push_enabled ?? true}
                   onCheckedChange={togglePush}
                   disabled={loading || permissionStatus === 'denied'}
@@ -115,7 +115,7 @@ const ConfiguracoesNotificacoes = () => {
         {isPushDisabled && (
           <Card className="p-4 bg-muted/30 border-border/30">
             <p className="text-sm text-muted-foreground text-center">
-              {permissionStatus === 'denied' 
+              {permissionStatus === 'denied'
                 ? "⚠️ As notificações estão bloqueadas nas configurações do seu dispositivo. Habilite-as para continuar."
                 : "ℹ️ Ative as notificações push acima para configurar os tipos de notificação."}
             </p>
@@ -129,13 +129,12 @@ const ConfiguracoesNotificacoes = () => {
           <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide px-2">
             Tipos de Notificação
           </h2>
-          
+
           {notificationTypes.map((type) => (
-            <Card 
+            <Card
               key={type.key}
-              className={`p-4 bg-card/50 border-border/50 transition-all ${
-                isPushDisabled ? 'opacity-50' : 'hover:bg-card/70'
-              }`}
+              className={`p-4 bg-card/50 border-border/50 transition-all ${isPushDisabled ? 'opacity-50' : 'hover:bg-card/70'
+                }`}
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -149,7 +148,7 @@ const ConfiguracoesNotificacoes = () => {
                   {loading ? (
                     <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
                   ) : (
-                    <Switch 
+                    <Switch
                       checked={preferences?.[type.key] ?? true}
                       onCheckedChange={() => handleToggleType(type.key)}
                       disabled={loading || isPushDisabled}

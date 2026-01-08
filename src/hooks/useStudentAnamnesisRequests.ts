@@ -9,9 +9,9 @@ export interface AnamnesisRequest {
     created_at: string;
     template: {
         title: string;
-        description: string;
+        description: string | null;
         questions: any[];
-    };
+    } | null;
 }
 
 export const useStudentAnamnesisRequests = () => {
@@ -36,10 +36,13 @@ export const useStudentAnamnesisRequests = () => {
             if (error) throw error;
 
             // Cast template questions from JSON to array if needed suitable for frontend
-            const typedData = data?.map(d => ({
-                ...d,
-                template: d.template ? { ...d.template, questions: d.template.questions } : null
-            })) as AnamnesisRequest[];
+            // Filter out requests where template is null (template was deleted)
+            const typedData = data
+                ?.map(d => ({
+                    ...d,
+                    template: d.template ? { ...d.template, questions: d.template.questions || [] } : null
+                }))
+                .filter(d => d.template !== null) as AnamnesisRequest[];
 
             setPendingRequests(typedData || []);
         } catch (error) {

@@ -41,7 +41,7 @@ const helpCategories = [
 
 export const HelpCenter = ({ onBack }: HelpCenterProps) => {
   return (
-    <div className="p-4 pt-8 pb-safe">
+    <div className="p-4 pt-safe pb-safe">
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
         <Button
@@ -72,7 +72,7 @@ export const HelpCenter = ({ onBack }: HelpCenterProps) => {
             <p className="text-sm font-medium text-foreground">Chat Suporte</p>
           </CardContent>
         </Card>
-        
+
         <Card className="card-gradient cursor-pointer hover:scale-105 transition-transform">
           <CardContent className="p-4 text-center">
             <Phone className="w-8 h-8 text-primary mx-auto mb-2" />
@@ -89,7 +89,7 @@ export const HelpCenter = ({ onBack }: HelpCenterProps) => {
               <category.icon className="w-5 h-5 text-primary" />
               <h3 className="text-lg font-semibold text-foreground">{category.title}</h3>
             </div>
-            
+
             <div className="space-y-2">
               {category.items.map((item, itemIndex) => (
                 <Card key={itemIndex} className="card-gradient cursor-pointer hover:bg-card/70 transition-colors">

@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useCallback } from "react";
+﻿import { useState, useEffect, useCallback, useRef } from "react";
 import { ArrowLeft, MoreVertical, Flag, Activity, Play, ChevronUp, Clock, Zap, Target, TrendingUp, AlertTriangle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -94,6 +94,7 @@ export const WorkoutSessionCOD = ({ workout, onFinish, onExit }: WorkoutSessionC
     const [showResumeDialog, setShowResumeDialog] = useState(false);
     const [sessionRestored, setSessionRestored] = useState(false);
     const [showEarlyFinishConfirm, setShowEarlyFinishConfirm] = useState(false);
+    const [showExitConfirm, setShowExitConfirm] = useState(false);
 
     // Ref to track if we are in the finish flow to prevent auto-saves
     const isFinishFlow = useRef(false);
@@ -509,14 +510,25 @@ export const WorkoutSessionCOD = ({ workout, onFinish, onExit }: WorkoutSessionC
             }
 
             // Also save to legacy workout_sessions table for compatibility
-            await supabase.from('workout_sessions').insert({
-                user_id: user.id,
-                workout_id: null,
-                notes: `COD: ${workout.name} | Vol: ${totalVolume}kg | RPE: ${avgRpe.toFixed(1)}`,
-                start_time: new Date(Date.now() - time * 1000).toISOString(),
-                end_time: new Date().toISOString(),
-                total_duration: Math.floor(time / 60)
-            });
+            // Wrapped in try-catch as this table may have schema issues
+            try {
+                const { error: sessionError } = await supabase.from('workout_sessions').insert({
+                    user_id: user.id,
+                    workout_id: null,
+                    notes: `COD: ${workout.name} | Vol: ${totalVolume}kg | RPE: ${avgRpe.toFixed(1)}`,
+                    start_time: new Date(Date.now() - time * 1000).toISOString(),
+                    end_time: new Date().toISOString(),
+                    total_duration: Math.floor(time / 60)
+                });
+
+                if (sessionError) {
+                    console.warn('[WorkoutSession] Legacy workout_sessions save failed (non-blocking):', sessionError.message);
+                } else {
+                    console.log('✅ [WorkoutSession] Saved to workout_sessions table successfully');
+                }
+            } catch (legacyError) {
+                console.warn('[WorkoutSession] workout_sessions insert skipped:', legacyError);
+            }
 
             // Invalidate queries
             queryClient.invalidateQueries({ queryKey: ['workout-history'] });
@@ -544,8 +556,9 @@ export const WorkoutSessionCOD = ({ workout, onFinish, onExit }: WorkoutSessionC
             <div className={`fixed top-0 left-0 right-0 z-50 bg-gradient-to-br ${getReadinessColor()} p-4 pt-safe border-b border-white/10 backdrop-blur-lg`}>
                 <div className="flex items-center justify-between mb-3">
                     <button
-                        onClick={onExit}
+                        onClick={() => setShowExitConfirm(true)}
                         className="w-10 h-10 rounded-2xl bg-background/20 backdrop-blur-sm flex items-center justify-center active:scale-95"
+                        aria-label="Sair do treino"
                     >
                         <ArrowLeft className="w-5 h-5 text-foreground" />
                     </button>
@@ -559,7 +572,10 @@ export const WorkoutSessionCOD = ({ workout, onFinish, onExit }: WorkoutSessionC
 
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <button className="w-10 h-10 rounded-2xl bg-background/20 backdrop-blur-sm flex items-center justify-center">
+                            <button
+                                className="w-10 h-10 rounded-2xl bg-background/20 backdrop-blur-sm flex items-center justify-center"
+                                aria-label="Menu de opções"
+                            >
                                 <MoreVertical className="w-5 h-5 text-foreground" />
                             </button>
                         </DropdownMenuTrigger>
@@ -724,33 +740,37 @@ export const WorkoutSessionCOD = ({ workout, onFinish, onExit }: WorkoutSessionC
             </div>
 
             {/* Fixed Finish Button - Shows when workout is COMPLETE (last exercise, all sets done) */}
-            {isWorkoutComplete && !showCheckout && (
-                <div className="fixed bottom-0 left-0 right-0 p-4 pb-safe bg-gradient-to-t from-background via-background to-transparent z-40">
-                    <Button
-                        onClick={handleFinish}
-                        disabled={isSaving}
-                        className="w-full h-14 text-lg font-bold bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg shadow-green-500/30 animate-pulse"
-                    >
-                        <Flag className="w-5 h-5 mr-2" />
-                        {isSaving ? 'Salvando...' : '🎉 Finalizar Treino'}
-                    </Button>
-                </div>
-            )}
+            {
+                isWorkoutComplete && !showCheckout && (
+                    <div className="fixed bottom-0 left-0 right-0 p-4 pb-safe bg-gradient-to-t from-background via-background to-transparent z-40">
+                        <Button
+                            onClick={handleFinish}
+                            disabled={isSaving}
+                            className="w-full h-14 text-lg font-bold bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg shadow-green-500/30 animate-pulse"
+                        >
+                            <Flag className="w-5 h-5 mr-2" />
+                            {isSaving ? 'Salvando...' : '🎉 Finalizar Treino'}
+                        </Button>
+                    </div>
+                )
+            }
 
             {/* Finish button visible when workout has started but NOT complete */}
-            {!isWorkoutComplete && completedSetsCount > 0 && !showCheckout && !showTimer && (
-                <div className="fixed bottom-0 left-0 right-0 p-4 pb-safe bg-gradient-to-t from-background to-transparent z-40">
-                    <Button
-                        variant="outline"
-                        onClick={handleFinishRequest}
-                        disabled={isSaving}
-                        className="w-full h-12 border-amber-500/50 text-amber-400 hover:bg-amber-500/10"
-                    >
-                        <Flag className="w-4 h-4 mr-2" />
-                        Finalizar Treino Antecipado
-                    </Button>
-                </div>
-            )}
+            {
+                !isWorkoutComplete && completedSetsCount > 0 && !showCheckout && !showTimer && (
+                    <div className="fixed bottom-0 left-0 right-0 p-4 pb-safe bg-gradient-to-t from-background to-transparent z-40">
+                        <Button
+                            variant="outline"
+                            onClick={handleFinishRequest}
+                            disabled={isSaving}
+                            className="w-full h-12 border-amber-500/50 text-amber-400 hover:bg-amber-500/10"
+                        >
+                            <Flag className="w-4 h-4 mr-2" />
+                            Finalizar Treino Antecipado
+                        </Button>
+                    </div>
+                )
+            }
 
             {/* Post-Workout Checkout Modal */}
             <PostWorkoutCheckout
@@ -802,7 +822,36 @@ export const WorkoutSessionCOD = ({ workout, onFinish, onExit }: WorkoutSessionC
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
-        </div>
+
+            {/* Exit Confirmation Dialog */}
+            <AlertDialog open={showExitConfirm} onOpenChange={setShowExitConfirm}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Sair do treino?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Seu progresso será salvo automaticamente e você poderá continuar depois.
+                            <br /><br />
+                            <strong>Progresso atual:</strong>
+                            <br />• Tempo: {formatTime(time)}
+                            <br />• Exercício {currentExerciseIndex + 1} de {workout.exercises.length}
+                            <br />• Volume total: {totalVolume}kg
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Continuar Treinando</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={() => {
+                                setShowExitConfirm(false);
+                                onExit();
+                            }}
+                            className="bg-destructive hover:bg-destructive/90"
+                        >
+                            Sim, Sair
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+        </div >
     );
 };
 

@@ -5,7 +5,6 @@ interface Exercise {
   id: string;
   name: string;
   video_url?: string;
-  image_url?: string;
   instructions?: string;
   description?: string;
 }
@@ -24,14 +23,14 @@ export const useExerciseVideo = (exerciseName: string) => {
     const fetchExercise = async () => {
       setLoading(true);
       setError(null);
-      
+
       try {
         console.log('Buscando exercício:', exerciseName);
-        
+
         // Buscar exercício pelo nome exato primeiro
         let { data, error } = await supabase
           .from('exercises')
-          .select('id, name, video_url, image_url, instructions, description')
+          .select('id, name, video_url, instructions, description')
           .eq('name', exerciseName)
           .limit(1);
 
@@ -41,7 +40,7 @@ export const useExerciseVideo = (exerciseName: string) => {
         if (!data || data.length === 0) {
           // Tentar busca por palavras-chave principais
           const normalizedName = exerciseName.toLowerCase();
-          
+
           let searchTerms = [];
           if (normalizedName.includes('abdominal') || normalizedName === 'abdominais') {
             searchTerms = ['abdominal', 'crunch'];
@@ -71,12 +70,12 @@ export const useExerciseVideo = (exerciseName: string) => {
           for (const term of searchTerms) {
             const { data: similarData, error: similarError } = await supabase
               .from('exercises')
-              .select('id, name, video_url, image_url, instructions, description')
+              .select('id, name, video_url, instructions, description')
               .ilike('name', `%${term}%`)
               .limit(1);
 
             if (similarError) throw similarError;
-            
+
             if (similarData && similarData.length > 0) {
               data = similarData;
               console.log('Exercício encontrado:', similarData[0].name, 'para busca:', exerciseName);
@@ -86,7 +85,7 @@ export const useExerciseVideo = (exerciseName: string) => {
         }
 
         setExercise(data && data.length > 0 ? data[0] : null);
-        
+
         if (!data || data.length === 0) {
           console.warn('Nenhum exercício encontrado para:', exerciseName);
         }
@@ -106,7 +105,6 @@ export const useExerciseVideo = (exerciseName: string) => {
     loading,
     error,
     videoUrl: exercise?.video_url,
-    imageUrl: exercise?.image_url,
     instructions: exercise?.instructions,
     description: exercise?.description
   };

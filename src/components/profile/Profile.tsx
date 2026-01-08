@@ -84,9 +84,14 @@ export const Profile = () => {
 
       hapticSuccess();
       toast.success("Foto de perfil atualizada!");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error uploading avatar:", error);
-      toast.error("Erro ao atualizar foto de perfil");
+      // Check for specific error types
+      if (error?.message?.includes('Bucket not found') || error?.statusCode === '404') {
+        toast.error("Configuração de storage pendente. Contate o suporte.");
+      } else {
+        toast.error("Erro ao atualizar foto de perfil");
+      }
     } finally {
       setUploading(false);
     }
@@ -108,7 +113,7 @@ export const Profile = () => {
   };
 
   return (
-    <div className="p-4 sm:p-6 pt-6 sm:pt-8 max-w-4xl mx-auto">
+    <div className="p-4 sm:p-6 pt-safe max-w-4xl mx-auto pb-safe-4xl">
       {/* Header */}
       <div className="flex flex-col items-center text-center mb-6 space-y-3">
         <div className="relative mb-3 animate-fade-up">
@@ -138,6 +143,7 @@ export const Profile = () => {
             accept="image/*"
             onChange={handleFileSelect}
             className="hidden"
+            aria-label="Selecionar foto de perfil"
           />
         </div>
 

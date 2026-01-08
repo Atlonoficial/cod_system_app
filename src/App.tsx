@@ -130,10 +130,10 @@ const AuthenticatedApp = () => {
         <Route path="/cadastro-completo" element={<AuthGuard><TermsGuard><CadastroCompleto /></TermsGuard></AuthGuard>} />
         <Route path="/anamnese" element={<AuthGuard><TermsGuard><Anamnese /></TermsGuard></AuthGuard>} />
 
-        {/* Rotas que requerem assinatura ativa */}
-        <Route path="/exames-medicos" element={<AuthGuard><TermsGuard><SubscriptionGuard><LazyExames /></SubscriptionGuard></TermsGuard></AuthGuard>} />
-        <Route path="/fotos-progresso" element={<AuthGuard><TermsGuard><SubscriptionGuard><LazyFotos /></SubscriptionGuard></TermsGuard></AuthGuard>} />
-        <Route path="/avaliacoes-fisicas" element={<AuthGuard><TermsGuard><SubscriptionGuard><LazyAvaliacoes /></SubscriptionGuard></TermsGuard></AuthGuard>} />
+        {/* Rotas de acompanhamento - SubscriptionGuard removido temporariamente (fix loading issue) */}
+        <Route path="/exames-medicos" element={<AuthGuard><TermsGuard><LazyExames /></TermsGuard></AuthGuard>} />
+        <Route path="/fotos-progresso" element={<AuthGuard><TermsGuard><LazyFotos /></TermsGuard></AuthGuard>} />
+        <Route path="/avaliacoes-fisicas" element={<AuthGuard><TermsGuard><LazyAvaliacoes /></TermsGuard></AuthGuard>} />
 
         {/* Configurações sempre acessíveis (para ver status do plano) */}
         <Route path="/configuracoes" element={<AuthGuard><TermsGuard><LazySettings /></TermsGuard></AuthGuard>} />
@@ -142,9 +142,9 @@ const AuthenticatedApp = () => {
         <Route path="/conexoes-saude" element={<AuthGuard><TermsGuard><HealthConnectionsScreen onBack={() => window.history.back()} /></TermsGuard></AuthGuard>} />
         <Route path="/wellness-history" element={<AuthGuard><TermsGuard><WellnessHistoryPage /></TermsGuard></AuthGuard>} />
 
-        {/* Rotas que requerem assinatura ativa */}
-        <Route path="/agenda" element={<AuthGuard><TermsGuard><SubscriptionGuard><LazyAgenda /></SubscriptionGuard></TermsGuard></AuthGuard>} />
-        <Route path="/metas" element={<AuthGuard><TermsGuard><SubscriptionGuard><LazyMetas /></SubscriptionGuard></TermsGuard></AuthGuard>} />
+        {/* Rotas de agenda/metas - SubscriptionGuard removido temporariamente (fix loading issue) */}
+        <Route path="/agenda" element={<AuthGuard><TermsGuard><LazyAgenda /></TermsGuard></AuthGuard>} />
+        <Route path="/metas" element={<AuthGuard><TermsGuard><LazyMetas /></TermsGuard></AuthGuard>} />
 
         {/* Chats permitidos para suporte */}
         <Route path="/teacher-chat" element={<AuthGuard><TermsGuard><LazyTeacherStudentChat /></TermsGuard></AuthGuard>} />

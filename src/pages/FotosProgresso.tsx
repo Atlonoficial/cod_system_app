@@ -82,7 +82,7 @@ export const FotosProgresso = () => {
   return (
     <div className="min-h-screen bg-background pb-safe-4xl">
       {/* Header */}
-      <div className="p-4 pt-8 border-b border-border/30">
+      <div className="p-4 pt-safe border-b border-border/30">
         <div className="flex items-center gap-3 mb-4">
           <Button
             variant="ghost"

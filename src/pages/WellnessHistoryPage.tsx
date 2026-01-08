@@ -136,8 +136,8 @@ export const WellnessHistoryPage: React.FC = () => {
 
     return (
         <div className="min-h-screen bg-background">
-            {/* Header */}
-            <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
+            {/* Header - Fixed with SafeZone */}
+            <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b pt-safe">
                 <div className="flex items-center gap-4 p-4">
                     <Button
                         variant="ghost"
@@ -155,7 +155,7 @@ export const WellnessHistoryPage: React.FC = () => {
                 </div>
             </div>
 
-            <div className="p-4 space-y-4">
+            <div className="p-4 space-y-4 pb-safe-4xl">
                 {/* Period Filter */}
                 <div className="flex gap-2">
                     {(['7', '30', '90'] as PeriodFilter[]).map((p) => (

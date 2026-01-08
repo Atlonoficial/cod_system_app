@@ -73,7 +73,7 @@ export const Settings = () => {
   }
 
   return (
-    <div className="p-4 pt-8 pb-safe">
+    <div className="p-4 pt-safe pb-safe">
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-foreground mb-2">Configurações</h1>
