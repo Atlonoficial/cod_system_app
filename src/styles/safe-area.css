@@ -39,12 +39,12 @@
    Usado em TODOS os headers de páginas internas
    ============================================ */
 .pt-safe {
-  padding-top: env(safe-area-inset-top, 0px);
+  padding-top: env(safe-area-inset-top, 0px) !important;
 }
 
 /* Margin top considering safe area */
 .mt-safe {
-  margin-top: env(safe-area-inset-top, 0px);
+  margin-top: env(safe-area-inset-top, 0px) !important;
 }
 
 /* ============================================
@@ -53,39 +53,39 @@
 
 /* Padding bottom considering navigation bar + safe area */
 .pb-safe {
-  padding-bottom: calc(100px + env(safe-area-inset-bottom));
+  padding-bottom: calc(100px + env(safe-area-inset-bottom)) !important;
 }
 
 .pb-safe-xl {
-  padding-bottom: calc(220px + env(safe-area-inset-bottom));
+  padding-bottom: calc(220px + env(safe-area-inset-bottom)) !important;
 }
 
 .pb-safe-2xl {
-  padding-bottom: calc(260px + env(safe-area-inset-bottom));
+  padding-bottom: calc(260px + env(safe-area-inset-bottom)) !important;
 }
 
 .pb-safe-3xl {
-  padding-bottom: calc(320px + env(safe-area-inset-bottom));
+  padding-bottom: calc(320px + env(safe-area-inset-bottom)) !important;
 }
 
 /* ✅ BUILD 52: Para conteúdo muito longo - aumentado para 220px */
 .pb-safe-4xl {
-  padding-bottom: calc(220px + env(safe-area-inset-bottom));
+  padding-bottom: calc(220px + env(safe-area-inset-bottom)) !important;
 }
 
 /* ✅ BUILD 52: Para conteúdo EXTREMAMENTE longo */
 .pb-safe-5xl {
-  padding-bottom: calc(280px + env(safe-area-inset-bottom));
+  padding-bottom: calc(280px + env(safe-area-inset-bottom)) !important;
 }
 
 /* Bottom positioning considering navigation bar + safe area */
 .bottom-safe {
-  bottom: calc(100px + env(safe-area-inset-bottom));
+  bottom: calc(100px + env(safe-area-inset-bottom)) !important;
 }
 
 /* Navigation bar safe area */
 .bottom-nav-safe {
-  padding-bottom: env(safe-area-inset-bottom);
+  padding-bottom: env(safe-area-inset-bottom) !important;
 }
 
 /* Smooth slide down animation */

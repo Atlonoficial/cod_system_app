@@ -1,15 +1,14 @@
 /**
- * COD System - Health Service (Build 16)
+ * COD System - Health Service (Build 17)
  * 
  * Uses @capgo/capacitor-health plugin for unified access to:
  * - iOS: Apple HealthKit
- * - Android: Health Connect
- * 
+ * - Android: Health Connect 
  * Requirements:
  * - npm install @capgo/capacitor-health
- * - iOS: HealthKit capability enabled in Xcode
- * - Android: Health Connect permissions in AndroidManifest.xml
- */
+    * - iOS: HealthKit capability enabled in Xcode
+        * - Android: Health Connect permissions in AndroidManifest.xml
+            */
 
 import { Capacitor } from '@capacitor/core';
 
