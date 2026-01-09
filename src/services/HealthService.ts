@@ -1,5 +1,5 @@
 /**
- * COD System - Health Service (Build 14)
+ * COD System - Health Service (Build 15)
  * 
  * Uses @capgo/capacitor-health plugin for unified access to:
  * - iOS: Apple HealthKit
@@ -31,12 +31,30 @@ async function getHealthPlugin() {
     if (HealthPlugin) return HealthPlugin;
 
     try {
-        // Use dynamic import for the health plugin
-        const module = await import('@capgo/capacitor-health');
-        HealthPlugin = module.Health;
-        return HealthPlugin;
+        // Timeout de 3 segundos para evitar loading infinito
+        // Se o plugin não estiver configurado corretamente, retorna null após timeout
+        const timeoutPromise = new Promise<null>((resolve) =>
+            setTimeout(() => {
+                console.warn('[HealthService] Plugin load timeout - native setup may be missing');
+                resolve(null);
+            }, 3000)
+        );
+
+        const importPromise = (async () => {
+            const module = await import('@capgo/capacitor-health');
+            return module.Health;
+        })();
+
+        const result = await Promise.race([importPromise, timeoutPromise]);
+
+        if (result) {
+            HealthPlugin = result;
+            return HealthPlugin;
+        }
+
+        return null;
     } catch (error) {
-        console.warn('[HealthService] @capgo/capacitor-health not installed:', error);
+        console.warn('[HealthService] @capgo/capacitor-health not available:', error);
         return null;
     }
 }

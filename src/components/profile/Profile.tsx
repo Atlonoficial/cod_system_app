@@ -39,10 +39,24 @@ export const Profile = () => {
 
   const handleAvatarUpload = async (file: File) => {
     if (!file || !user?.id) return;
+
+    // Validação de tamanho (max 5MB)
+    const MAX_SIZE = 5 * 1024 * 1024;
+    if (file.size > MAX_SIZE) {
+      toast.error("Imagem muito grande. Máximo 5MB.");
+      return;
+    }
+
+    // Validação de tipo
+    if (!file.type.startsWith('image/')) {
+      toast.error("Arquivo deve ser uma imagem.");
+      return;
+    }
+
     setUploading(true);
     try {
       // Use unique filename with timestamp for cache busting
-      const fileExt = file.name.split('.').pop();
+      const fileExt = file.name.split('.').pop()?.toLowerCase() || 'jpg';
       const fileName = `${user.id}_${Date.now()}.${fileExt}`;
       const path = `${user.id}/${fileName}`;
 
@@ -86,11 +100,30 @@ export const Profile = () => {
       toast.success("Foto de perfil atualizada!");
     } catch (error: any) {
       console.error("Error uploading avatar:", error);
-      // Check for specific error types
-      if (error?.message?.includes('Bucket not found') || error?.statusCode === '404') {
+
+      // Diagnóstico detalhado
+      const errorMsg = error?.message || '';
+      const errorCode = error?.statusCode || error?.status || '';
+
+      console.error('[Avatar Upload] Details:', {
+        message: errorMsg,
+        code: errorCode,
+        fullError: error
+      });
+
+      // Mensagens de erro específicas
+      if (errorMsg.includes('Bucket not found') || errorCode === 404 || errorCode === '404') {
         toast.error("Configuração de storage pendente. Contate o suporte.");
+      } else if (errorMsg.includes('policy') || errorCode === 403 || errorCode === '403') {
+        toast.error("Sem permissão para upload. Verifique com o suporte.");
+      } else if (errorMsg.includes('row-level security') || errorMsg.includes('RLS')) {
+        toast.error("Erro de permissão. Tente fazer login novamente.");
+      } else if (errorMsg.includes('Payload too large') || errorCode === 413) {
+        toast.error("Arquivo muito grande para o servidor.");
+      } else if (errorMsg.includes('network') || errorMsg.includes('Network')) {
+        toast.error("Erro de conexão. Verifique sua internet.");
       } else {
-        toast.error("Erro ao atualizar foto de perfil");
+        toast.error("Erro ao atualizar foto de perfil. Tente novamente.");
       }
     } finally {
       setUploading(false);

@@ -44,6 +44,7 @@ export const HealthConnectionsScreen: React.FC<HealthConnectionsScreenProps> = (
     } = useBiometricSync();
 
     const [isConnecting, setIsConnecting] = useState(false);
+    const [connectionTimeout, setConnectionTimeout] = useState(false);
     const platform = Capacitor.getPlatform();
     const isNative = Capacitor.isNativePlatform();
 
@@ -52,13 +53,23 @@ export const HealthConnectionsScreen: React.FC<HealthConnectionsScreenProps> = (
 
     const handleConnect = async () => {
         setIsConnecting(true);
+        setConnectionTimeout(false);
+
+        // Timeout de segurança - 8 segundos
+        const timeoutId = setTimeout(() => {
+            setConnectionTimeout(true);
+            setIsConnecting(false);
+        }, 8000);
+
         try {
             const granted = await requestPermissions();
+            clearTimeout(timeoutId);
             if (granted) {
                 await syncHealthData();
             }
         } catch (err) {
             console.error('Error connecting:', err);
+            clearTimeout(timeoutId);
         } finally {
             setIsConnecting(false);
         }
@@ -134,6 +145,18 @@ export const HealthConnectionsScreen: React.FC<HealthConnectionsScreenProps> = (
                         ) : !hasHealthPermission ? (
                             // Not connected
                             <div className="space-y-4">
+                                {connectionTimeout && (
+                                    <div className="flex items-start gap-3 p-3 bg-red-500/10 rounded-xl">
+                                        <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+                                        <div className="text-sm">
+                                            <p className="font-medium text-red-500">Conexão expirou</p>
+                                            <p className="text-muted-foreground mt-1">
+                                                Não foi possível conectar ao {healthServiceName}.
+                                                Verifique se o app tem permissão de acesso à saúde nas configurações do dispositivo.
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
                                 <p className="text-sm text-muted-foreground">
                                     Conecte para sincronizar automaticamente seus dados de sono e
                                     variabilidade cardíaca (VFC) no check-in diário.
@@ -146,6 +169,8 @@ export const HealthConnectionsScreen: React.FC<HealthConnectionsScreenProps> = (
                                 >
                                     {isConnecting ? (
                                         <><RefreshCw className="w-4 h-4 mr-2 animate-spin" /> Conectando...</>
+                                    ) : connectionTimeout ? (
+                                        <><RefreshCw className="w-4 h-4 mr-2" /> Tentar Novamente</>
                                     ) : (
                                         <><Smartphone className="w-4 h-4 mr-2" /> Conectar {healthServiceName}</>
                                     )}

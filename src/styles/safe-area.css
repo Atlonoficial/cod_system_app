@@ -34,6 +34,23 @@
 
 /* Safe Area Insets for devices with notch */
 
+/* ============================================
+   PADDING TOP - Safe Area (notch/camera/Dynamic Island)
+   Usado em TODOS os headers de páginas internas
+   ============================================ */
+.pt-safe {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+/* Margin top considering safe area */
+.mt-safe {
+  margin-top: env(safe-area-inset-top, 0px);
+}
+
+/* ============================================
+   PADDING BOTTOM - Safe Area + Navigation
+   ============================================ */
+
 /* Padding bottom considering navigation bar + safe area */
 .pb-safe {
   padding-bottom: calc(100px + env(safe-area-inset-bottom));
@@ -78,6 +95,7 @@
     max-height: 0;
     transform: translateY(-10px);
   }
+
   to {
     opacity: 1;
     max-height: 1000px;
@@ -90,6 +108,7 @@
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -101,6 +120,7 @@
     opacity: 0;
     transform: scale(0.95);
   }
+
   to {
     opacity: 1;
     transform: scale(1);
