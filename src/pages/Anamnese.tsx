@@ -49,7 +49,7 @@ const Anamnese = () => {
   // View: Fill out specific form
   if (selectedRequest) {
     return (
-      <div className="min-h-screen bg-background pb-safe-4xl fade-in">
+      <div className="page-scroll-container flex flex-col fade-in">
         <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b border-border/50 px-4 py-3 pt-safe flex items-center gap-3">
           <Button
             variant="ghost"
@@ -85,7 +85,7 @@ const Anamnese = () => {
 
   // View: List of pending requests
   return (
-    <div className="min-h-screen bg-background pb-safe-4xl fade-in">
+    <div className="page-scroll-container flex flex-col fade-in">
       {/* Header with back button */}
       <div className="p-4 pt-safe border-b border-border/30">
         <div className="flex items-center gap-3 mb-2">

@@ -1,5 +1,5 @@
 /**
- * COD System - Health Service (Build 15)
+ * COD System - Health Service (Build 16)
  * 
  * Uses @capgo/capacitor-health plugin for unified access to:
  * - iOS: Apple HealthKit
@@ -70,16 +70,24 @@ class HealthServiceImpl {
      * Check if health services are available on this device
      */
     async isAvailable(): Promise<boolean> {
-        if (!this.isNative) return false;
+        if (!this.isNative) {
+            console.log('[HealthService] Not native platform - health not available');
+            return false;
+        }
 
         try {
+            console.log('[HealthService] Checking availability...');
             const plugin = await getHealthPlugin();
-            if (!plugin) return false;
+            if (!plugin) {
+                console.error('[HealthService] Plugin failed to load');
+                return false;
+            }
 
             const result = await plugin.isAvailable();
+            console.log('[HealthService] Availability check result:', JSON.stringify(result));
             return result.available === true;
         } catch (error) {
-            console.warn('[HealthService] Check availability failed:', error);
+            console.error('[HealthService] Check availability failed:', error);
             return false;
         }
     }
@@ -88,20 +96,33 @@ class HealthServiceImpl {
      * Request health data permissions from user
      */
     async requestPermissions(): Promise<boolean> {
-        if (!this.isNative) return false;
+        if (!this.isNative) {
+            console.log('[HealthService] Skipping - not native platform');
+            return false;
+        }
 
         try {
             const plugin = await getHealthPlugin();
-            if (!plugin) return false;
+            if (!plugin) {
+                console.error('[HealthService] Plugin not loaded - check native setup');
+                return false;
+            }
 
-            // Request read permissions for the data types we need
+            console.log('[HealthService] Requesting authorization...');
+
+            // Request read permissions for all data types including sleep
             const result = await plugin.requestAuthorization({
-                read: ['heartRate', 'steps', 'calories', 'weight'],
+                read: ['steps', 'heartRate', 'calories', 'weight', 'sleep'],
                 write: []
             });
 
+            console.log('[HealthService] Authorization result:', JSON.stringify(result));
+
             // Check if authorization was successful
-            return result.status === 'authorized' || result.status === 'limited';
+            const isAuthorized = result.status === 'authorized' || result.status === 'limited';
+            console.log('[HealthService] Is authorized:', isAuthorized);
+
+            return isAuthorized;
         } catch (error) {
             console.error('[HealthService] Permission request failed:', error);
             return false;

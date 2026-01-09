@@ -890,4 +890,37 @@ input[type="range"].rpe-slider::-moz-range-track {
       background: hsl(var(--primary));
     }
   }
+
+  /* ============================================
+     BUILD 15: Page Scroll Container
+     Container de scroll para páginas internas que NÃO usam AppLayout
+     Resolve o problema de scroll travado no iOS
+     ============================================ */
+  .page-scroll-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+    scroll-behavior: smooth;
+    touch-action: pan-y pinch-zoom;
+    /* Background default */
+    background: hsl(var(--background));
+  }
+
+  /* Hide scrollbar on mobile for page-scroll-container */
+  @media (max-width: 768px) {
+    .page-scroll-container::-webkit-scrollbar {
+      display: none;
+    }
+
+    .page-scroll-container {
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+  }
 }

@@ -61,7 +61,7 @@ const ConfiguracoesNotificacoes = () => {
   const isPushDisabled = !preferences?.push_enabled || permissionStatus === 'denied';
 
   return (
-    <div className="min-h-screen bg-background pb-safe-3xl">
+    <div className="page-scroll-container flex flex-col">
       {/* Header */}
       <div className="p-4 pt-safe border-b border-border/30">
         <div className="flex items-center gap-3 mb-4">

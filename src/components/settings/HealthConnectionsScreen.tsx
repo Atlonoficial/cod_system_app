@@ -92,11 +92,10 @@ export const HealthConnectionsScreen: React.FC<HealthConnectionsScreenProps> = (
     };
 
     return (
-        <div className="flex flex-col h-screen bg-background">
+        <div className="page-scroll-container flex flex-col">
             {/* Header */}
             <div
-                className="flex items-center gap-3 p-4 border-b border-border"
-                style={{ paddingTop: 'max(env(safe-area-inset-top), 16px)' }}
+                className="flex items-center gap-3 p-4 pt-safe border-b border-border"
             >
                 {onBack && (
                     <Button variant="ghost" size="icon" onClick={onBack}>
