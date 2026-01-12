@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
-import { Search, Filter, Loader2, ArrowLeft, ShieldAlert, ChevronDown, ChevronRight, FolderOpen, Target, Clock, CalendarDays } from "lucide-react";
+import { Search, Filter, ArrowLeft, ShieldAlert, ChevronDown, ChevronRight, FolderOpen, Target, Clock, CalendarDays } from "lucide-react";
+import { Skeleton, SkeletonList } from "@/components/ui/skeleton";
 import { toast } from "@/hooks/use-toast";
 import { useWorkouts } from "@/hooks/useWorkouts";
 import { useStudentMesocycles, type StudentMesocycle, type StudentMicrocycle } from "@/hooks/useStudentMesocycles";
@@ -238,11 +239,20 @@ export const Workouts = () => {
 
   if (loading || loadingMesocycles) {
     return (
-      <div className="p-4 pt-8 pb-safe-4xl flex items-center justify-center min-h-96">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="w-8 h-8 animate-spin text-accent" />
-          <p className="text-muted-foreground">Carregando seus treinos...</p>
+      <div className="p-4 pt-8 pb-safe-4xl">
+        {/* Header Skeleton */}
+        <div className="mb-6 animate-fade-in-up">
+          <Skeleton className="h-8 w-[150px] mb-2" />
+          <Skeleton className="h-4 w-[250px]" />
         </div>
+
+        {/* Search Skeleton */}
+        <div className="mb-6 animate-fade-in-up animate-delay-100">
+          <Skeleton className="h-12 w-full rounded-2xl" />
+        </div>
+
+        {/* Workout Cards Skeleton */}
+        <SkeletonList count={4} type="workout" />
       </div>
     );
   }
@@ -295,11 +305,8 @@ export const Workouts = () => {
   // ✅ Verificar loading PRIMEIRO (antes de validar autenticação ou mostrar empty state)
   if (loading) {
     return (
-      <div className="p-4 pt-8 pb-safe-4xl flex items-center justify-center min-h-96">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="w-8 h-8 animate-spin text-accent" />
-          <p className="text-muted-foreground">Carregando seus treinos...</p>
-        </div>
+      <div className="p-4 pt-8 pb-safe-4xl">
+        <SkeletonList count={3} type="workout" />
       </div>
     );
   }

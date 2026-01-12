@@ -146,6 +146,27 @@ export const WorkoutDetail = ({ workout, onBack, onStartWorkout, onExerciseSelec
     onStartWorkout();
   }, [onStartWorkout]);
 
+  // BUILD 18: Parse exercise values safely to prevent display bugs like "212 séries"
+  const parseSetsValue = (val: any): number => {
+    if (typeof val === 'number') return val;
+    if (typeof val === 'string') {
+      const parsed = parseInt(val, 10);
+      return isNaN(parsed) ? 3 : Math.min(parsed, 20); // Cap at 20 for sanity
+    }
+    return 3;
+  };
+
+  const parseRepsValue = (val: any): string => {
+    if (typeof val === 'number') return String(val);
+    if (typeof val === 'string') {
+      // Check if it's already a range like "10-12"
+      if (val.includes('-')) return val;
+      const parsed = parseInt(val, 10);
+      return isNaN(parsed) ? '12' : String(parsed);
+    }
+    return '12';
+  };
+
   // Calcular calorias estimadas
   const estimateCalories = () => {
     const totalExercises = workout.exercises.length;
@@ -275,10 +296,10 @@ export const WorkoutDetail = ({ workout, onBack, onStartWorkout, onExerciseSelec
                     <div className="flex flex-wrap gap-2 mt-2">
                       {exercise.sets && exercise.reps && (
                         <span className="inline-flex items-center gap-1.5 bg-accent/10 px-2.5 py-1 rounded-full text-xs">
-                          <span className="font-semibold text-foreground">{exercise.sets}</span>
+                          <span className="font-semibold text-foreground">{parseSetsValue(exercise.sets)}</span>
                           <span className="text-muted-foreground">séries</span>
                           <span className="text-muted-foreground">×</span>
-                          <span className="font-semibold text-foreground">{exercise.reps}</span>
+                          <span className="font-semibold text-foreground">{parseRepsValue(exercise.reps)}</span>
                           <span className="text-muted-foreground">reps</span>
                         </span>
                       )}
@@ -300,13 +321,10 @@ export const WorkoutDetail = ({ workout, onBack, onStartWorkout, onExerciseSelec
                     />
                     <button
                       onClick={() => handleExpandClick(exercise)}
-                      className="w-9 h-9 rounded-xl bg-muted/50 flex items-center justify-center hover:bg-muted transition-all active:scale-95"
-                      aria-label="Ver detalhes do exercício"
+                      className="px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-xs font-medium hover:bg-primary/20 transition-all active:scale-95"
+                      aria-label="Ver descrição do exercício"
                     >
-                      <ChevronDown
-                        className={`w-4 h-4 text-muted-foreground transition-transform duration-300 ${expandedExercise === exercise.id ? 'rotate-180' : ''
-                          }`}
-                      />
+                      {expandedExercise === exercise.id ? 'Ocultar' : 'Ver descrição'}
                     </button>
                   </div>
                 </div>

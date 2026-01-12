@@ -1,19 +1,28 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Activity, Trophy, CalendarDays } from "lucide-react";
+import { Activity, CalendarDays } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
+/**
+ * ═══════════════════════════════════════════════════════════════════════════
+ * ProfileStats - Estatísticas do Perfil
+ * Version: 1.0.0 | Build: 18
+ * ═══════════════════════════════════════════════════════════════════════════
+ * NOTA: Sistema de pontos removido (não há painel no dashboard professor)
+ * Agora exibe apenas: Treinos Concluídos + Dias Ativos
+ * ═══════════════════════════════════════════════════════════════════════════
+ */
+
 interface ProfileStatsProps {
-  points: number;
   sessionsCount: number;
   activeDays: number;
   loading?: boolean;
 }
 
-export const ProfileStats = ({ points, sessionsCount, activeDays, loading = false }: ProfileStatsProps) => {
+export const ProfileStats = ({ sessionsCount, activeDays, loading = false }: ProfileStatsProps) => {
   if (loading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
-        {Array.from({ length: 3 }).map((_, i) => (
+      <div className="grid grid-cols-2 gap-3 mb-6">
+        {Array.from({ length: 2 }).map((_, i) => (
           <Card key={i}>
             <CardContent className="p-4 flex items-center gap-3">
               <Skeleton className="w-5 h-5 rounded-full" />
@@ -29,23 +38,13 @@ export const ProfileStats = ({ points, sessionsCount, activeDays, loading = fals
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+    <div className="grid grid-cols-2 gap-3 mb-6">
       <Card>
         <CardContent className="p-4 flex items-center gap-3">
           <Activity className="w-5 h-5 text-primary" />
           <div>
             <p className="text-xs text-muted-foreground">Treinos Concluídos</p>
             <p className="text-lg font-semibold text-foreground">{sessionsCount}</p>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardContent className="p-4 flex items-center gap-3">
-          <Trophy className="w-5 h-5 text-warning" />
-          <div>
-            <p className="text-xs text-muted-foreground">Pontos Totais</p>
-            <p className="text-lg font-semibold text-foreground">{(points || 0).toLocaleString("pt-BR")}</p>
           </div>
         </CardContent>
       </Card>

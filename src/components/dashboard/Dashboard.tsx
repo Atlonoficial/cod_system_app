@@ -30,6 +30,8 @@ import "@/components/wellness/ReadinessDashboard.css";
 import { EvolutionCharts } from "@/components/analytics/EvolutionCharts";
 import { useWorkoutEvolution } from "@/hooks/useWorkoutEvolution";
 
+// BUILD 18: Gamification removed (no teacher dashboard support)
+
 interface DashboardProps {
 
   onWorkoutClick?: () => void;
@@ -214,6 +216,8 @@ export const Dashboard = ({ onWorkoutClick }: DashboardProps) => {
           <EvolutionCharts data={evolutionChartData} compact />
         </div>
       )}
+
+      {/* BUILD 18: StreakDisplay removed - gamification not supported */}
 
 
       {/* Weight Progress Chart */}

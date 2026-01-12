@@ -83,10 +83,9 @@ export const DynamicFormRenderer = ({ questions, onSubmit, loading }: DynamicFor
             onSubmit(answers);
         } else {
             // Scroll to first error
-            const firstErrorId = Object.keys(errors)[0]; // Actually the state hasn't updated yet here with pure React state, unless we pass newErrors. 
-            // Simple alert for now or logic improved
-            const firstError = document.getElementById(`question-${Object.keys(validate() ? {} : errors)[0]}`); // Hacky
-            if (firstError) firstError.scrollIntoView({ behavior: 'smooth' });
+            const firstErrorId = Object.keys(errors)[0];
+            const firstError = document.getElementById(`question-${firstErrorId}`);
+            if (firstError) firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
     };
 
@@ -175,7 +174,8 @@ export const DynamicFormRenderer = ({ questions, onSubmit, loading }: DynamicFor
                 </div>
             ))}
 
-            <div className="fixed bottom-safe left-4 right-4 pb-4">
+            {/* Botão de envio - não fixo para evitar ser cortado pelo teclado ou SafeArea */}
+            <div className="pt-6 pb-safe-2xl">
                 <Button
                     className="w-full h-12 rounded-full text-lg font-medium shadow-lg shadow-primary/20"
                     onClick={handleSubmit}
@@ -184,8 +184,6 @@ export const DynamicFormRenderer = ({ questions, onSubmit, loading }: DynamicFor
                     {loading ? 'Enviando...' : 'Enviar Respostas'}
                 </Button>
             </div>
-            {/* Spacer for fixed button */}
-            <div className="h-20" />
         </div>
     );
 };

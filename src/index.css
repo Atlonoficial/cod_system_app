@@ -924,3 +924,229 @@ input[type="range"].rpe-slider::-moz-range-track {
     }
   }
 }
+
+/* ============================================
+   NATIVE UX ANIMATIONS - Performance Optimized
+   ============================================ */
+
+/* Fade in up animation for cards */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.3s ease-out forwards;
+  opacity: 0;
+  /* Start invisible */
+}
+
+/* Delay classes for staggered animations */
+.animate-delay-100 {
+  animation-delay: 100ms;
+}
+
+.animate-delay-200 {
+  animation-delay: 200ms;
+}
+
+.animate-delay-300 {
+  animation-delay: 300ms;
+}
+
+.animate-delay-400 {
+  animation-delay: 400ms;
+}
+
+.animate-delay-500 {
+  animation-delay: 500ms;
+}
+
+/* Shimmer effect for skeleton loading */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Scale down on press (native feel) */
+@keyframes scalePress {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(0.97);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+.active-scale:active {
+  transform: scale(0.97);
+  transition: transform 0.1s ease;
+}
+
+/* Slide in from bottom (for modals/sheets) */
+@keyframes slideInFromBottom {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in-bottom {
+  animation: slideInFromBottom 0.3s ease-out forwards;
+}
+
+/* Pulse animation for emphasis */
+@keyframes gentlePulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.animate-gentle-pulse {
+  animation: gentlePulse 2s ease-in-out infinite;
+}
+
+/* Bounce in for success states */
+@keyframes bounceIn {
+  0% {
+    transform: scale(0);
+  }
+
+  50% {
+    transform: scale(1.1);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-bounce-in {
+  animation: bounceIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   CONFETTI ANIMATION - Peak-End Rule (Build 18)
+   Celebração visual para treinos completados
+   ═══════════════════════════════════════════════════════════════ */
+
+@keyframes confetti {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+.animate-confetti {
+  animation: confetti 3s ease-out forwards;
+}
+
+/* Streak fire glow effect */
+@keyframes fireGlow {
+
+  0%,
+  100% {
+    box-shadow: 0 0 10px rgba(255, 165, 0, 0.5);
+  }
+
+  50% {
+    box-shadow: 0 0 20px rgba(255, 100, 0, 0.8), 0 0 30px rgba(255, 50, 0, 0.5);
+  }
+}
+
+.animate-fire-glow {
+  animation: fireGlow 1.5s ease-in-out infinite;
+}
+
+/* Points popup animation */
+@keyframes pointsPopup {
+  0% {
+    transform: translateY(0) scale(0.8);
+    opacity: 0;
+  }
+
+  20% {
+    transform: translateY(-10px) scale(1.1);
+    opacity: 1;
+  }
+
+  80% {
+    transform: translateY(-30px) scale(1);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(-50px) scale(0.9);
+    opacity: 0;
+  }
+}
+
+.animate-points-popup {
+  animation: pointsPopup 1.5s ease-out forwards;
+}
+
+/* Victory shake for new records */
+@keyframes victoryShake {
+
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+
+  10% {
+    transform: rotate(-5deg);
+  }
+
+  20% {
+    transform: rotate(5deg);
+  }
+
+  30% {
+    transform: rotate(-5deg);
+  }
+
+  40% {
+    transform: rotate(5deg);
+  }
+
+  50% {
+    transform: rotate(0deg);
+  }
+}
+
+.animate-victory-shake {
+  animation: victoryShake 0.6s ease-in-out;
+}

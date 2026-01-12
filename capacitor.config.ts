@@ -1,4 +1,12 @@
-// capacitor.config.ts
+/**
+ * ═══════════════════════════════════════════════════════════════════════════
+ * COD SYSTEM - Capacitor Configuration
+ * Version: 1.0.0 | Build: 18
+ * ═══════════════════════════════════════════════════════════════════════════
+ * @copyright (c) 2024-2026 Atlon Tech (CNPJ: 58.079.600/0001-77)
+ * All intellectual property rights reserved to Atlon Tech
+ * ═══════════════════════════════════════════════════════════════════════════
+ */
 import type { CapacitorConfig } from "@capacitor/cli";
 
 // Detecta produção/CI (Appflow exporta CI/Appflow vars)
@@ -29,9 +37,6 @@ const config: CapacitorConfig = {
     cleartext: true,
     allowNavigation: [
       'https://bqbopkqzkavhmenjlhab.supabase.co',
-
-      '*.lovableproject.com',
-      'https://*.lovable.app'
     ]
   },
 
@@ -39,25 +44,25 @@ const config: CapacitorConfig = {
   ios: {
     scheme: "codsystem",
     contentInset: "automatic",
-    // ✅ BUILD 57: Cor do background do app para safe area profissional
+    // ✅ BUILD 18: Cor do background do app para safe area profissional
     // hsl(214.3, 36.8%, 7.5%) = #0d1117 (dark blue matching app theme)
     backgroundColor: "#0d1117",
     allowsLinkPreview: false,
     handleApplicationNotifications: false,
 
-    // ✅ BUILD 04: Scroll nativo habilitado para permitir scroll do conteúdo
+    // ✅ BUILD 18: Scroll nativo habilitado para permitir scroll do conteúdo
     // Header e footer permanecem fixos via CSS (position: fixed)
 
   },
 
   android: {
-    // ✅ BUILD 57: Cor do background consistente com iOS
+    // ✅ BUILD 18: Cor do background consistente com iOS
     backgroundColor: "#0d1117",
     allowMixedContent: true,
     captureInput: true,
     webContentsDebuggingEnabled: false,
     appendUserAgent: "COD SYSTEM/1.0",
-    overrideUserAgent: "[APP_NAME]/1.0 Mobile App",
+    overrideUserAgent: "COD SYSTEM/1.0.0 Mobile App",
 
 
 
@@ -68,7 +73,7 @@ const config: CapacitorConfig = {
     SplashScreen: {
       launchAutoHide: true,
       launchShowDuration: 0,
-      // ✅ BUILD 57: Cor consistente com o tema do app
+      // ✅ BUILD 18: Cor consistente com o tema do app
       backgroundColor: "#0d1117",
       androidSplashResourceName: "splash",
       androidScaleType: "CENTER_CROP",

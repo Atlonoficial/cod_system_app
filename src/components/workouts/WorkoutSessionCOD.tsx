@@ -19,7 +19,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { VideoPlayer } from "./VideoPlayer";
+import { ExerciseVideoSheet } from "./ExerciseVideoSheet";
 import { AGTTimer } from "@/components/workout/AGTTimer";
 import { SetLogger } from "@/components/workout/SetLogger";
 import { PostWorkoutCheckout, CheckoutData } from "@/components/workout/PostWorkoutCheckout";
@@ -677,33 +677,13 @@ export const WorkoutSessionCOD = ({ workout, onFinish, onExit }: WorkoutSessionC
                             </div>
                         )}
 
-                        {/* Video Player with better styled toggle button */}
+                        {/* BUILD 18: Video Player as Native Bottom Sheet */}
                         {currentExercise?.video_url && (
                             <div className="mt-2">
-                                <button
-                                    onClick={() => setIsVideoCollapsed(!isVideoCollapsed)}
-                                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary/10 text-primary text-sm font-medium hover:bg-primary/20 active:scale-[0.98] transition-all border border-primary/20"
-                                >
-                                    {isVideoCollapsed ? (
-                                        <>
-                                            <Play className="w-4 h-4" />
-                                            <span>Ver demonstração</span>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <ChevronUp className="w-4 h-4" />
-                                            <span>Ocultar vídeo</span>
-                                        </>
-                                    )}
-                                </button>
-                                {!isVideoCollapsed && (
-                                    <div className="mt-3">
-                                        <VideoPlayer
-                                            exerciseName={currentExercise?.name || ''}
-                                            videoUrl={currentExercise?.video_url}
-                                        />
-                                    </div>
-                                )}
+                                <ExerciseVideoSheet
+                                    exerciseName={currentExercise.name}
+                                    videoUrl={currentExercise.video_url}
+                                />
                             </div>
                         )}
                     </CardContent>

@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Trophy, Camera, Calendar, CreditCard, ClipboardList, Stethoscope, Images, Ruler, Shield, Cog, Target, Heart, Activity } from "lucide-react";
+import { Camera, Calendar, CreditCard, ClipboardList, Stethoscope, Images, Ruler, Shield, Cog, Target, Heart, Activity } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { useHapticFeedback } from "@/hooks/useHapticFeedback";
@@ -32,8 +32,8 @@ export const Profile = () => {
   const { sessionsCount, activeDays, examCount, photoCount, assessmentCount, loading: statsLoading } = useProfileStats();
   const { avatarUrl, memberSince, displayName, avatarFallback } = useOptimizedAvatar();
 
-  // Points are no longer tracked since gamification was removed
-  const points = sessionsCount * 10; // Simple calculation based on sessions
+  // BUILD 18: Gamification removed (no teacher dashboard support)
+  // Points are no longer displayed
 
   // Statistics are now handled by useProfileStats hook
 
@@ -190,16 +190,10 @@ export const Profile = () => {
             </p>
           )}
         </div>
-
-        <div className="mt-3 flex items-center gap-2 animate-fade-up stagger-delay-2">
-          <Trophy className="w-5 h-5 sm:w-6 sm:h-6 text-warning" />
-          <span className="font-semibold text-base sm:text-lg text-foreground">{(points || 0).toLocaleString("pt-BR")} pontos</span>
-        </div>
       </div>
 
-      {/* Stats */}
+      {/* Stats - BUILD 18: Only Treinos/Dias (no points) */}
       <ProfileStats
-        points={points}
         sessionsCount={sessionsCount}
         activeDays={activeDays}
         loading={statsLoading}

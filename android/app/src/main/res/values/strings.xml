@@ -1,9 +1,18 @@
 <?xml version='1.0' encoding='utf-8'?>
+<!--
+  ═══════════════════════════════════════════════════════════════════════════
+  COD SYSTEM - Android Resources
+  Version: 1.0.0 | Build: 18
+  ═══════════════════════════════════════════════════════════════════════════
+  @copyright (c) 2024-2026 Atlon Tech (CNPJ: 58.079.600/0001-77)
+  All intellectual property rights reserved to Atlon Tech
+  ═══════════════════════════════════════════════════════════════════════════
+-->
 <resources>
-    <string name="app_name">[APP_NAME]</string>
-    <string name="title_activity_main">[APP_NAME]</string>
-    <string name="package_name">com.yourcompany.studentapp</string>
-    <string name="custom_url_scheme">com.yourcompany.studentapp</string>
+    <string name="app_name">COD SYSTEM</string>
+    <string name="title_activity_main">COD SYSTEM</string>
+    <string name="package_name">com.atlontech.codsystem.app</string>
+    <string name="custom_url_scheme">com.atlontech.codsystem.app</string>
     
     <!-- OneSignal App ID -->
     <string name="onesignal_app_id">your_onesignal_app_id</string>
