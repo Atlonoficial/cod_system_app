@@ -119,7 +119,7 @@ class HealthServiceImpl {
 
     /**
      * Request health data permissions from user
-     * BUILD 18: Updated with complete list of permissions
+     * BUILD 27: Added detailed logs and timeout wrapper
      */
     async requestPermissions(): Promise<boolean> {
         debugLog('HealthService', '🚀 requestPermissions() INICIADO');
@@ -147,45 +147,36 @@ class HealthServiceImpl {
 
             debugLog('HealthService', '✅ Plugin carregado com sucesso!');
             debugLog('HealthService', `Plugin type: ${typeof plugin}`);
-            console.log('[HealthService] Requesting authorization...');
 
-            // BUILD 18: Complete list of permissions for iOS & Android
-            const readPermissions = [
-                'steps',
-                'distance',
-                'activeEnergyBurned',
-                'calories',
-                'heartRate',
-                'restingHeartRate',
-                'heartRateVariability',
-                'weight',
-                'height',
-                'bodyMass',
-                'bodyFatPercentage',
-                'sleep',
-                'sleepAnalysis'
-            ];
+            // BUILD 27: Simplified permissions - just the essentials
+            const readPermissions = ['steps', 'distance', 'weight', 'height'];
+            const writePermissions: string[] = [];
 
-            const writePermissions = [
-                'activeEnergyBurned',
-                'steps',
-                'distance'
-            ];
+            debugLog('HealthService', `📋 Read (${readPermissions.length}): ${readPermissions.join(', ')}`);
+            debugLog('HealthService', `📋 Write (${writePermissions.length}): ${writePermissions.join(', ') || 'nenhum'}`);
 
-            debugLog('HealthService', `📋 Read permissions (${readPermissions.length}): ${readPermissions.join(', ')}`);
-            debugLog('HealthService', `📋 Write permissions (${writePermissions.length}): ${writePermissions.join(', ')}`);
-            console.log('[HealthService] Requesting read:', readPermissions);
-            console.log('[HealthService] Requesting write:', writePermissions);
+            debugLog('HealthService', '⏳ ANTES de plugin.requestAuthorization()');
+            debugLog('HealthService', `Método existe: ${typeof plugin.requestAuthorization}`);
 
-            debugLog('HealthService', '⏳ Chamando plugin.requestAuthorization()...');
-            const result = await plugin.requestAuthorization({
+            // BUILD 27: Wrap in timeout to prevent infinite hang
+            const authPromise = plugin.requestAuthorization({
                 read: readPermissions,
                 write: writePermissions
             });
 
-            debugLog('HealthService', '🔙 requestAuthorization() RETORNOU');
-            debugLog('HealthService', `📥 Resultado recebido!`);
-            debugLog('HealthService', `Resultado completo: ${JSON.stringify(result)}`);
+            debugLog('HealthService', '📤 Promise criada, aguardando...');
+
+            // 10 second timeout
+            const timeoutPromise = new Promise<never>((_, reject) => {
+                setTimeout(() => {
+                    reject(new Error('TIMEOUT: requestAuthorization demorou mais de 10s'));
+                }, 10000);
+            });
+
+            const result = await Promise.race([authPromise, timeoutPromise]);
+
+            debugLog('HealthService', '🔙 requestAuthorization() RETORNOU!');
+            debugLog('HealthService', `📥 Resultado: ${JSON.stringify(result)}`);
             console.log('[HealthService] Authorization result:', JSON.stringify(result));
 
             // Check if authorization was successful
@@ -195,14 +186,12 @@ class HealthServiceImpl {
 
             debugLog('HealthService', `🔍 isAuthorized: ${isAuthorized}`);
             debugLog('HealthService', `Status: ${result.status}`);
-            console.log('[HealthService] Is authorized:', isAuthorized);
 
             return isAuthorized;
         } catch (error) {
             debugLog('HealthService', `🔥 ERRO CAPTURADO!`);
             debugLog('HealthService', `Tipo: ${(error as Error).name}`);
             debugLog('HealthService', `Mensagem: ${(error as Error).message}`);
-            debugLog('HealthService', `Stack: ${(error as Error).stack}`);
             console.error('[HealthService] Permission request failed:', error);
             return false;
         }
