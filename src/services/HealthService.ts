@@ -112,18 +112,28 @@ class HealthServiceImpl {
      * BUILD 18: Updated with complete list of permissions
      */
     async requestPermissions(): Promise<boolean> {
+        debugLog('HealthService', '🚀 requestPermissions() INICIADO');
+        debugLog('HealthService', `Platform: ${this.platform}, Native: ${this.isNative}`);
+
         if (!this.isNative) {
+            debugLog('HealthService', '❌ NÃO É NATIVO - retornando false');
             console.log('[HealthService] Skipping - not native platform');
             return false;
         }
 
         try {
+            debugLog('HealthService', '📦 Tentando carregar plugin...');
             const plugin = await getHealthPlugin();
+
             if (!plugin) {
+                debugLog('HealthService', '💥 PLUGIN NÃO CARREGOU!');
+                debugLog('HealthService', 'Isso significa que @capgo/capacitor-health não está instalado nativamente');
                 console.error('[HealthService] Plugin not loaded - check native setup');
                 return false;
             }
 
+            debugLog('HealthService', '✅ Plugin carregado com sucesso!');
+            debugLog('HealthService', `Plugin type: ${typeof plugin}`);
             console.log('[HealthService] Requesting authorization...');
 
             // BUILD 18: Complete list of permissions for iOS & Android
@@ -149,14 +159,19 @@ class HealthServiceImpl {
                 'distance'
             ];
 
+            debugLog('HealthService', `📋 Read permissions (${readPermissions.length}): ${readPermissions.join(', ')}`);
+            debugLog('HealthService', `📋 Write permissions (${writePermissions.length}): ${writePermissions.join(', ')}`);
             console.log('[HealthService] Requesting read:', readPermissions);
             console.log('[HealthService] Requesting write:', writePermissions);
 
+            debugLog('HealthService', '⏳ Chamando plugin.requestAuthorization()...');
             const result = await plugin.requestAuthorization({
                 read: readPermissions,
                 write: writePermissions
             });
 
+            debugLog('HealthService', `📥 Resultado recebido!`);
+            debugLog('HealthService', `Resultado completo: ${JSON.stringify(result)}`);
             console.log('[HealthService] Authorization result:', JSON.stringify(result));
 
             // Check if authorization was successful
@@ -164,10 +179,16 @@ class HealthServiceImpl {
                 result.status === 'limited' ||
                 result.authorized === true;
 
+            debugLog('HealthService', `🔍 isAuthorized: ${isAuthorized}`);
+            debugLog('HealthService', `Status: ${result.status}`);
             console.log('[HealthService] Is authorized:', isAuthorized);
 
             return isAuthorized;
         } catch (error) {
+            debugLog('HealthService', `🔥 ERRO CAPTURADO!`);
+            debugLog('HealthService', `Tipo: ${(error as Error).name}`);
+            debugLog('HealthService', `Mensagem: ${(error as Error).message}`);
+            debugLog('HealthService', `Stack: ${(error as Error).stack}`);
             console.error('[HealthService] Permission request failed:', error);
             return false;
         }

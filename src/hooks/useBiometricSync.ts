@@ -10,6 +10,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { HealthService, type HealthDataResponse } from '@/services/HealthService';
+import { debugLog } from '@/lib/debugLogger';
 
 // Types for health data
 export interface SleepData {
@@ -96,30 +97,43 @@ export const useBiometricSync = (): UseBiometricSyncResult => {
 
     // Request health data permissions
     const requestPermissions = useCallback(async (): Promise<boolean> => {
+        debugLog('BiometricSync', '📥 requestPermissions() INICIADO');
+        debugLog('BiometricSync', `isNative: ${isNative}`);
+
         if (!isNative) {
+            debugLog('BiometricSync', '❌ NÃO É NATIVO - abortando');
             console.log('[BiometricSync] Cannot request permissions - not native');
             return false;
         }
 
         try {
+            debugLog('BiometricSync', '⏳ Setando loading...');
             setLoading(true);
             setError(null);
 
+            debugLog('BiometricSync', '📞 Chamando HealthService.requestPermissions()...');
             const granted = await HealthService.requestPermissions();
+
+            debugLog('BiometricSync', `📋 Resposta recebida: ${granted}`);
             console.log('[BiometricSync] Permissions granted:', granted);
             setHasHealthPermission(granted);
 
             if (granted) {
+                debugLog('BiometricSync', '✅ PERMITIDO - iniciando sync');
                 // Auto-sync after permissions granted
                 await syncHealthDataInternal();
+            } else {
+                debugLog('BiometricSync', '❌ NEGADO pelo usuário ou sistema');
             }
 
             return granted;
         } catch (err) {
+            debugLog('BiometricSync', `🔥 ERRO CAPTURADO: ${(err as Error).message}`);
             console.error('[BiometricSync] Permission request failed:', err);
             setError('Falha ao solicitar permissões de saúde');
             return false;
         } finally {
+            debugLog('BiometricSync', '🏁 Finally block - setando loading false');
             setLoading(false);
         }
     }, [isNative]);
