@@ -119,14 +119,15 @@ class HealthServiceImpl {
 
     /**
      * Request health data permissions from user
-     * BUILD 30: Step-by-step execution with isAvailable check
+     * BUILD 31: Added XCODE31 marker - if this doesn't show, code is not updated!
      */
     async requestPermissions(): Promise<boolean> {
-        // Use console.log for immediate visibility in Safari debugger
-        console.log('[HealthService] ==========================================');
-        console.log('[HealthService] BUILD 30 - requestPermissions() START');
-        console.log('[HealthService] Platform:', this.platform, '| Native:', this.isNative);
-        console.log('[HealthService] ==========================================');
+        // XCODE31 MARKER - This MUST appear in logs if code is updated
+        console.log('========================================');
+        console.log('XCODE31 - BUILD 31 - requestPermissions ENTRY');
+        console.log('XCODE31 - Platform:', this.platform);
+        console.log('XCODE31 - isNative:', this.isNative);
+        console.log('========================================');
 
         if (!this.isNative) {
             console.log('[HealthService] ❌ Not native platform');

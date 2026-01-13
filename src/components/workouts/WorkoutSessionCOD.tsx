@@ -622,28 +622,28 @@ export const WorkoutSessionCOD = ({ workout, onFinish, onExit }: WorkoutSessionC
                     </div>
                 </div>
 
-                {/* Stats Cards - BUILD 29: Clean minimal design */}
-                <div className="grid grid-cols-3 gap-2 px-4 pb-4">
-                    <div className="rounded-xl p-3 text-center border border-border/20">
+                {/* Stats Cards - BUILD 32: Ultra clean like Home */}
+                <div className="grid grid-cols-3 gap-3 px-4 pb-4">
+                    <div className="p-2 text-center">
                         <div className="flex items-center justify-center gap-1 mb-1">
-                            <Target className="w-3.5 h-3.5 text-primary" />
+                            <Target className="w-4 h-4 text-primary" />
                             <p className="text-[10px] text-muted-foreground">Séries</p>
                         </div>
-                        <p className="text-lg font-bold text-foreground">{displaySetsCount}/{adaptedSets}</p>
+                        <p className="text-xl font-bold text-foreground">{displaySetsCount}/{adaptedSets}</p>
                     </div>
-                    <div className="rounded-xl p-3 text-center border border-border/20">
+                    <div className="p-2 text-center">
                         <div className="flex items-center justify-center gap-1 mb-1">
-                            <TrendingUp className="w-3.5 h-3.5 text-purple-400" />
+                            <TrendingUp className="w-4 h-4 text-purple-400" />
                             <p className="text-[10px] text-muted-foreground">Volume</p>
                         </div>
-                        <p className="text-lg font-bold text-foreground">{totalVolume.toLocaleString()}kg</p>
+                        <p className="text-xl font-bold text-foreground">{totalVolume.toLocaleString()}kg</p>
                     </div>
-                    <div className="rounded-xl p-3 text-center border border-border/20">
+                    <div className="p-2 text-center">
                         <div className="flex items-center justify-center gap-1 mb-1">
-                            <Zap className="w-3.5 h-3.5 text-green-400" />
+                            <Zap className="w-4 h-4 text-green-400" />
                             <p className="text-[10px] text-muted-foreground">RPE</p>
                         </div>
-                        <p className="text-lg font-bold text-foreground">
+                        <p className="text-xl font-bold text-foreground">
                             {exerciseLogs.size > 0
                                 ? (Array.from(exerciseLogs.values()).flat().reduce((sum, l) => sum + l.rpe, 0) /
                                     Array.from(exerciseLogs.values()).flat().length || 0).toFixed(1)
