@@ -1,11 +1,9 @@
 /**
- * COD System - Health Connections Screen
+ * ═══════════════════════════════════════════════════════════════════════════
+ * COD System - Health Connections Screen (Build 20 - WITH DEBUG)
+ * ═══════════════════════════════════════════════════════════════════════════
  * 
- * Allows users to connect to Apple Health (iOS) or Google Fit (Android)
- * to automatically sync biometric data like sleep and HRV.
- * 
- * Garmin and Strava sync through Apple Health/Google Fit natively,
- * so this is the only connection needed.
+ * IMPORTANTE: Agora com LOGS VISÍVEIS na tela para debug sem Mac
  */
 
 import React, { useState, useEffect } from 'react';
@@ -13,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import {
     Heart,
     Moon,
@@ -23,10 +22,14 @@ import {
     AlertCircle,
     RefreshCw,
     ChevronLeft,
-    Info
+    Info,
+    Bug,
+    Copy
 } from 'lucide-react';
 import { useBiometricSync } from '@/hooks/useBiometricSync';
 import { Capacitor } from '@capacitor/core';
+import { toast } from 'sonner';
+import { debugLog, getDebugLogs, subscribeToLogs, clearDebugLogs } from '@/lib/debugLogger';
 
 interface HealthConnectionsScreenProps {
     onBack?: () => void;
@@ -45,33 +48,56 @@ export const HealthConnectionsScreen: React.FC<HealthConnectionsScreenProps> = (
 
     const [isConnecting, setIsConnecting] = useState(false);
     const [connectionTimeout, setConnectionTimeout] = useState(false);
+    const [showDebugLogs, setShowDebugLogs] = useState(false);
+    const [debugLogs, setDebugLogs] = useState<string[]>([]);
+
     const platform = Capacitor.getPlatform();
     const isNative = Capacitor.isNativePlatform();
 
     const healthServiceName = platform === 'ios' ? 'Apple Health' : 'Google Fit';
     const healthServiceIcon = platform === 'ios' ? '🍎' : '💚';
 
+    // Subscribe to debug logs
+    useEffect(() => {
+        setDebugLogs(getDebugLogs());
+        const unsubscribe = subscribeToLogs((logs) => {
+            setDebugLogs(logs);
+        });
+        return unsubscribe;
+    }, []);
+
     const handleConnect = async () => {
+        debugLog('UI', '========== BOTÃO CLICADO ==========');
+        debugLog('UI', `Plataforma: ${platform}, Nativo: ${isNative}`);
+
         setIsConnecting(true);
         setConnectionTimeout(false);
+        setShowDebugLogs(true); // Mostrar logs automaticamente
 
-        // Timeout de segurança - 8 segundos
         const timeoutId = setTimeout(() => {
+            debugLog('UI', '⏰ TIMEOUT! Conexão levou mais de 8 segundos');
             setConnectionTimeout(true);
             setIsConnecting(false);
         }, 8000);
 
         try {
+            debugLog('UI', 'Chamando requestPermissions()...');
             const granted = await requestPermissions();
+
             clearTimeout(timeoutId);
+            debugLog('UI', `Resultado: ${granted ? '✅ PERMITIDO' : '❌ NEGADO'}`);
+
             if (granted) {
+                debugLog('UI', 'Sincronizando dados...');
                 await syncHealthData();
+                debugLog('UI', '✅ Sincronização completa!');
             }
         } catch (err) {
-            console.error('Error connecting:', err);
+            debugLog('UI', `❌ ERRO: ${(err as Error).message}`);
             clearTimeout(timeoutId);
         } finally {
             setIsConnecting(false);
+            debugLog('UI', '========== FIM ==========');
         }
     };
 
@@ -79,7 +105,16 @@ export const HealthConnectionsScreen: React.FC<HealthConnectionsScreenProps> = (
         await syncHealthData();
     };
 
-    // Format last sync time
+    const handleCopyLogs = async () => {
+        try {
+            const logsText = debugLogs.join('\n');
+            await navigator.clipboard.writeText(logsText);
+            toast.success('Logs copiados! Envie para análise.');
+        } catch (error) {
+            toast.error('Falha ao copiar logs');
+        }
+    };
+
     const formatLastSync = () => {
         if (!biometricData.lastSyncedAt) return 'Nunca sincronizado';
         const diff = Date.now() - biometricData.lastSyncedAt.getTime();
@@ -94,23 +129,95 @@ export const HealthConnectionsScreen: React.FC<HealthConnectionsScreenProps> = (
     return (
         <div className="page-scroll-container flex flex-col">
             {/* Header */}
-            <div
-                className="flex items-center gap-3 p-4 pt-safe border-b border-border"
-            >
+            <div className="flex items-center gap-3 p-4 pt-safe border-b border-border">
                 {onBack && (
                     <Button variant="ghost" size="icon" onClick={onBack}>
                         <ChevronLeft className="w-5 h-5" />
                     </Button>
                 )}
-                <div>
+                <div className="flex-1">
                     <h1 className="text-xl font-bold">Conexões de Saúde</h1>
                     <p className="text-sm text-muted-foreground">
                         Sincronize dados de sono e recuperação
                     </p>
                 </div>
+                {isNative && (
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setShowDebugLogs(!showDebugLogs)}
+                    >
+                        <Bug className={`w-5 h-5 ${showDebugLogs ? 'text-primary' : ''}`} />
+                    </Button>
+                )}
             </div>
 
             <div className="flex-1 p-4 space-y-4 overflow-auto pb-24">
+                {/* Debug Logs (se habilitado) */}
+                {showDebugLogs && isNative && (
+                    <Card className="border-yellow-500/30 bg-yellow-500/5">
+                        <CardHeader className="pb-3">
+                            <CardTitle className="text-base flex items-center justify-between">
+                                <span className="flex items-center gap-2">
+                                    <Bug className="w-4 h-4" />
+                                    Debug Logs
+                                </span>
+                                <div className="flex gap-2">
+                                    <Button
+                                        onClick={handleCopyLogs}
+                                        size="sm"
+                                        variant="outline"
+                                        className="gap-2"
+                                    >
+                                        <Copy className="w-3 h-3" />
+                                        Copiar
+                                    </Button>
+                                    <Button
+                                        onClick={clearDebugLogs}
+                                        size="sm"
+                                        variant="outline"
+                                    >
+                                        Limpar
+                                    </Button>
+                                </div>
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <ScrollArea className="h-64 w-full">
+                                <div className="space-y-1 font-mono text-xs">
+                                    {debugLogs.length === 0 ? (
+                                        <p className="text-muted-foreground">
+                                            Nenhum log ainda. Clique em "Conectar" abaixo.
+                                        </p>
+                                    ) : (
+                                        debugLogs.map((log, index) => {
+                                            let bgColor = 'bg-muted/30';
+                                            if (log.includes('❌') || log.includes('ERROR')) {
+                                                bgColor = 'bg-red-500/20';
+                                            } else if (log.includes('✅')) {
+                                                bgColor = 'bg-green-500/20';
+                                            } else if (log.includes('⚠️') || log.includes('⏰')) {
+                                                bgColor = 'bg-yellow-500/20';
+                                            }
+                                            return (
+                                                <div
+                                                    key={index}
+                                                    className={`p-2 rounded ${bgColor} whitespace-pre-wrap break-all`}
+                                                >
+                                                    {log}
+                                                </div>
+                                            );
+                                        })
+                                    )}
+                                </div>
+                            </ScrollArea>
+                            <p className="text-xs text-muted-foreground mt-2">
+                                💡 Clique "Copiar" e me envie os logs para análise
+                            </p>
+                        </CardContent>
+                    </Card>
+                )}
+
                 {/* Connection Status Card */}
                 <Card className={hasHealthPermission ? 'border-green-500/30' : ''}>
                     <CardHeader className="pb-3">
@@ -130,7 +237,6 @@ export const HealthConnectionsScreen: React.FC<HealthConnectionsScreenProps> = (
                     </CardHeader>
                     <CardContent className="space-y-4">
                         {!isNative ? (
-                            // Web/Development message
                             <div className="flex items-start gap-3 p-3 bg-yellow-500/10 rounded-xl">
                                 <AlertCircle className="w-5 h-5 text-yellow-500 flex-shrink-0 mt-0.5" />
                                 <div className="text-sm">
@@ -142,7 +248,6 @@ export const HealthConnectionsScreen: React.FC<HealthConnectionsScreenProps> = (
                                 </div>
                             </div>
                         ) : !hasHealthPermission ? (
-                            // Not connected
                             <div className="space-y-4">
                                 {connectionTimeout && (
                                     <div className="flex items-start gap-3 p-3 bg-red-500/10 rounded-xl">
@@ -151,7 +256,7 @@ export const HealthConnectionsScreen: React.FC<HealthConnectionsScreenProps> = (
                                             <p className="font-medium text-red-500">Conexão expirou</p>
                                             <p className="text-muted-foreground mt-1">
                                                 Não foi possível conectar ao {healthServiceName}.
-                                                Verifique se o app tem permissão de acesso à saúde nas configurações do dispositivo.
+                                                Veja os logs acima (ícone 🐛) para mais detalhes.
                                             </p>
                                         </div>
                                     </div>
@@ -176,7 +281,6 @@ export const HealthConnectionsScreen: React.FC<HealthConnectionsScreenProps> = (
                                 </Button>
                             </div>
                         ) : (
-                            // Connected
                             <div className="space-y-4">
                                 <div className="flex items-center justify-between">
                                     <span className="text-sm text-muted-foreground">Última sincronização</span>
@@ -246,7 +350,7 @@ export const HealthConnectionsScreen: React.FC<HealthConnectionsScreenProps> = (
                     </CardContent>
                 </Card>
 
-                {/* Info Card - Garmin/Strava */}
+                {/* Info Card */}
                 <Card className="border-primary/20 bg-primary/5">
                     <CardContent className="p-4">
                         <div className="flex items-start gap-3">
@@ -258,22 +362,10 @@ export const HealthConnectionsScreen: React.FC<HealthConnectionsScreenProps> = (
                                     automaticamente sincronizados com {healthServiceName}. Basta ativar
                                     "Compartilhar com {healthServiceName}" nas configurações desses apps.
                                 </p>
-                                <div className="flex gap-2 mt-2">
-                                    <Badge variant="outline" className="text-xs">⌚ Garmin</Badge>
-                                    <Badge variant="outline" className="text-xs">🏃 Strava</Badge>
-                                    <span className="text-xs text-muted-foreground">→</span>
-                                    <Badge variant="outline" className="text-xs">{healthServiceIcon} {healthServiceName}</Badge>
-                                </div>
                             </div>
                         </div>
                     </CardContent>
                 </Card>
-
-                {/* How it works */}
-                <div className="p-4 text-center text-xs text-muted-foreground">
-                    <p>Os dados sincronizados são usados para preencher</p>
-                    <p>automaticamente seu check-in de prontidão diário.</p>
-                </div>
             </div>
         </div>
     );
