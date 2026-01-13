@@ -11,9 +11,8 @@
 	<string>production</string>
 	<key>com.apple.developer.healthkit</key>
 	<true/>
-	<key>com.apple.developer.healthkit.access</key>
-	<array>
-		<string>health-records</string>
-	</array>
+	<!-- BUILD 27: Array removido - health-records é para clinical data, não fitness -->
+	<!-- Para fitness data (steps, calories, etc), não precisa do array 'access' -->
 </dict>
 </plist>
+
