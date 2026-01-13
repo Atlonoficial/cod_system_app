@@ -142,13 +142,20 @@ export const HealthConnectionsScreen: React.FC<HealthConnectionsScreenProps> = (
                     </p>
                 </div>
                 {isNative && (
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => setShowDebugLogs(!showDebugLogs)}
-                    >
-                        <Bug className={`w-5 h-5 ${showDebugLogs ? 'text-primary' : ''}`} />
-                    </Button>
+                    <>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setShowDebugLogs(!showDebugLogs)}
+                        >
+                            <Bug className={`w-5 h-5 ${showDebugLogs ? 'text-primary' : ''}`} />
+                        </Button>
+
+                        {/* BUILD VERSION BADGE - Para confirmar qual build está instalado */}
+                        <Badge variant="outline" className="ml-2 font-mono text-xs">
+                            BUILD 23
+                        </Badge>
+                    </>
                 )}
             </div>
 

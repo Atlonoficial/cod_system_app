@@ -157,6 +157,9 @@ class HealthServiceImpl {
             debugLog('HealthService', '📦 Tentando carregar plugin...');
             const plugin = await getHealthPlugin();
 
+            debugLog('HealthService', '🔄 getHealthPlugin() RETORNOU');
+            debugLog('HealthService', `Plugin value: ${plugin ? 'EXISTS' : 'NULL'}`);
+
             if (!plugin) {
                 debugLog('HealthService', '💥 PLUGIN NÃO CARREGOU!');
                 debugLog('HealthService', 'Isso significa que @capgo/capacitor-health não está instalado nativamente');
@@ -202,6 +205,7 @@ class HealthServiceImpl {
                 write: writePermissions
             });
 
+            debugLog('HealthService', '🔙 requestAuthorization() RETORNOU');
             debugLog('HealthService', `📥 Resultado recebido!`);
             debugLog('HealthService', `Resultado completo: ${JSON.stringify(result)}`);
             console.log('[HealthService] Authorization result:', JSON.stringify(result));
