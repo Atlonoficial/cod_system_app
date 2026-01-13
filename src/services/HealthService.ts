@@ -119,80 +119,96 @@ class HealthServiceImpl {
 
     /**
      * Request health data permissions from user
-     * BUILD 27: Added detailed logs and timeout wrapper
+     * BUILD 30: Step-by-step execution with isAvailable check
      */
     async requestPermissions(): Promise<boolean> {
-        debugLog('HealthService', '🚀 requestPermissions() INICIADO');
-        debugLog('HealthService', `Platform: ${this.platform}, Native: ${this.isNative}`);
+        // Use console.log for immediate visibility in Safari debugger
+        console.log('[HealthService] ==========================================');
+        console.log('[HealthService] BUILD 30 - requestPermissions() START');
+        console.log('[HealthService] Platform:', this.platform, '| Native:', this.isNative);
+        console.log('[HealthService] ==========================================');
 
         if (!this.isNative) {
-            debugLog('HealthService', '❌ NÃO É NATIVO - retornando false');
-            console.log('[HealthService] Skipping - not native platform');
+            console.log('[HealthService] ❌ Not native platform');
             return false;
         }
 
+        // Step 1: Load plugin
+        console.log('[HealthService] STEP 1: Loading plugin...');
+        let plugin: any;
         try {
-            debugLog('HealthService', '📦 Tentando carregar plugin...');
-            const plugin = await getHealthPlugin();
+            plugin = await getHealthPlugin();
+            console.log('[HealthService] STEP 1: Plugin loaded -', plugin ? 'OK' : 'NULL');
+        } catch (e) {
+            console.log('[HealthService] STEP 1: FAILED -', (e as Error).message);
+            return false;
+        }
 
-            debugLog('HealthService', '🔄 getHealthPlugin() RETORNOU');
-            debugLog('HealthService', `Plugin value: ${plugin ? 'EXISTS' : 'NULL'}`);
+        if (!plugin) {
+            console.log('[HealthService] ❌ Plugin is null, cannot proceed');
+            return false;
+        }
 
-            if (!plugin) {
-                debugLog('HealthService', '💥 PLUGIN NÃO CARREGOU!');
-                debugLog('HealthService', 'Isso significa que @capgo/capacitor-health não está instalado nativamente');
-                console.error('[HealthService] Plugin not loaded - check native setup');
+        // Step 2: Check availability FIRST
+        console.log('[HealthService] STEP 2: Checking isAvailable()...');
+        try {
+            const availResult = await plugin.isAvailable();
+            console.log('[HealthService] STEP 2: isAvailable result:', JSON.stringify(availResult));
+
+            if (!availResult?.available) {
+                console.log('[HealthService] ❌ HealthKit not available on this device');
                 return false;
             }
+            console.log('[HealthService] ✅ HealthKit IS available');
+        } catch (e) {
+            console.log('[HealthService] STEP 2: FAILED -', (e as Error).message);
+            // Continue anyway - some devices may not support isAvailable check
+        }
 
-            debugLog('HealthService', '✅ Plugin carregado com sucesso!');
-            debugLog('HealthService', `Plugin type: ${typeof plugin}`);
+        // Step 3: Request authorization with minimal permissions
+        console.log('[HealthService] STEP 3: Requesting authorization...');
+        console.log('[HealthService] Permissions: read=[steps], write=[]');
 
-            // BUILD 27: Simplified permissions - just the essentials
-            const readPermissions = ['steps', 'distance', 'weight', 'height'];
-            const writePermissions: string[] = [];
+        try {
+            // Use absolute minimum permissions for testing
+            console.log('[HealthService] Creating promise...');
 
-            debugLog('HealthService', `📋 Read (${readPermissions.length}): ${readPermissions.join(', ')}`);
-            debugLog('HealthService', `📋 Write (${writePermissions.length}): ${writePermissions.join(', ') || 'nenhum'}`);
-
-            debugLog('HealthService', '⏳ ANTES de plugin.requestAuthorization()');
-            debugLog('HealthService', `Método existe: ${typeof plugin.requestAuthorization}`);
-
-            // BUILD 27: Wrap in timeout to prevent infinite hang
             const authPromise = plugin.requestAuthorization({
-                read: readPermissions,
-                write: writePermissions
+                read: ['steps'],
+                write: []
             });
 
-            debugLog('HealthService', '📤 Promise criada, aguardando...');
+            console.log('[HealthService] Promise created, waiting with 15s timeout...');
 
-            // 10 second timeout
-            const timeoutPromise = new Promise<never>((_, reject) => {
-                setTimeout(() => {
-                    reject(new Error('TIMEOUT: requestAuthorization demorou mais de 10s'));
-                }, 10000);
-            });
+            // 15 second timeout 
+            const result = await Promise.race([
+                authPromise,
+                new Promise((_, reject) =>
+                    setTimeout(() => reject(new Error('TIMEOUT_15S')), 15000)
+                )
+            ]);
 
-            const result = await Promise.race([authPromise, timeoutPromise]);
+            console.log('[HealthService] STEP 3: Got result:', JSON.stringify(result));
 
-            debugLog('HealthService', '🔙 requestAuthorization() RETORNOU!');
-            debugLog('HealthService', `📥 Resultado: ${JSON.stringify(result)}`);
-            console.log('[HealthService] Authorization result:', JSON.stringify(result));
+            const success = result?.status === 'authorized' ||
+                result?.status === 'limited' ||
+                result?.authorized === true;
 
-            // Check if authorization was successful
-            const isAuthorized = result.status === 'authorized' ||
-                result.status === 'limited' ||
-                result.authorized === true;
+            console.log('[HealthService] ✅ Authorization success:', success);
+            return success;
 
-            debugLog('HealthService', `🔍 isAuthorized: ${isAuthorized}`);
-            debugLog('HealthService', `Status: ${result.status}`);
+        } catch (e) {
+            const msg = (e as Error).message;
+            console.log('[HealthService] STEP 3: FAILED -', msg);
 
-            return isAuthorized;
-        } catch (error) {
-            debugLog('HealthService', `🔥 ERRO CAPTURADO!`);
-            debugLog('HealthService', `Tipo: ${(error as Error).name}`);
-            debugLog('HealthService', `Mensagem: ${(error as Error).message}`);
-            console.error('[HealthService] Permission request failed:', error);
+            if (msg === 'TIMEOUT_15S') {
+                console.log('[HealthService] 🔥 Native call timed out - HealthKit dialog may not have appeared');
+                console.log('[HealthService] Possible causes:');
+                console.log('[HealthService]  1. HealthKit capability not properly signed in provisioning profile');
+                console.log('[HealthService]  2. Device has HealthKit disabled in Settings > Privacy');
+                console.log('[HealthService]  3. Plugin native code issue');
+            }
+
             return false;
         }
     }
