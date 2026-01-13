@@ -34,37 +34,69 @@ let HealthPlugin: any = null;
 let pluginLoadAttempted = false;
 
 async function getHealthPlugin() {
-    if (HealthPlugin) return HealthPlugin;
-    if (pluginLoadAttempted) return null;
+    debugLog('HealthService', '🔌 getHealthPlugin() chamado');
+
+    if (HealthPlugin) {
+        debugLog('HealthService', '✅ Plugin já carregado (cache)');
+        return HealthPlugin;
+    }
+
+    if (pluginLoadAttempted) {
+        debugLog('HealthService', '⚠️ Já tentamos carregar e falhou');
+        return null;
+    }
 
     pluginLoadAttempted = true;
+    debugLog('HealthService', '📦 Primeira tentativa de carregar plugin...');
 
     try {
+        debugLog('HealthService', '⏳ Importando @capgo/capacitor-health...');
         console.log('[HealthService] Loading @capgo/capacitor-health plugin...');
 
-        // Timeout de 5 segundos para evitar loading infinito
-        const timeoutPromise = new Promise<null>((resolve) =>
-            setTimeout(() => {
-                console.warn('[HealthService] Plugin load timeout - native setup may be missing');
-                resolve(null);
-            }, 5000)
-        );
+        // Import direto sem timeout primeiro
+        const module = await import('@capgo/capacitor-health');
 
-        const importPromise = (async () => {
-            const module = await import('@capgo/capacitor-health');
-            console.log('[HealthService] Plugin loaded successfully');
-            return module.Health;
-        })();
+        debugLog('HealthService', `📥 Módulo importado!`);
+        debugLog('HealthService', `Chaves do módulo: ${Object.keys(module).join(', ')}`);
+        console.log('[HealthService] Module keys:', Object.keys(module));
 
-        const result = await Promise.race([importPromise, timeoutPromise]);
+        // Verificar diferentes formas de acessar o plugin
+        let plugin = null;
 
-        if (result) {
-            HealthPlugin = result;
+        if (module.Health) {
+            debugLog('HealthService', '✅ Encontrou module.Health');
+            plugin = module.Health;
+        } else if (module.default) {
+            debugLog('HealthService', '✅ Encontrou module.default');
+            plugin = module.default;
+        } else if ((module as any).HealthPlugin) {
+            debugLog('HealthService', '✅ Encontrou module.HealthPlugin');
+            plugin = (module as any).HealthPlugin;
+        } else {
+            debugLog('HealthService', '❌ Nenhum export conhecido encontrado!');
+            debugLog('HealthService', `Módulo completo: ${JSON.stringify(module)}`);
+        }
+
+        if (plugin) {
+            debugLog('HealthService', `✅ Plugin obtido! Tipo: ${typeof plugin}`);
+
+            // Verificar se tem os métodos esperados
+            const methods = ['requestAuthorization', 'isAvailable', 'read'];
+            for (const method of methods) {
+                const hasMethod = typeof plugin[method] === 'function';
+                debugLog('HealthService', `  - ${method}: ${hasMethod ? '✅' : '❌'}`);
+            }
+
+            HealthPlugin = plugin;
             return HealthPlugin;
         }
 
+        debugLog('HealthService', '💥 Plugin é null após importação');
         return null;
     } catch (error) {
+        debugLog('HealthService', `🔥 ERRO ao importar plugin!`);
+        debugLog('HealthService', `Tipo: ${(error as Error).name}`);
+        debugLog('HealthService', `Mensagem: ${(error as Error).message}`);
         console.warn('[HealthService] @capgo/capacitor-health not available:', error);
         return null;
     }
