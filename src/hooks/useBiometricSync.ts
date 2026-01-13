@@ -111,8 +111,8 @@ export const useBiometricSync = (): UseBiometricSyncResult => {
             setLoading(true);
             setError(null);
 
-            debugLog('BiometricSync', '📞 BUILD32: Usando GLOBAL function...');
-            console.log('[BiometricSync] BUILD32 - Calling requestHealthPermissionsGlobal()');
+            debugLog('BiometricSync', '📞 BUILD34: Usando GLOBAL_V2 function...');
+            console.log('[BiometricSync] BUILD34 - Calling requestHealthPermissionsGlobal()');
             const granted = await requestHealthPermissionsGlobal();
 
             debugLog('BiometricSync', `📋 Resposta recebida: ${granted}`);

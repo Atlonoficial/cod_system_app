@@ -81,84 +81,117 @@ async function getHealthPlugin() {
 }
 
 /**
- * BUILD 32: GLOBAL FUNCTION - Bypasses class caching issues
+ * BUILD 34: GLOBAL FUNCTION - Uses debugLog for UI visibility 
  * This function is OUTSIDE the class to ensure fresh code execution
+ * Now with GRANULAR TIMEOUTS to identify exactly where it hangs
  */
 export async function requestHealthPermissionsGlobal(): Promise<boolean> {
+    // Import debugLog here to ensure it's available
+    const { debugLog } = await import('@/lib/debugLogger');
+
     // MARKER - If this appears, we know the new code is running
-    console.log('================================================');
-    console.log('🚀 GLOBAL_V1 - requestHealthPermissionsGlobal()');
-    console.log('🚀 BUILD 33 - Fresh global function');
-    console.log('🚀 Timestamp:', new Date().toISOString());
-    console.log('================================================');
+    debugLog('GLOBAL', '================================================');
+    debugLog('GLOBAL', '🚀 GLOBAL_V2 - requestHealthPermissionsGlobal()');
+    debugLog('GLOBAL', '🚀 BUILD 34 - With debugLog + granular timeouts');
+    debugLog('GLOBAL', `🚀 Timestamp: ${new Date().toISOString()}`);
+    debugLog('GLOBAL', '================================================');
 
     const isNative = Capacitor.isNativePlatform();
     const platform = Capacitor.getPlatform();
 
-    console.log('GLOBAL_V1 - Platform:', platform, '| Native:', isNative);
+    debugLog('GLOBAL', `Platform: ${platform} | Native: ${isNative}`);
 
     if (!isNative) {
-        console.log('GLOBAL_V1 - ❌ Not native, returning false');
+        debugLog('GLOBAL', '❌ Not native, returning false');
         return false;
     }
 
-    // Step 1: Load plugin
-    console.log('GLOBAL_V1 - Step 1: Loading plugin...');
-    const plugin = await getHealthPlugin();
+    // Step 1: Load plugin (max 5s)
+    debugLog('GLOBAL', '📦 Step 1: Loading plugin (5s timeout)...');
+    let plugin: any;
+
+    try {
+        const pluginPromise = getHealthPlugin();
+        plugin = await Promise.race([
+            pluginPromise,
+            new Promise((_, reject) =>
+                setTimeout(() => reject(new Error('PLUGIN_LOAD_TIMEOUT_5S')), 5000)
+            )
+        ]);
+    } catch (e) {
+        debugLog('GLOBAL', `❌ Step 1 FAILED: ${(e as Error).message}`);
+        return false;
+    }
 
     if (!plugin) {
-        console.log('GLOBAL_V1 - ❌ Plugin null, returning false');
+        debugLog('GLOBAL', '❌ Step 1: Plugin is null');
         return false;
     }
-    console.log('GLOBAL_V1 - Step 1: ✅ Plugin loaded');
+    debugLog('GLOBAL', '✅ Step 1: Plugin loaded successfully');
 
-    // Step 2: Check availability
-    console.log('GLOBAL_V1 - Step 2: Checking isAvailable...');
+    // Step 2: Check isAvailable (max 5s)
+    debugLog('GLOBAL', '🔍 Step 2: Checking isAvailable (5s timeout)...');
     try {
-        const availResult = await plugin.isAvailable();
-        console.log('GLOBAL_V1 - Step 2: Result:', JSON.stringify(availResult));
+        const availPromise = plugin.isAvailable();
+        const availResult = await Promise.race([
+            availPromise,
+            new Promise((_, reject) =>
+                setTimeout(() => reject(new Error('IS_AVAILABLE_TIMEOUT_5S')), 5000)
+            )
+        ]);
+        debugLog('GLOBAL', `✅ Step 2 Result: ${JSON.stringify(availResult)}`);
+
+        if (!(availResult as any)?.available) {
+            debugLog('GLOBAL', '⚠️ HealthKit NOT available on device');
+            // Continue anyway - some plugins return false but still work
+        }
     } catch (e) {
-        console.log('GLOBAL_V1 - Step 2: Error (continuing):', (e as Error).message);
+        debugLog('GLOBAL', `⚠️ Step 2 Error (continuing): ${(e as Error).message}`);
+        // Continue anyway
     }
 
-    // Step 3: Request authorization
-    console.log('GLOBAL_V1 - Step 3: Requesting authorization...');
-    console.log('GLOBAL_V1 - Permissions: read=[steps], write=[]');
+    // Step 3: Request authorization (max 30s)
+    debugLog('GLOBAL', '🔐 Step 3: Requesting authorization (30s timeout)...');
+    debugLog('GLOBAL', '📋 Permissions requested: read=[steps], write=[]');
 
     try {
+        debugLog('GLOBAL', '⏳ Creating authorization promise...');
+
         const authPromise = plugin.requestAuthorization({
             read: ['steps'],
             write: []
         });
 
-        console.log('GLOBAL_V1 - Promise created, waiting 20s...');
+        debugLog('GLOBAL', '⏳ Promise created, waiting for native response...');
 
         const result = await Promise.race([
             authPromise,
             new Promise((_, reject) =>
-                setTimeout(() => reject(new Error('TIMEOUT_20S')), 20000)
+                setTimeout(() => reject(new Error('AUTH_REQUEST_TIMEOUT_30S')), 30000)
             )
         ]);
 
-        console.log('GLOBAL_V1 - Step 3: ✅ Got result:', JSON.stringify(result));
+        debugLog('GLOBAL', `✅ Step 3 Got result: ${JSON.stringify(result)}`);
 
         const success = (result as any)?.status === 'authorized' ||
             (result as any)?.status === 'limited' ||
             (result as any)?.authorized === true;
 
-        console.log('GLOBAL_V1 - Authorization success:', success);
+        debugLog('GLOBAL', success ? '🎉 AUTHORIZED!' : '❌ NOT AUTHORIZED');
         return success;
 
     } catch (e) {
         const msg = (e as Error).message;
-        console.log('GLOBAL_V1 - Step 3: ❌ Error:', msg);
+        debugLog('GLOBAL', `❌ Step 3 FAILED: ${msg}`);
 
-        if (msg === 'TIMEOUT_20S') {
-            console.log('GLOBAL_V1 - 🔥 Native call timed out!');
-            console.log('GLOBAL_V1 - Possible causes:');
-            console.log('  1. HealthKit capability not in provisioning profile');
-            console.log('  2. Device has HealthKit disabled');
-            console.log('  3. Plugin native bridge issue');
+        if (msg === 'AUTH_REQUEST_TIMEOUT_30S') {
+            debugLog('GLOBAL', '🔥 NATIVE CALL TIMED OUT!');
+            debugLog('GLOBAL', '🔥 The HealthKit dialog probably never appeared');
+            debugLog('GLOBAL', '🔥 Possible causes:');
+            debugLog('GLOBAL', '  1. HealthKit NOT enabled in Xcode capabilities');
+            debugLog('GLOBAL', '  2. Provisioning profile missing HealthKit');
+            debugLog('GLOBAL', '  3. Plugin native bridge broken');
+            debugLog('GLOBAL', '  4. Device HealthKit is disabled');
         }
 
         return false;
