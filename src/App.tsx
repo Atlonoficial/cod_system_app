@@ -49,6 +49,7 @@ import CadastroCompleto from "./pages/CadastroCompleto";
 import { HealthConnectionsScreen } from "./components/settings/HealthConnectionsScreen";
 import WellnessHistoryPage from "./pages/WellnessHistoryPage";
 import { AssessmentPopup } from "@/components/physical-assessment/AssessmentPopup";
+import DebugConsolePage from "./pages/DebugConsole";
 
 
 
@@ -148,6 +149,9 @@ const AuthenticatedApp = () => {
 
         {/* Chats permitidos para suporte */}
         <Route path="/teacher-chat" element={<AuthGuard><TermsGuard><LazyTeacherStudentChat /></TermsGuard></AuthGuard>} />
+
+        {/* Debug Console - Para debugar sem Mac */}
+        <Route path="/debug" element={<AuthGuard><DebugConsolePage /></AuthGuard>} />
 
 
 

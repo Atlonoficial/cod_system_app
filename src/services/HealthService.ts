@@ -16,6 +16,7 @@
  */
 
 import { Capacitor } from '@capacitor/core';
+import { debugLog } from '@/lib/debugLogger';
 
 // Types
 export interface HealthDataResponse {
