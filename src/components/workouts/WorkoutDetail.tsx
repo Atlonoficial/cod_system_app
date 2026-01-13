@@ -195,82 +195,75 @@ export const WorkoutDetail = ({ workout, onBack, onStartWorkout, onExerciseSelec
   }
 
   return (
-    <div className="min-h-screen bg-background">{/* Removed overflow-x-hidden that was hiding content */}
-      {/* Fixed Header - stays at top while scrolling */}
-      <div className="fixed top-0 left-0 right-0 z-50">
-        <div
-          className="relative h-32 bg-gradient-to-br from-primary/20 to-secondary/20 flex flex-col pt-safe"
-          style={{
-            backgroundImage: workout.image ? `url(${workout.image})` : undefined,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-          }}
-        >
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-background/40" />
+    <div className="min-h-screen bg-background workout-page">{/* BUILD 25: workout-page remove quadrados */}
+      {/* Fixed Header - Clean design, no harsh gradients */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-lg border-b border-border/50 pt-safe">
+        {/* Navigation Row */}
+        <div className="flex items-center justify-between px-4 py-3">
+          <button
+            onClick={onBack}
+            style={{ pointerEvents: 'auto' }}
+            className="w-10 h-10 rounded-xl bg-card/50 border border-border/50 flex items-center justify-center hover:bg-card transition-colors active:scale-95"
+          >
+            <ArrowLeft className="w-5 h-5 text-foreground" />
+          </button>
 
-          {/* Top Bar: Navigation buttons */}
-          <div className="relative z-10 flex items-center justify-between px-4 py-3">
-            <button
-              onClick={onBack}
-              style={{ pointerEvents: 'auto' }}
-              className="w-10 h-10 rounded-full bg-background/30 backdrop-blur-md border border-white/20 flex items-center justify-center hover:bg-background/40 transition-colors active:scale-95"
-            >
-              <ArrowLeft className="w-5 h-5 text-white" />
-            </button>
-
-            <div className="w-10 h-10" /> {/* Spacer */}
+          {/* Title centered */}
+          <div className="flex-1 mx-4 text-center">
+            <h1 className="text-lg font-bold text-foreground leading-tight line-clamp-1">{workout.name}</h1>
+            <p className="text-xs text-muted-foreground">{workout.type}</p>
           </div>
 
-          {/* Workout info - title only */}
-          <div className="relative z-10 mt-auto px-4 pb-3 text-white">
-            <h1 className="text-xl font-bold leading-tight line-clamp-2">{workout.name}</h1>
-            <p className="text-white/80 text-xs">{workout.type}</p>
-          </div>
+          <div className="w-10 h-10" /> {/* Spacer for balance */}
         </div>
       </div>
 
       {/* Content with top margin to account for fixed header */}
-      <div className="pt-32">
-        {/* Stats section - separado do header */}
-        <div className="px-4 py-4 bg-background">
-          <div className="grid grid-cols-2 gap-2.5">
-            <div className="flex items-center gap-2.5 bg-card/30 px-3 py-2.5 rounded-xl">
-              <div className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center flex-shrink-0">
-                <Clock className="w-4.5 h-4.5 text-blue-400" />
+      <div className="pt-20">{/* BUILD 25: Ajustado para header menor */}
+        {/* Stats section - Premium design */}
+        <div className="px-4 py-4">
+          <div className="grid grid-cols-2 gap-3">
+            {/* Duração */}
+            <div className="flex items-center gap-3 bg-card/40 backdrop-blur-sm px-4 py-3 rounded-2xl border border-border/30">
+              <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center flex-shrink-0">
+                <Clock className="w-5 h-5 text-primary" />
               </div>
               <div className="min-w-0">
-                <p className="text-base font-semibold text-foreground leading-tight">{workout.duration} min</p>
-                <p className="text-[11px] text-muted-foreground">Duração</p>
+                <p className="text-lg font-bold text-foreground leading-tight">{workout.duration} min</p>
+                <p className="text-xs text-muted-foreground">Duração</p>
               </div>
             </div>
 
-            <div className="flex items-center gap-2.5 bg-card/30 px-3 py-2.5 rounded-xl">
-              <div className="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center flex-shrink-0">
-                <Dumbbell className="w-4.5 h-4.5 text-purple-400" />
+            {/* Exercícios */}
+            <div className="flex items-center gap-3 bg-card/40 backdrop-blur-sm px-4 py-3 rounded-2xl border border-border/30">
+              <div className="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center flex-shrink-0">
+                <Dumbbell className="w-5 h-5 text-purple-400" />
               </div>
               <div className="min-w-0">
-                <p className="text-base font-semibold text-foreground leading-tight">{workout.exercises.length}</p>
-                <p className="text-[11px] text-muted-foreground">Exercícios</p>
+                <p className="text-lg font-bold text-foreground leading-tight">{workout.exercises.length}</p>
+                <p className="text-xs text-muted-foreground">Exercícios</p>
               </div>
             </div>
 
-            <div className="flex items-center gap-2.5 bg-card/30 px-3 py-2.5 rounded-xl">
-              <div className="w-8 h-8 rounded-lg bg-orange-500/20 flex items-center justify-center flex-shrink-0">
-                <Flame className="w-4.5 h-4.5 text-orange-400" />
+            {/* Dificuldade */}
+            <div className="flex items-center gap-3 bg-card/40 backdrop-blur-sm px-4 py-3 rounded-2xl border border-border/30">
+              <div className="w-10 h-10 rounded-xl bg-orange-500/20 flex items-center justify-center flex-shrink-0">
+                <Flame className="w-5 h-5 text-orange-400" />
               </div>
               <div className="min-w-0">
-                <p className="text-base font-semibold text-foreground leading-tight">{workout.difficulty}</p>
-                <p className="text-[11px] text-muted-foreground">Dificuldade</p>
+                <p className="text-lg font-bold text-foreground leading-tight">{workout.difficulty}</p>
+                <p className="text-xs text-muted-foreground">Dificuldade</p>
               </div>
             </div>
 
-            <div className="flex items-center gap-2.5 bg-card/30 px-3 py-2.5 rounded-xl">
-              <div className="w-8 h-8 rounded-lg bg-yellow-500/20 flex items-center justify-center flex-shrink-0">
-                <Zap className="w-4.5 h-4.5 text-yellow-400" />
+            {/* Calorias */}
+            <div className="flex items-center gap-3 bg-card/40 backdrop-blur-sm px-4 py-3 rounded-2xl border border-border/30">
+              <div className="w-10 h-10 rounded-xl bg-green-500/20 flex items-center justify-center flex-shrink-0">
+                <Zap className="w-5 h-5 text-green-400" />
               </div>
               <div className="min-w-0">
-                <p className="text-base font-semibold text-foreground leading-tight">~{estimateCalories()}</p>
-                <p className="text-[11px] text-muted-foreground">kcal</p>
+                <p className="text-lg font-bold text-foreground leading-tight">~{estimateCalories()}</p>
+                <p className="text-xs text-muted-foreground">kcal</p>
               </div>
             </div>
           </div>

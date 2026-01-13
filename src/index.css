@@ -252,6 +252,16 @@ input[type="range"].rpe-slider::-moz-range-track {
     overscroll-behavior: none;
   }
 
+  /* BUILD 25: Classe para telas de treino sem os gradients geométricos */
+  .workout-page {
+    background-image: none !important;
+    background-color: hsl(var(--background));
+  }
+
+  .workout-page::before {
+    content: none !important;
+  }
+
   html {
     /* BUILD 64: Removido position: fixed que conflitava com layout flex */
     height: 100%;

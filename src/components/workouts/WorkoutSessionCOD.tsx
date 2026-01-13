@@ -560,13 +560,14 @@ export const WorkoutSessionCOD = ({ workout, onFinish, onExit }: WorkoutSessionC
     );
 
     return (
-        <div className="min-h-screen bg-background">
-            {/* Fixed Header - stays at top while scrolling */}
-            <div className={`fixed top-0 left-0 right-0 z-50 bg-gradient-to-br ${getReadinessColor()} p-4 pt-safe border-b border-white/10 backdrop-blur-lg`}>
-                <div className="flex items-center justify-between mb-3">
+        <div className="min-h-screen bg-background workout-page">{/* BUILD 25: workout-page remove quadrados */}
+            {/* Fixed Header - Clean design, no harsh gradients */}
+            <div className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-lg border-b border-border/50 pt-safe">
+                {/* Top Navigation Row */}
+                <div className="flex items-center justify-between px-4 py-3">
                     <button
                         onClick={() => setShowExitConfirm(true)}
-                        className="w-10 h-10 rounded-2xl bg-background/20 backdrop-blur-sm flex items-center justify-center active:scale-95"
+                        className="w-10 h-10 rounded-xl bg-card/50 border border-border/50 flex items-center justify-center active:scale-95"
                         aria-label="Sair do treino"
                     >
                         <ArrowLeft className="w-5 h-5 text-foreground" />
@@ -574,15 +575,13 @@ export const WorkoutSessionCOD = ({ workout, onFinish, onExit }: WorkoutSessionC
 
                     <div className="flex-1 mx-4 text-center">
                         <h1 className="text-sm font-semibold text-foreground truncate">{workout.name}</h1>
-                        <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
-                            <span className="tabular-nums font-bold text-lg text-primary">{formatTime(time)}</span>
-                        </div>
+                        <span className="tabular-nums font-bold text-xl text-primary">{formatTime(time)}</span>
                     </div>
 
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <button
-                                className="w-10 h-10 rounded-2xl bg-background/20 backdrop-blur-sm flex items-center justify-center"
+                                className="w-10 h-10 rounded-xl bg-card/50 border border-border/50 flex items-center justify-center"
                                 aria-label="Menu de opções"
                             >
                                 <MoreVertical className="w-5 h-5 text-foreground" />
@@ -601,50 +600,50 @@ export const WorkoutSessionCOD = ({ workout, onFinish, onExit }: WorkoutSessionC
                     </DropdownMenu>
                 </div>
 
-                {/* Readiness Badge */}
+                {/* Readiness Badge - More subtle */}
                 {readinessLevel && readinessLevel !== 'green' && (
-                    <div className="flex items-center justify-center gap-2 py-2.5 px-4 bg-amber-500/10 rounded-xl text-sm border border-amber-500/20">
+                    <div className="mx-4 mb-3 flex items-center justify-center gap-2 py-2 px-4 bg-amber-500/10 rounded-xl text-sm border border-amber-500/20">
                         <AlertTriangle className="w-4 h-4 text-amber-400" />
-                        <span className="font-medium text-amber-100">{readinessMessage}</span>
+                        <span className="font-medium text-amber-300 text-xs">{readinessMessage}</span>
                     </div>
                 )}
 
                 {/* Progress Bar */}
-                <div className="mt-3">
-                    <div className="w-full h-2.5 bg-white/10 rounded-full overflow-hidden">
+                <div className="px-4 pb-3">
+                    <div className="w-full h-2 bg-muted/30 rounded-full overflow-hidden">
                         <div
-                            className="h-full bg-gradient-to-r from-primary to-green-400 transition-all duration-500"
+                            className="h-full bg-primary transition-all duration-500"
                             style={{ width: `${progressPercent}%` }}
                         />
                     </div>
                     <div className="flex justify-between text-xs text-muted-foreground mt-1.5">
                         <span>Exercício {currentExerciseIndex + 1}/{workout.exercises.length}</span>
-                        <span className="font-medium">{Math.round(progressPercent)}% completo</span>
+                        <span className="font-medium text-primary">{Math.round(progressPercent)}%</span>
                     </div>
                 </div>
 
-                {/* Stats Cards - Part of fixed header */}
-                <div className="grid grid-cols-3 gap-2 mt-3">
-                    <div className="bg-accent/20 rounded-xl p-2.5 text-center border border-accent/10">
-                        <div className="flex items-center justify-center gap-1 mb-0.5">
-                            <Target className="w-3 h-3 text-accent" />
+                {/* Stats Cards - Clean and uniform */}
+                <div className="grid grid-cols-3 gap-2 px-4 pb-4">
+                    <div className="bg-card/40 backdrop-blur-sm rounded-xl p-3 text-center border border-border/30">
+                        <div className="flex items-center justify-center gap-1 mb-1">
+                            <Target className="w-3.5 h-3.5 text-primary" />
                             <p className="text-[10px] text-muted-foreground">Séries</p>
                         </div>
-                        <p className="text-lg font-bold">{displaySetsCount}/{adaptedSets}</p>
+                        <p className="text-lg font-bold text-foreground">{displaySetsCount}/{adaptedSets}</p>
                     </div>
-                    <div className="bg-primary/20 rounded-xl p-2.5 text-center border border-primary/10">
-                        <div className="flex items-center justify-center gap-1 mb-0.5">
-                            <TrendingUp className="w-3 h-3 text-primary" />
+                    <div className="bg-card/40 backdrop-blur-sm rounded-xl p-3 text-center border border-border/30">
+                        <div className="flex items-center justify-center gap-1 mb-1">
+                            <TrendingUp className="w-3.5 h-3.5 text-purple-400" />
                             <p className="text-[10px] text-muted-foreground">Volume</p>
                         </div>
-                        <p className="text-lg font-bold">{totalVolume.toLocaleString()}kg</p>
+                        <p className="text-lg font-bold text-foreground">{totalVolume.toLocaleString()}kg</p>
                     </div>
-                    <div className="bg-green-500/20 rounded-xl p-2.5 text-center border border-green-500/10">
-                        <div className="flex items-center justify-center gap-1 mb-0.5">
-                            <Zap className="w-3 h-3 text-green-400" />
+                    <div className="bg-card/40 backdrop-blur-sm rounded-xl p-3 text-center border border-border/30">
+                        <div className="flex items-center justify-center gap-1 mb-1">
+                            <Zap className="w-3.5 h-3.5 text-green-400" />
                             <p className="text-[10px] text-muted-foreground">RPE</p>
                         </div>
-                        <p className="text-lg font-bold">
+                        <p className="text-lg font-bold text-foreground">
                             {exerciseLogs.size > 0
                                 ? (Array.from(exerciseLogs.values()).flat().reduce((sum, l) => sum + l.rpe, 0) /
                                     Array.from(exerciseLogs.values()).flat().length || 0).toFixed(1)
@@ -654,10 +653,10 @@ export const WorkoutSessionCOD = ({ workout, onFinish, onExit }: WorkoutSessionC
                 </div>
             </div>
 
-            {/* Scrollable Content Area */}
-            <div className="pt-[280px] pb-32 px-4">
+            {/* Scrollable Content Area - Adjusted for smaller header */}
+            <div className="pt-[240px] pb-32 px-4">
                 {/* Current Exercise Info */}
-                <Card className="mb-4 bg-gradient-to-br from-accent/10 to-transparent border-accent/20">
+                <Card className="mb-4 bg-card/40 backdrop-blur-sm border-border/30">
                     <CardContent className="p-4">
                         <h2 className="text-xl font-bold mb-1 text-foreground">{currentExercise?.name}</h2>
                         {currentExercise?.description && (
