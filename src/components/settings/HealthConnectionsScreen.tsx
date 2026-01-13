@@ -151,9 +151,9 @@ export const HealthConnectionsScreen: React.FC<HealthConnectionsScreenProps> = (
                             <Bug className={`w-5 h-5 ${showDebugLogs ? 'text-primary' : ''}`} />
                         </Button>
 
-                        {/* BUILD VERSION BADGE - Para confirmar qual build está instalado */}
+                        {/* BUILD VERSION BADGE */}
                         <Badge variant="outline" className="ml-2 font-mono text-xs">
-                            BUILD 24
+                            BUILD 25 🎯
                         </Badge>
                     </>
                 )}

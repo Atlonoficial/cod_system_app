@@ -36,63 +36,46 @@ let pluginLoadAttempted = false;
 async function getHealthPlugin() {
     debugLog('HealthService', '🔌 getHealthPlugin() chamado');
 
-    // IMPORTANTE: Cache REMOVIDO porque await estava travando!
-    // Bug confirmado no Build 22 e 23
-
     try {
-        debugLog('HealthService', '⏳ Importando @capgo/capacitor-health...');
+        debugLog('HealthService', '📦 Executando import direto...');
 
-        // Timeout de 3 segundos para evitar travamento
-        const timeoutPromise = new Promise<null>((resolve) => {
-            setTimeout(() => {
-                debugLog('HealthService', '⏰ TIMEOUT após 3s!');
-                resolve(null);
-            }, 3000);
-        });
+        const module = await import('@capgo/capacitor-health');
 
-        const importPromise = (async () => {
-            debugLog('HealthService', '📦 Executando import()...');
-            const module = await import('@capgo/capacitor-health');
-            debugLog('HealthService', '📥 Import completo!');
-            debugLog('HealthService', `Chaves: ${Object.keys(module).join(', ')}`);
+        debugLog('HealthService', '📥 Import completo!');
+        debugLog('HealthService', `Chaves: ${Object.keys(module).join(', ')}`);
 
-            let plugin = null;
+        let plugin = null;
 
-            if (module.Health) {
-                debugLog('HealthService', '✅ Encontrou module.Health');
-                plugin = module.Health;
-            } else if (module.default) {
-                debugLog('HealthService', '✅ Encontrou module.default');
-                plugin = module.default;
-            } else {
-                debugLog('HealthService', '❌ Nenhum export encontrado!');
-                return null;
+        if (module.Health) {
+            debugLog('HealthService', '✅ Encontrou module.Health');
+            plugin = module.Health;
+        } else if (module.default) {
+            debugLog('HealthService', '✅ Encontrou module.default');
+            plugin = module.default;
+        } else {
+            debugLog('HealthService', '❌ Nenhum export encontrado!');
+            return null;
+        }
+
+        if (plugin) {
+            debugLog('HealthService', `✅ Plugin tipo: ${typeof plugin}`);
+
+            const methods = ['requestAuthorization', 'isAvailable'];
+            for (const method of methods) {
+                const hasMethod = typeof plugin[method] === 'function';
+                debugLog('HealthService', `  - ${method}: ${hasMethod ? '✅' : '❌'}`);
             }
 
-            if (plugin) {
-                debugLog('HealthService', `✅ Plugin tipo: ${typeof plugin}`);
-
-                // Verificar métodos
-                const methods = ['requestAuthorization', 'isAvailable'];
-                for (const method of methods) {
-                    const hasMethod = typeof plugin[method] === 'function';
-                    debugLog('HealthService', `  - ${method}: ${hasMethod ? '✅' : '❌'}`);
-                }
-            }
-
+            debugLog('HealthService', '🎉 RETORNANDO PLUGIN!');
             return plugin;
-        })();
+        }
 
-        debugLog('HealthService', '⏳ Aguardando Promise.race...');
-        const result = await Promise.race([importPromise, timeoutPromise]);
-        debugLog('HealthService', `🔙 Promise.race resolveu: ${result ? 'PLUGIN' : 'TIMEOUT'}`);
-
-        return result;
+        debugLog('HealthService', '💥 Plugin é null');
+        return null;
     } catch (error) {
         debugLog('HealthService', `🔥 ERRO!`);
         debugLog('HealthService', `Tipo: ${(error as Error).name}`);
         debugLog('HealthService', `Msg: ${(error as Error).message}`);
-        console.warn('[HealthService] Plugin load failed:', error);
         return null;
     }
 }
