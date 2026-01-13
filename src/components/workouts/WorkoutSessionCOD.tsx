@@ -622,23 +622,23 @@ export const WorkoutSessionCOD = ({ workout, onFinish, onExit }: WorkoutSessionC
                     </div>
                 </div>
 
-                {/* Stats Cards - Clean and uniform */}
+                {/* Stats Cards - BUILD 29: Clean minimal design */}
                 <div className="grid grid-cols-3 gap-2 px-4 pb-4">
-                    <div className="bg-card/40 backdrop-blur-sm rounded-xl p-3 text-center border border-border/30">
+                    <div className="rounded-xl p-3 text-center border border-border/20">
                         <div className="flex items-center justify-center gap-1 mb-1">
                             <Target className="w-3.5 h-3.5 text-primary" />
                             <p className="text-[10px] text-muted-foreground">Séries</p>
                         </div>
                         <p className="text-lg font-bold text-foreground">{displaySetsCount}/{adaptedSets}</p>
                     </div>
-                    <div className="bg-card/40 backdrop-blur-sm rounded-xl p-3 text-center border border-border/30">
+                    <div className="rounded-xl p-3 text-center border border-border/20">
                         <div className="flex items-center justify-center gap-1 mb-1">
                             <TrendingUp className="w-3.5 h-3.5 text-purple-400" />
                             <p className="text-[10px] text-muted-foreground">Volume</p>
                         </div>
                         <p className="text-lg font-bold text-foreground">{totalVolume.toLocaleString()}kg</p>
                     </div>
-                    <div className="bg-card/40 backdrop-blur-sm rounded-xl p-3 text-center border border-border/30">
+                    <div className="rounded-xl p-3 text-center border border-border/20">
                         <div className="flex items-center justify-center gap-1 mb-1">
                             <Zap className="w-3.5 h-3.5 text-green-400" />
                             <p className="text-[10px] text-muted-foreground">RPE</p>
@@ -655,8 +655,8 @@ export const WorkoutSessionCOD = ({ workout, onFinish, onExit }: WorkoutSessionC
 
             {/* Scrollable Content Area - Adjusted for smaller header */}
             <div className="pt-[240px] pb-32 px-4">
-                {/* Current Exercise Info */}
-                <Card className="mb-4 bg-card/40 backdrop-blur-sm border-border/30">
+                {/* Current Exercise Info - BUILD 29: Clean design */}
+                <Card className="mb-4 border-border/20">
                     <CardContent className="p-4">
                         <h2 className="text-xl font-bold mb-1 text-foreground">{currentExercise?.name}</h2>
                         {currentExercise?.description && (

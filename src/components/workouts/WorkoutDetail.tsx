@@ -219,13 +219,13 @@ export const WorkoutDetail = ({ workout, onBack, onStartWorkout, onExerciseSelec
       </div>
 
       {/* Content with top margin to account for fixed header */}
-      <div className="pt-20">{/* BUILD 25: Ajustado para header menor */}
-        {/* Stats section - Premium design */}
+      <div className="pt-20">
+        {/* Stats section - Clean minimal design BUILD 29 */}
         <div className="px-4 py-4">
           <div className="grid grid-cols-2 gap-3">
             {/* Duração */}
-            <div className="flex items-center gap-3 bg-card/40 backdrop-blur-sm px-4 py-3 rounded-2xl border border-border/30">
-              <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center flex-shrink-0">
+            <div className="flex items-center gap-3 px-4 py-3 rounded-2xl border border-border/20">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
                 <Clock className="w-5 h-5 text-primary" />
               </div>
               <div className="min-w-0">
@@ -235,8 +235,8 @@ export const WorkoutDetail = ({ workout, onBack, onStartWorkout, onExerciseSelec
             </div>
 
             {/* Exercícios */}
-            <div className="flex items-center gap-3 bg-card/40 backdrop-blur-sm px-4 py-3 rounded-2xl border border-border/30">
-              <div className="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center flex-shrink-0">
+            <div className="flex items-center gap-3 px-4 py-3 rounded-2xl border border-border/20">
+              <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center flex-shrink-0">
                 <Dumbbell className="w-5 h-5 text-purple-400" />
               </div>
               <div className="min-w-0">
@@ -246,8 +246,8 @@ export const WorkoutDetail = ({ workout, onBack, onStartWorkout, onExerciseSelec
             </div>
 
             {/* Dificuldade */}
-            <div className="flex items-center gap-3 bg-card/40 backdrop-blur-sm px-4 py-3 rounded-2xl border border-border/30">
-              <div className="w-10 h-10 rounded-xl bg-orange-500/20 flex items-center justify-center flex-shrink-0">
+            <div className="flex items-center gap-3 px-4 py-3 rounded-2xl border border-border/20">
+              <div className="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center flex-shrink-0">
                 <Flame className="w-5 h-5 text-orange-400" />
               </div>
               <div className="min-w-0">
@@ -257,8 +257,8 @@ export const WorkoutDetail = ({ workout, onBack, onStartWorkout, onExerciseSelec
             </div>
 
             {/* Calorias */}
-            <div className="flex items-center gap-3 bg-card/40 backdrop-blur-sm px-4 py-3 rounded-2xl border border-border/30">
-              <div className="w-10 h-10 rounded-xl bg-green-500/20 flex items-center justify-center flex-shrink-0">
+            <div className="flex items-center gap-3 px-4 py-3 rounded-2xl border border-border/20">
+              <div className="w-10 h-10 rounded-xl bg-green-500/10 flex items-center justify-center flex-shrink-0">
                 <Zap className="w-5 h-5 text-green-400" />
               </div>
               <div className="min-w-0">

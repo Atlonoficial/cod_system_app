@@ -59,7 +59,7 @@ export const SetLogger: React.FC<SetLoggerProps> = ({
     };
 
     return (
-        <div className="p-6 bg-white/5 rounded-2xl">
+        <div className="p-6">{/* BUILD 29: Removed visible background */}
             {/* Header */}
             <div className="flex justify-between items-center mb-6">
                 <span className="px-4 py-2 rounded-full bg-gradient-to-r from-primary to-purple-500 font-semibold text-sm">
@@ -145,7 +145,7 @@ export const SetLogger: React.FC<SetLoggerProps> = ({
             </div>
 
             {/* RPE Input */}
-            <div className="mb-6 p-4 bg-black/20 rounded-xl">
+            <div className="mb-6 p-4 rounded-xl border border-border/20">{/* BUILD 29: Clean border only */}
                 <label className="block text-gray-400 text-sm mb-3 font-medium">
                     RPE (Esforço Percebido)
                 </label>
