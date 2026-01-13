@@ -196,14 +196,14 @@ export const WorkoutDetail = ({ workout, onBack, onStartWorkout, onExerciseSelec
 
   return (
     <div className="min-h-screen bg-background workout-page">{/* BUILD 25: workout-page remove quadrados */}
-      {/* Fixed Header - Clean design, no harsh gradients */}
-      <div className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-lg border-b border-border/50 pt-safe">
+      {/* Fixed Header - Transparent, no second background */}
+      <div className="fixed top-0 left-0 right-0 z-50 pt-safe">
         {/* Navigation Row */}
         <div className="flex items-center justify-between px-4 py-3">
           <button
             onClick={onBack}
             style={{ pointerEvents: 'auto' }}
-            className="w-10 h-10 rounded-xl bg-card/50 border border-border/50 flex items-center justify-center hover:bg-card transition-colors active:scale-95"
+            className="w-10 h-10 rounded-xl flex items-center justify-center hover:bg-card/30 transition-colors active:scale-95"
           >
             <ArrowLeft className="w-5 h-5 text-foreground" />
           </button>
@@ -269,7 +269,7 @@ export const WorkoutDetail = ({ workout, onBack, onStartWorkout, onExerciseSelec
             {workout.exercises.map((exercise) => (
               <div
                 key={exercise.id}
-                className="bg-card/20 rounded-2xl p-4 transition-all duration-300"
+                className="rounded-2xl p-4 transition-all duration-300"
               >
                 {/* Header sempre visível */}
                 <div className="flex items-center justify-between mb-3">

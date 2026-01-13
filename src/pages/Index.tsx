@@ -47,7 +47,7 @@ const Index = () => {
     >
       <div
         key={activeTab}
-        className="animate-in fade-in slide-in-from-bottom-4 duration-300 p-4"
+        className="animate-in fade-in slide-in-from-bottom-4 duration-300"
       >
         {renderContent()}
       </div>

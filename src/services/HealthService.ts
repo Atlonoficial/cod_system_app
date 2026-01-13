@@ -88,7 +88,7 @@ export async function requestHealthPermissionsGlobal(): Promise<boolean> {
     // MARKER - If this appears, we know the new code is running
     console.log('================================================');
     console.log('🚀 GLOBAL_V1 - requestHealthPermissionsGlobal()');
-    console.log('🚀 BUILD 32 - Fresh global function');
+    console.log('🚀 BUILD 33 - Fresh global function');
     console.log('🚀 Timestamp:', new Date().toISOString());
     console.log('================================================');
 

@@ -50,7 +50,8 @@ const Anamnese = () => {
   if (selectedRequest) {
     return (
       <div className="page-scroll-container flex flex-col fade-in">
-        <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b border-border/50 px-4 py-3 pt-safe flex items-center gap-3">
+        {/* Header - Transparent, no second background */}
+        <div className="sticky top-0 z-10 px-4 py-3 pt-safe flex items-center gap-3">
           <Button
             variant="ghost"
             size="icon"
@@ -62,7 +63,7 @@ const Anamnese = () => {
           <div className="flex-1">
             <h1 className="font-semibold text-lg line-clamp-1">{selectedRequest?.template?.title || 'Anamnese'}</h1>
           </div>
-        </div>
+        </div >
 
         <div className="p-4 max-w-lg mx-auto">
           {selectedRequest?.template?.description && (
@@ -79,7 +80,7 @@ const Anamnese = () => {
             loading={submitting}
           />
         </div>
-      </div>
+      </div >
     );
   }
 

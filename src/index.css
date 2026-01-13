@@ -824,8 +824,8 @@ input[type="range"].rpe-slider::-moz-range-track {
     /* BUILD 58: Otimização de touch e performance */
     touch-action: pan-y pinch-zoom;
     contain: layout style;
-    /* Padding base - pode ser overriden por .has-bottom-nav */
-    padding: 1rem;
+    /* BUILD FINAL: Padding base REMOVIDO - conteúdo ocupa largura total */
+    padding: 0;
   }
 
   /* BUILD 64: Padding quando tem bottom nav - considera safe-area-inset-bottom */

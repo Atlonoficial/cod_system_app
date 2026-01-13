@@ -561,13 +561,13 @@ export const WorkoutSessionCOD = ({ workout, onFinish, onExit }: WorkoutSessionC
 
     return (
         <div className="min-h-screen bg-background workout-page">{/* BUILD 25: workout-page remove quadrados */}
-            {/* Fixed Header - Clean design, no harsh gradients */}
-            <div className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-lg border-b border-border/50 pt-safe">
+            {/* Fixed Header - Transparent, no second background */}
+            <div className="fixed top-0 left-0 right-0 z-50 pt-safe">
                 {/* Top Navigation Row */}
                 <div className="flex items-center justify-between px-4 py-3">
                     <button
                         onClick={() => setShowExitConfirm(true)}
-                        className="w-10 h-10 rounded-xl bg-card/50 border border-border/50 flex items-center justify-center active:scale-95"
+                        className="w-10 h-10 rounded-xl flex items-center justify-center active:scale-95 hover:bg-card/30 transition-colors"
                         aria-label="Sair do treino"
                     >
                         <ArrowLeft className="w-5 h-5 text-foreground" />
@@ -581,7 +581,7 @@ export const WorkoutSessionCOD = ({ workout, onFinish, onExit }: WorkoutSessionC
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <button
-                                className="w-10 h-10 rounded-xl bg-card/50 border border-border/50 flex items-center justify-center"
+                                className="w-10 h-10 rounded-xl flex items-center justify-center hover:bg-card/30 transition-colors"
                                 aria-label="Menu de opções"
                             >
                                 <MoreVertical className="w-5 h-5 text-foreground" />
@@ -655,8 +655,8 @@ export const WorkoutSessionCOD = ({ workout, onFinish, onExit }: WorkoutSessionC
 
             {/* Scrollable Content Area - Adjusted for smaller header */}
             <div className="pt-[240px] pb-32 px-4">
-                {/* Current Exercise Info - BUILD 29: Clean design */}
-                <Card className="mb-4 border-border/20">
+                {/* Current Exercise Info - BUILD 29: Clean design - No background */}
+                <Card className="mb-4 border-border/20 bg-transparent">
                     <CardContent className="p-4">
                         <h2 className="text-xl font-bold mb-1 text-foreground">{currentExercise?.name}</h2>
                         {currentExercise?.description && (

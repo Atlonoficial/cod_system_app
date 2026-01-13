@@ -136,8 +136,8 @@ export const WellnessHistoryPage: React.FC = () => {
 
     return (
         <div className="page-scroll-container flex flex-col">
-            {/* Header - Fixed with SafeZone */}
-            <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b pt-safe">
+            {/* Header - Fixed with SafeZone - Transparent, no second background */}
+            <div className="sticky top-0 z-10 pt-safe">
                 <div className="flex items-center gap-4 p-4">
                     <Button
                         variant="ghost"
