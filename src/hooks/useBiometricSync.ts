@@ -9,7 +9,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { Capacitor } from '@capacitor/core';
-import { HealthService, type HealthDataResponse } from '@/services/HealthService';
+import { HealthService, type HealthDataResponse, requestHealthPermissionsGlobal } from '@/services/HealthService';
 import { debugLog } from '@/lib/debugLogger';
 
 // Types for health data
@@ -111,8 +111,9 @@ export const useBiometricSync = (): UseBiometricSyncResult => {
             setLoading(true);
             setError(null);
 
-            debugLog('BiometricSync', '📞 Chamando HealthService.requestPermissions()...');
-            const granted = await HealthService.requestPermissions();
+            debugLog('BiometricSync', '📞 BUILD32: Usando GLOBAL function...');
+            console.log('[BiometricSync] BUILD32 - Calling requestHealthPermissionsGlobal()');
+            const granted = await requestHealthPermissionsGlobal();
 
             debugLog('BiometricSync', `📋 Resposta recebida: ${granted}`);
             console.log('[BiometricSync] Permissions granted:', granted);

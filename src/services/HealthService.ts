@@ -80,6 +80,91 @@ async function getHealthPlugin() {
     }
 }
 
+/**
+ * BUILD 32: GLOBAL FUNCTION - Bypasses class caching issues
+ * This function is OUTSIDE the class to ensure fresh code execution
+ */
+export async function requestHealthPermissionsGlobal(): Promise<boolean> {
+    // MARKER - If this appears, we know the new code is running
+    console.log('================================================');
+    console.log('🚀 GLOBAL_V1 - requestHealthPermissionsGlobal()');
+    console.log('🚀 BUILD 32 - Fresh global function');
+    console.log('🚀 Timestamp:', new Date().toISOString());
+    console.log('================================================');
+
+    const isNative = Capacitor.isNativePlatform();
+    const platform = Capacitor.getPlatform();
+
+    console.log('GLOBAL_V1 - Platform:', platform, '| Native:', isNative);
+
+    if (!isNative) {
+        console.log('GLOBAL_V1 - ❌ Not native, returning false');
+        return false;
+    }
+
+    // Step 1: Load plugin
+    console.log('GLOBAL_V1 - Step 1: Loading plugin...');
+    const plugin = await getHealthPlugin();
+
+    if (!plugin) {
+        console.log('GLOBAL_V1 - ❌ Plugin null, returning false');
+        return false;
+    }
+    console.log('GLOBAL_V1 - Step 1: ✅ Plugin loaded');
+
+    // Step 2: Check availability
+    console.log('GLOBAL_V1 - Step 2: Checking isAvailable...');
+    try {
+        const availResult = await plugin.isAvailable();
+        console.log('GLOBAL_V1 - Step 2: Result:', JSON.stringify(availResult));
+    } catch (e) {
+        console.log('GLOBAL_V1 - Step 2: Error (continuing):', (e as Error).message);
+    }
+
+    // Step 3: Request authorization
+    console.log('GLOBAL_V1 - Step 3: Requesting authorization...');
+    console.log('GLOBAL_V1 - Permissions: read=[steps], write=[]');
+
+    try {
+        const authPromise = plugin.requestAuthorization({
+            read: ['steps'],
+            write: []
+        });
+
+        console.log('GLOBAL_V1 - Promise created, waiting 20s...');
+
+        const result = await Promise.race([
+            authPromise,
+            new Promise((_, reject) =>
+                setTimeout(() => reject(new Error('TIMEOUT_20S')), 20000)
+            )
+        ]);
+
+        console.log('GLOBAL_V1 - Step 3: ✅ Got result:', JSON.stringify(result));
+
+        const success = (result as any)?.status === 'authorized' ||
+            (result as any)?.status === 'limited' ||
+            (result as any)?.authorized === true;
+
+        console.log('GLOBAL_V1 - Authorization success:', success);
+        return success;
+
+    } catch (e) {
+        const msg = (e as Error).message;
+        console.log('GLOBAL_V1 - Step 3: ❌ Error:', msg);
+
+        if (msg === 'TIMEOUT_20S') {
+            console.log('GLOBAL_V1 - 🔥 Native call timed out!');
+            console.log('GLOBAL_V1 - Possible causes:');
+            console.log('  1. HealthKit capability not in provisioning profile');
+            console.log('  2. Device has HealthKit disabled');
+            console.log('  3. Plugin native bridge issue');
+        }
+
+        return false;
+    }
+}
+
 class HealthServiceImpl {
     private isNative: boolean;
     private platform: 'ios' | 'android' | 'web';
