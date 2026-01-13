@@ -153,7 +153,7 @@ export const HealthConnectionsScreen: React.FC<HealthConnectionsScreenProps> = (
 
                         {/* BUILD VERSION BADGE - Para confirmar qual build está instalado */}
                         <Badge variant="outline" className="ml-2 font-mono text-xs">
-                            BUILD 23
+                            BUILD 24
                         </Badge>
                     </>
                 )}
