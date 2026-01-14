@@ -172,7 +172,7 @@ export const Dashboard = ({ onWorkoutClick }: DashboardProps) => {
     <div className="space-y-6">
       {/* Header with Date and Profile */}
       <div className="flex items-start justify-between mb-4 animate-fade-up">
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <div className="flex items-center gap-2 text-sm text-foreground/70">
           <Calendar size={16} className="text-warning" />
           {currentDate}
         </div>

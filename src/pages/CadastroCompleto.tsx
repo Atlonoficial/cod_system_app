@@ -260,9 +260,9 @@ export default function CadastroCompleto() {
               <CardContent className="space-y-4">
                 <div className="flex flex-col items-center gap-4">
                   <div className="relative">
-                    <Avatar className="w-24 h-24">
+                    <Avatar className="w-28 h-28 ring-2 ring-primary/20">
                       <AvatarImage src={avatarUrl ?? undefined} alt="Avatar" />
-                      <AvatarFallback className="text-xl">
+                      <AvatarFallback className="text-2xl font-bold bg-gradient-to-br from-primary to-primary-variant text-white">
                         {userProfile?.name?.charAt(0)?.toUpperCase() || "U"}
                       </AvatarFallback>
                     </Avatar>
@@ -270,11 +270,11 @@ export default function CadastroCompleto() {
                       type="button"
                       size="sm"
                       variant="secondary"
-                      className="absolute -bottom-2 -right-2 rounded-full w-9 h-9 p-0"
+                      className="absolute bottom-0 right-0 rounded-full w-10 h-10 p-0 bg-primary hover:bg-primary/90 text-white shadow-lg"
                       onClick={() => fileInputRef.current?.click()}
                       disabled={uploading}
                     >
-                      <Camera className="w-4 h-4" />
+                      <Camera className="w-5 h-5" />
                     </Button>
                   </div>
                   <input
@@ -363,7 +363,7 @@ export default function CadastroCompleto() {
             </Card>
 
             {/* Medidas Corporais */}
-            <Card>
+            <Card className="mt-2">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle>Medidas Corporais</CardTitle>
