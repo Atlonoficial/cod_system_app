@@ -38,10 +38,10 @@ export const WeightChart = ({ onWeightNeeded }: WeightChartProps) => {
     return (
       <text
         x={x + width / 2}
-        y={y - 3}
+        y={y - 4}
         fill="hsl(var(--primary))"
         textAnchor="middle"
-        fontSize="10"
+        fontSize="12"
         fontWeight="600"
       >
         {value}kg

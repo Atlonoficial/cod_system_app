@@ -169,7 +169,7 @@ export const Dashboard = ({ onWorkoutClick }: DashboardProps) => {
   });
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* Header with Date and Profile */}
       <div className="flex items-start justify-between mb-4 animate-fade-up">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -189,7 +189,7 @@ export const Dashboard = ({ onWorkoutClick }: DashboardProps) => {
           </AvatarFallback>
         </Avatar>
         <div className="flex-1">
-          <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-foreground leading-tight">
+          <h1 className="text-xl sm:text-2xl font-bold text-foreground leading-tight">
             Olá, <span className="text-gradient-primary">{firstName}!</span>
           </h1>
         </div>

@@ -574,8 +574,8 @@ export const WorkoutSessionCOD = ({ workout, onFinish, onExit }: WorkoutSessionC
                     </button>
 
                     <div className="flex-1 mx-4 text-center">
-                        <h1 className="text-sm font-semibold text-foreground truncate">{workout.name}</h1>
-                        <span className="tabular-nums font-bold text-xl text-primary">{formatTime(time)}</span>
+                        <h1 className="text-xs font-medium text-muted-foreground truncate">{workout.name}</h1>
+                        <span className="tabular-nums font-bold text-2xl text-primary">{formatTime(time)}</span>
                     </div>
 
                     <DropdownMenu>
@@ -623,7 +623,7 @@ export const WorkoutSessionCOD = ({ workout, onFinish, onExit }: WorkoutSessionC
                 </div>
 
                 {/* Stats Cards - BUILD 32: Ultra clean like Home */}
-                <div className="grid grid-cols-3 gap-3 px-4 pb-4">
+                <div className="grid grid-cols-3 gap-4 px-4 pb-4">
                     <div className="p-2 text-center">
                         <div className="flex items-center justify-center gap-1 mb-1">
                             <Target className="w-4 h-4 text-primary" />
