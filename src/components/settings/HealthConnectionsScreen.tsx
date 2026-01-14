@@ -153,7 +153,7 @@ export const HealthConnectionsScreen: React.FC<HealthConnectionsScreenProps> = (
 
                         {/* BUILD VERSION BADGE */}
                         <Badge variant="outline" className="ml-2 font-mono text-xs">
-                            BUILD 41 🩺
+                            BUILD 42 🔧
                         </Badge>
                     </>
                 )}

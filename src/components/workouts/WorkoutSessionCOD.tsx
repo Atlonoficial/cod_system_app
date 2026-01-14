@@ -658,9 +658,10 @@ export const WorkoutSessionCOD = ({ workout, onFinish, onExit }: WorkoutSessionC
                 {/* Current Exercise Info - BUILD 29: Clean design - No background */}
                 <Card className="mb-4 border-border/20 bg-transparent">
                     <CardContent className="p-4">
-                        <h2 className="text-xl font-bold mb-1 text-foreground">{currentExercise?.name}</h2>
-                        {currentExercise?.description && (
-                            <p className="text-sm text-muted-foreground mb-3">{currentExercise?.description}</p>
+                        <h2 className="text-lg font-bold mb-1 text-foreground line-clamp-2">{currentExercise?.name}</h2>
+                        {/* Only show description if it's not purely numeric (hide exercise IDs like "2212") */}
+                        {currentExercise?.description && !/^\d+$/.test(currentExercise.description.trim()) && (
+                            <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{currentExercise?.description}</p>
                         )}
 
                         {/* Adapted Values Badge - mais legível */}

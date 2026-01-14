@@ -41,15 +41,18 @@ export const useStudentAppointments = () => {
         .eq('student_id', user.id)
         .order('scheduled_time', { ascending: true });
 
-      if (error) throw error;
+      if (error) {
+        // Only show error for critical issues, not RLS restrictions
+        console.error('Error fetching appointments:', error);
+        if (error.code !== 'PGRST116') { // Not a "no rows" type error
+          throw error;
+        }
+      }
       setAppointments(data || []);
     } catch (error: any) {
       console.error('Error fetching appointments:', error);
-      toast({
-        title: 'Erro',
-        description: 'Falha ao carregar agendamentos',
-        variant: 'destructive',
-      });
+      // Silent fail - don't show toast for agenda errors
+      // The UI already handles empty states gracefully
     } finally {
       setLoading(false);
     }
@@ -58,9 +61,9 @@ export const useStudentAppointments = () => {
   const cancelAppointment = useCallback(async (appointmentId: string, reason?: string) => {
     // Optimistic UI - immediately update local state
     setOptimisticOperations(prev => new Set(prev).add(appointmentId));
-    setAppointments(prev => 
-      prev.map(apt => 
-        apt.id === appointmentId 
+    setAppointments(prev =>
+      prev.map(apt =>
+        apt.id === appointmentId
           ? { ...apt, status: 'cancelled' }
           : apt
       )
@@ -69,7 +72,7 @@ export const useStudentAppointments = () => {
     try {
       const { error } = await supabase
         .from('appointments')
-        .update({ 
+        .update({
           status: 'cancelled',
           cancellation_reason: reason || 'Cancelado pelo aluno',
           cancelled_by: user?.id,
@@ -86,16 +89,16 @@ export const useStudentAppointments = () => {
       });
     } catch (error: any) {
       console.error('Error cancelling appointment:', error);
-      
+
       // Rollback optimistic update on error
-      setAppointments(prev => 
-        prev.map(apt => 
-          apt.id === appointmentId 
+      setAppointments(prev =>
+        prev.map(apt =>
+          apt.id === appointmentId
             ? { ...apt, status: 'scheduled' }
             : apt
         )
       );
-      
+
       toast({
         title: 'Erro',
         description: 'Falha ao cancelar agendamento',
@@ -114,10 +117,10 @@ export const useStudentAppointments = () => {
     // Optimistic UI - immediately update local state
     setOptimisticOperations(prev => new Set(prev).add(appointmentId));
     const originalAppointment = appointments.find(apt => apt.id === appointmentId);
-    
-    setAppointments(prev => 
-      prev.map(apt => 
-        apt.id === appointmentId 
+
+    setAppointments(prev =>
+      prev.map(apt =>
+        apt.id === appointmentId
           ? { ...apt, scheduled_time: newDateTime, status: 'scheduled' }
           : apt
       )
@@ -126,7 +129,7 @@ export const useStudentAppointments = () => {
     try {
       const { error } = await supabase
         .from('appointments')
-        .update({ 
+        .update({
           scheduled_time: newDateTime,
           status: 'scheduled'
         })
@@ -141,18 +144,18 @@ export const useStudentAppointments = () => {
       });
     } catch (error: any) {
       console.error('Error rescheduling appointment:', error);
-      
+
       // Rollback optimistic update on error
       if (originalAppointment) {
-        setAppointments(prev => 
-          prev.map(apt => 
-            apt.id === appointmentId 
+        setAppointments(prev =>
+          prev.map(apt =>
+            apt.id === appointmentId
               ? originalAppointment
               : apt
           )
         );
       }
-      
+
       toast({
         title: 'Erro',
         description: 'Falha ao reagendar',
@@ -172,13 +175,13 @@ export const useStudentAppointments = () => {
     if (payload.eventType === 'INSERT') {
       setAppointments(prev => [...prev, payload.new]);
     } else if (payload.eventType === 'UPDATE') {
-      setAppointments(prev => 
-        prev.map(apt => 
+      setAppointments(prev =>
+        prev.map(apt =>
           apt.id === payload.new.id ? payload.new : apt
         )
       );
     } else if (payload.eventType === 'DELETE') {
-      setAppointments(prev => 
+      setAppointments(prev =>
         prev.filter(apt => apt.id !== payload.old.id)
       );
     }
@@ -220,12 +223,12 @@ export const useStudentAppointments = () => {
 
   // Separate upcoming and past appointments
   const now = new Date();
-  
+
   // Define valid active statuses (centralized logic)
   const isActiveStatus = (status: string | null) => {
     return ['scheduled', 'confirmed', 'pending'].includes(status || '');
   };
-  
+
   const upcomingAppointments = appointments.filter(
     (apt) => new Date(apt.scheduled_time) >= now && isActiveStatus(apt.status)
   );

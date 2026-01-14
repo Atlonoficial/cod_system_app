@@ -213,8 +213,8 @@ export default function CadastroCompleto() {
 
   return (
     <div className="page-scroll-container flex flex-col">
-      {/* Fixed Header with Safe Area - Transparent, no second background */}
-      <div className="fixed top-0 left-0 right-0 z-50 pt-safe">
+      {/* Fixed Header with Safe Area and Background to prevent overlap */}
+      <div className="fixed top-0 left-0 right-0 z-50 pt-safe bg-background">
         <div className="px-4 py-3 flex items-center gap-3">
           <Button
             variant="ghost"

@@ -30,7 +30,7 @@ export const useStudentTeacherAvailability = () => {
 
     try {
       setLoading(true);
-      
+
       // Check if user has active subscription first
       if (!hasActiveSubscription || !subscriptionTeacherId) {
         setTeacherId(null);
@@ -51,25 +51,21 @@ export const useStudentTeacherAvailability = () => {
         .order('start_time', { ascending: true });
 
       if (availabilityError) throw availabilityError;
-      
+
       console.log('📊 [useStudentTeacherAvailability] Resultado:', {
         teacherId: subscriptionTeacherId,
         availabilityCount: availabilityData?.length || 0,
         hasAvailability: (availabilityData?.length || 0) > 0
       });
-      
+
       if (!availabilityData || availabilityData.length === 0) {
         console.warn('⚠️ [useStudentTeacherAvailability] Professor não tem disponibilidade configurada');
       }
-      
+
       setAvailability(availabilityData || []);
     } catch (error: any) {
       console.error('Error fetching teacher availability:', error);
-      toast({
-        title: 'Erro',
-        description: 'Falha ao carregar disponibilidade do professor',
-        variant: 'destructive',
-      });
+      // Silent fail - don't show toast, the UI handles no-data state gracefully
     } finally {
       setLoading(false);
     }
