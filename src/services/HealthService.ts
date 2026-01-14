@@ -81,9 +81,9 @@ async function getHealthPlugin() {
 }
 
 /**
- * BUILD 34: GLOBAL FUNCTION - Uses debugLog for UI visibility 
- * This function is OUTSIDE the class to ensure fresh code execution
- * Now with GRANULAR TIMEOUTS to identify exactly where it hangs
+ * BUILD 36: GLOBAL FUNCTION - SIMPLIFIED VERSION
+ * Removed Step 1 timeout since plugin loads correctly
+ * Focus on Step 3 (requestAuthorization) which is where it actually hangs
  */
 export async function requestHealthPermissionsGlobal(): Promise<boolean> {
     // Import debugLog here to ensure it's available
@@ -91,8 +91,8 @@ export async function requestHealthPermissionsGlobal(): Promise<boolean> {
 
     // MARKER - If this appears, we know the new code is running
     debugLog('GLOBAL', '================================================');
-    debugLog('GLOBAL', '🚀 GLOBAL_V2 - requestHealthPermissionsGlobal()');
-    debugLog('GLOBAL', '🚀 BUILD 34 - With debugLog + granular timeouts');
+    debugLog('GLOBAL', '🚀 GLOBAL_V3 - requestHealthPermissionsGlobal()');
+    debugLog('GLOBAL', '🚀 BUILD 36 - SIMPLIFIED (no Step 1 timeout)');
     debugLog('GLOBAL', `🚀 Timestamp: ${new Date().toISOString()}`);
     debugLog('GLOBAL', '================================================');
 
@@ -106,63 +106,43 @@ export async function requestHealthPermissionsGlobal(): Promise<boolean> {
         return false;
     }
 
-    // Step 1: Load plugin (max 5s)
-    debugLog('GLOBAL', '📦 Step 1: Loading plugin (5s timeout)...');
-    let plugin: any;
-
-    try {
-        const pluginPromise = getHealthPlugin();
-        plugin = await Promise.race([
-            pluginPromise,
-            new Promise((_, reject) =>
-                setTimeout(() => reject(new Error('PLUGIN_LOAD_TIMEOUT_5S')), 5000)
-            )
-        ]);
-    } catch (e) {
-        debugLog('GLOBAL', `❌ Step 1 FAILED: ${(e as Error).message}`);
-        return false;
-    }
+    // Step 1: Load plugin (NO TIMEOUT - it works fine)
+    debugLog('GLOBAL', '📦 Step 1: Loading plugin...');
+    const plugin = await getHealthPlugin();
 
     if (!plugin) {
         debugLog('GLOBAL', '❌ Step 1: Plugin is null');
         return false;
     }
-    debugLog('GLOBAL', '✅ Step 1: Plugin loaded successfully');
+    debugLog('GLOBAL', '✅ Step 1: Plugin loaded!');
 
-    // Step 2: Check isAvailable (max 5s)
-    debugLog('GLOBAL', '🔍 Step 2: Checking isAvailable (5s timeout)...');
+    // Step 2: Check isAvailable (NO TIMEOUT - just informational)
+    debugLog('GLOBAL', '🔍 Step 2: Checking isAvailable...');
     try {
-        const availPromise = plugin.isAvailable();
-        const availResult = await Promise.race([
-            availPromise,
-            new Promise((_, reject) =>
-                setTimeout(() => reject(new Error('IS_AVAILABLE_TIMEOUT_5S')), 5000)
-            )
-        ]);
+        const availResult = await plugin.isAvailable();
         debugLog('GLOBAL', `✅ Step 2 Result: ${JSON.stringify(availResult)}`);
 
         if (!(availResult as any)?.available) {
-            debugLog('GLOBAL', '⚠️ HealthKit NOT available on device');
-            // Continue anyway - some plugins return false but still work
+            debugLog('GLOBAL', '⚠️ HealthKit reports NOT available');
+            debugLog('GLOBAL', '⚠️ But we will try requestAuthorization anyway...');
         }
     } catch (e) {
-        debugLog('GLOBAL', `⚠️ Step 2 Error (continuing): ${(e as Error).message}`);
-        // Continue anyway
+        debugLog('GLOBAL', `⚠️ Step 2 Error: ${(e as Error).message}`);
+        debugLog('GLOBAL', '⚠️ Continuing anyway...');
     }
 
-    // Step 3: Request authorization (max 30s)
-    debugLog('GLOBAL', '🔐 Step 3: Requesting authorization (30s timeout)...');
-    debugLog('GLOBAL', '📋 Permissions requested: read=[steps], write=[]');
+    // Step 3: Request authorization (THIS IS WHERE IT HANGS - 30s timeout)
+    debugLog('GLOBAL', '🔐 Step 3: Requesting authorization...');
+    debugLog('GLOBAL', '📋 Calling plugin.requestAuthorization({ read: ["steps"], write: [] })');
+    debugLog('GLOBAL', '⏱️ Starting 30 second timeout...');
 
     try {
-        debugLog('GLOBAL', '⏳ Creating authorization promise...');
-
         const authPromise = plugin.requestAuthorization({
             read: ['steps'],
             write: []
         });
 
-        debugLog('GLOBAL', '⏳ Promise created, waiting for native response...');
+        debugLog('GLOBAL', '⏳ Authorization promise created, waiting...');
 
         const result = await Promise.race([
             authPromise,
@@ -185,13 +165,17 @@ export async function requestHealthPermissionsGlobal(): Promise<boolean> {
         debugLog('GLOBAL', `❌ Step 3 FAILED: ${msg}`);
 
         if (msg === 'AUTH_REQUEST_TIMEOUT_30S') {
-            debugLog('GLOBAL', '🔥 NATIVE CALL TIMED OUT!');
-            debugLog('GLOBAL', '🔥 The HealthKit dialog probably never appeared');
-            debugLog('GLOBAL', '🔥 Possible causes:');
-            debugLog('GLOBAL', '  1. HealthKit NOT enabled in Xcode capabilities');
-            debugLog('GLOBAL', '  2. Provisioning profile missing HealthKit');
-            debugLog('GLOBAL', '  3. Plugin native bridge broken');
-            debugLog('GLOBAL', '  4. Device HealthKit is disabled');
+            debugLog('GLOBAL', '🔥🔥🔥 NATIVE requestAuthorization() TIMED OUT! 🔥🔥🔥');
+            debugLog('GLOBAL', '🔥 The HealthKit permission dialog NEVER appeared');
+            debugLog('GLOBAL', '🔥 This is a NATIVE iOS issue, not JavaScript');
+            debugLog('GLOBAL', '');
+            debugLog('GLOBAL', '📋 POSSIBLE CAUSES:');
+            debugLog('GLOBAL', '  1. HealthKit capability NOT in provisioning profile');
+            debugLog('GLOBAL', '  2. App needs to be opened from Xcode with HealthKit enabled');
+            debugLog('GLOBAL', '  3. Device Settings > Health > COD SYSTEM > Permissions blocked');
+            debugLog('GLOBAL', '  4. Plugin native bridge issue');
+            debugLog('GLOBAL', '');
+            debugLog('GLOBAL', '💡 TRY: Go to iPhone Settings > Health > Data Access > COD SYSTEM');
         }
 
         return false;
