@@ -28,66 +28,33 @@ export interface HealthDataResponse {
 }
 
 /**
- * BUILD 40: DEFINITIVE FIX - Direct plugin access, NO dynamic imports
- * Previous issue: await getHealthPlugin() never resolved on iOS/Appflow
- * Solution: Use direct static import at file top
+ * BUILD 43: Simplified - Feature temporarily disabled (Em Breve)
+ * Will be enabled when configured via Xcode
  */
 export async function requestHealthPermissionsGlobal(): Promise<boolean> {
-    // MARKER - If this appears, we know the new code is running
-    debugLog('GLOBAL', '================================================');
-    debugLog('GLOBAL', '🚀 GLOBAL_V4 - DEFINITIVE FIX');
-    debugLog('GLOBAL', '🚀 BUILD 40 - Direct Health import');
-    debugLog('GLOBAL', `🚀 Timestamp: ${new Date().toISOString()}`);
-    debugLog('GLOBAL', `🚀 Timestamp: ${new Date().toISOString()}`);
-    debugLog('GLOBAL', '================================================');
-
     const isNative = Capacitor.isNativePlatform();
-    const platform = Capacitor.getPlatform();
-
-    debugLog('GLOBAL', `Platform: ${platform} | Native: ${isNative}`);
 
     if (!isNative) {
-        debugLog('GLOBAL', '❌ Not native, returning false');
         return false;
     }
-
-    // Step 1: Use direct Health import - NO await!
-    debugLog('GLOBAL', '📦 Using direct Health import...');
 
     if (typeof Health === 'undefined' || !Health) {
-        debugLog('GLOBAL', '❌ Health plugin unavailable');
+        console.error('Health plugin unavailable');
         return false;
     }
 
-    debugLog('GLOBAL', '✅ Health plugin ready');
-
-    // Step 2: Check isAvailable (NO TIMEOUT - just informational)
-    debugLog('GLOBAL', '🔍 Step 2: Checking isAvailable...');
     try {
+        // Check availability first
         const availResult = await Health.isAvailable();
-        debugLog('GLOBAL', `✅ Step 2 Result: ${JSON.stringify(availResult)}`);
-
         if (!(availResult as any)?.available) {
-            debugLog('GLOBAL', '⚠️ HealthKit reports NOT available');
-            debugLog('GLOBAL', '⚠️ But we will try requestAuthorization anyway...');
+            return false;
         }
-    } catch (e) {
-        debugLog('GLOBAL', `⚠️ Step 2 Error: ${(e as Error).message}`);
-        debugLog('GLOBAL', '⚠️ Continuing anyway...');
-    }
 
-    // Step 3: Request authorization (THIS IS WHERE IT HANGS - 30s timeout)
-    debugLog('GLOBAL', '🔐 Step 3: Requesting authorization...');
-    debugLog('GLOBAL', '📋 Calling plugin.requestAuthorization({ read: ["steps"], write: [] })');
-    debugLog('GLOBAL', '⏱️ Starting 30 second timeout...');
-
-    try {
+        // Request authorization with 30s timeout
         const authPromise = Health.requestAuthorization({
             read: ['steps'],
             write: []
         });
-
-        debugLog('GLOBAL', '⏳ Authorization promise created, waiting...');
 
         const result = await Promise.race([
             authPromise,
@@ -96,33 +63,14 @@ export async function requestHealthPermissionsGlobal(): Promise<boolean> {
             )
         ]);
 
-        debugLog('GLOBAL', `✅ Step 3 Got result: ${JSON.stringify(result)}`);
-
         const success = (result as any)?.status === 'authorized' ||
             (result as any)?.status === 'limited' ||
             (result as any)?.authorized === true;
 
-        debugLog('GLOBAL', success ? '🎉 AUTHORIZED!' : '❌ NOT AUTHORIZED');
         return success;
 
     } catch (e) {
-        const msg = (e as Error).message;
-        debugLog('GLOBAL', `❌ Step 3 FAILED: ${msg}`);
-
-        if (msg === 'AUTH_REQUEST_TIMEOUT_30S') {
-            debugLog('GLOBAL', '🔥🔥🔥 NATIVE requestAuthorization() TIMED OUT! 🔥🔥🔥');
-            debugLog('GLOBAL', '🔥 The HealthKit permission dialog NEVER appeared');
-            debugLog('GLOBAL', '🔥 This is a NATIVE iOS issue, not JavaScript');
-            debugLog('GLOBAL', '');
-            debugLog('GLOBAL', '📋 POSSIBLE CAUSES:');
-            debugLog('GLOBAL', '  1. HealthKit capability NOT in provisioning profile');
-            debugLog('GLOBAL', '  2. App needs to be opened from Xcode with HealthKit enabled');
-            debugLog('GLOBAL', '  3. Device Settings > Health > COD SYSTEM > Permissions blocked');
-            debugLog('GLOBAL', '  4. Plugin native bridge issue');
-            debugLog('GLOBAL', '');
-            debugLog('GLOBAL', '💡 TRY: Go to iPhone Settings > Health > Data Access > COD SYSTEM');
-        }
-
+        console.error('HealthKit error:', (e as Error).message);
         return false;
     }
 }
@@ -147,118 +95,26 @@ class HealthServiceImpl {
         }
 
         try {
-            console.log(`[HealthService] Checking availability on ${this.platform}...`);
-            const plugin = await getHealthPlugin();
-
-            if (!plugin) {
-                console.error('[HealthService] Plugin failed to load');
+            if (!Health) {
                 return false;
             }
-
-            const result = await plugin.isAvailable();
-            console.log('[HealthService] Availability check result:', JSON.stringify(result));
-            return result.available === true;
+            const result = await Health.isAvailable();
+            return (result as any).available === true;
         } catch (error) {
             console.error('[HealthService] Check availability failed:', error);
             return false;
         }
     }
-
     /**
      * Request health data permissions from user
-     * BUILD 31: Added XCODE31 marker - if this doesn't show, code is not updated!
+     * BUILD 43: Simplified - uses global function
      */
     async requestPermissions(): Promise<boolean> {
-        // XCODE31 MARKER - This MUST appear in logs if code is updated
-        console.log('========================================');
-        console.log('XCODE31 - BUILD 31 - requestPermissions ENTRY');
-        console.log('XCODE31 - Platform:', this.platform);
-        console.log('XCODE31 - isNative:', this.isNative);
-        console.log('========================================');
-
         if (!this.isNative) {
-            console.log('[HealthService] ❌ Not native platform');
             return false;
         }
 
-        // Step 1: Load plugin
-        console.log('[HealthService] STEP 1: Loading plugin...');
-        let plugin: any;
-        try {
-            plugin = await getHealthPlugin();
-            console.log('[HealthService] STEP 1: Plugin loaded -', plugin ? 'OK' : 'NULL');
-        } catch (e) {
-            console.log('[HealthService] STEP 1: FAILED -', (e as Error).message);
-            return false;
-        }
-
-        if (!plugin) {
-            console.log('[HealthService] ❌ Plugin is null, cannot proceed');
-            return false;
-        }
-
-        // Step 2: Check availability FIRST
-        console.log('[HealthService] STEP 2: Checking isAvailable()...');
-        try {
-            const availResult = await plugin.isAvailable();
-            console.log('[HealthService] STEP 2: isAvailable result:', JSON.stringify(availResult));
-
-            if (!availResult?.available) {
-                console.log('[HealthService] ❌ HealthKit not available on this device');
-                return false;
-            }
-            console.log('[HealthService] ✅ HealthKit IS available');
-        } catch (e) {
-            console.log('[HealthService] STEP 2: FAILED -', (e as Error).message);
-            // Continue anyway - some devices may not support isAvailable check
-        }
-
-        // Step 3: Request authorization with minimal permissions
-        console.log('[HealthService] STEP 3: Requesting authorization...');
-        console.log('[HealthService] Permissions: read=[steps], write=[]');
-
-        try {
-            // Use absolute minimum permissions for testing
-            console.log('[HealthService] Creating promise...');
-
-            const authPromise = plugin.requestAuthorization({
-                read: ['steps'],
-                write: []
-            });
-
-            console.log('[HealthService] Promise created, waiting with 15s timeout...');
-
-            // 15 second timeout 
-            const result = await Promise.race([
-                authPromise,
-                new Promise((_, reject) =>
-                    setTimeout(() => reject(new Error('TIMEOUT_15S')), 15000)
-                )
-            ]);
-
-            console.log('[HealthService] STEP 3: Got result:', JSON.stringify(result));
-
-            const success = result?.status === 'authorized' ||
-                result?.status === 'limited' ||
-                result?.authorized === true;
-
-            console.log('[HealthService] ✅ Authorization success:', success);
-            return success;
-
-        } catch (e) {
-            const msg = (e as Error).message;
-            console.log('[HealthService] STEP 3: FAILED -', msg);
-
-            if (msg === 'TIMEOUT_15S') {
-                console.log('[HealthService] 🔥 Native call timed out - HealthKit dialog may not have appeared');
-                console.log('[HealthService] Possible causes:');
-                console.log('[HealthService]  1. HealthKit capability not properly signed in provisioning profile');
-                console.log('[HealthService]  2. Device has HealthKit disabled in Settings > Privacy');
-                console.log('[HealthService]  3. Plugin native code issue');
-            }
-
-            return false;
-        }
+        return requestHealthPermissionsGlobal();
     }
 
     /**
@@ -269,15 +125,14 @@ class HealthServiceImpl {
         if (!this.isNative) return null;
 
         try {
-            const plugin = await getHealthPlugin();
-            if (!plugin) return null;
+            if (!Health) return null;
 
             const now = new Date();
             const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
             // Try to get sleep data directly
             try {
-                const { samples } = await plugin.readSamples({
+                const { samples } = await (Health as any).readSamples({
                     dataType: 'sleep',
                     startDate: yesterday.toISOString(),
                     endDate: now.toISOString(),
@@ -321,7 +176,7 @@ class HealthServiceImpl {
 
             // Fallback: Use heart rate data as proxy for sleep quality
             try {
-                const { samples } = await plugin.readSamples({
+                const { samples } = await (Health as any).readSamples({
                     dataType: 'heartRate',
                     startDate: yesterday.toISOString(),
                     endDate: now.toISOString(),
@@ -360,8 +215,7 @@ class HealthServiceImpl {
         if (!this.isNative) return null;
 
         try {
-            const plugin = await getHealthPlugin();
-            if (!plugin) return null;
+            if (!Health) return null;
 
             const now = new Date();
             const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
@@ -371,7 +225,7 @@ class HealthServiceImpl {
 
             // Get heart rate samples
             try {
-                const { samples } = await plugin.readSamples({
+                const { samples } = await (Health as any).readSamples({
                     dataType: 'heartRate',
                     startDate: yesterday.toISOString(),
                     endDate: now.toISOString(),
@@ -389,7 +243,7 @@ class HealthServiceImpl {
 
             // Try to get HRV data directly
             try {
-                const { samples } = await plugin.readSamples({
+                const { samples } = await (Health as any).readSamples({
                     dataType: 'heartRateVariability',
                     startDate: yesterday.toISOString(),
                     endDate: now.toISOString(),

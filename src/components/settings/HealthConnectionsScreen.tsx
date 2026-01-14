@@ -24,7 +24,8 @@ import {
     ChevronLeft,
     Info,
     Bug,
-    Copy
+    Copy,
+    Clock
 } from 'lucide-react';
 import { useBiometricSync } from '@/hooks/useBiometricSync';
 import { Capacitor } from '@capacitor/core';
@@ -141,22 +142,7 @@ export const HealthConnectionsScreen: React.FC<HealthConnectionsScreenProps> = (
                         Sincronize dados de sono e recuperação
                     </p>
                 </div>
-                {isNative && (
-                    <>
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => setShowDebugLogs(!showDebugLogs)}
-                        >
-                            <Bug className={`w-5 h-5 ${showDebugLogs ? 'text-primary' : ''}`} />
-                        </Button>
-
-                        {/* BUILD VERSION BADGE */}
-                        <Badge variant="outline" className="ml-2 font-mono text-xs">
-                            BUILD 42 🔧
-                        </Badge>
-                    </>
-                )}
+                {/* Debug removed - cleaner production UI */}
             </div>
 
             <div className="flex-1 p-4 space-y-4 overflow-auto pb-24">
@@ -256,35 +242,26 @@ export const HealthConnectionsScreen: React.FC<HealthConnectionsScreenProps> = (
                             </div>
                         ) : !hasHealthPermission ? (
                             <div className="space-y-4">
-                                {connectionTimeout && (
-                                    <div className="flex items-start gap-3 p-3 bg-red-500/10 rounded-xl">
-                                        <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
-                                        <div className="text-sm">
-                                            <p className="font-medium text-red-500">Conexão expirou</p>
-                                            <p className="text-muted-foreground mt-1">
-                                                Não foi possível conectar ao {healthServiceName}.
-                                                Veja os logs acima (ícone 🐛) para mais detalhes.
-                                            </p>
-                                        </div>
+                                <div className="flex items-start gap-3 p-3 bg-primary/10 rounded-xl">
+                                    <Clock className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                                    <div className="text-sm">
+                                        <p className="font-medium text-primary">Em Breve</p>
+                                        <p className="text-muted-foreground mt-1">
+                                            A integração com {healthServiceName} estará disponível em breve.
+                                            Estamos finalizando a configuração no Xcode.
+                                        </p>
                                     </div>
-                                )}
+                                </div>
                                 <p className="text-sm text-muted-foreground">
-                                    Conecte para sincronizar automaticamente seus dados de sono e
+                                    Quando disponível, você poderá sincronizar automaticamente seus dados de sono e
                                     variabilidade cardíaca (VFC) no check-in diário.
                                 </p>
                                 <Button
-                                    onClick={handleConnect}
-                                    disabled={isConnecting}
-                                    className="w-full"
+                                    disabled={true}
+                                    className="w-full opacity-50"
                                     size="lg"
                                 >
-                                    {isConnecting ? (
-                                        <><RefreshCw className="w-4 h-4 mr-2 animate-spin" /> Conectando...</>
-                                    ) : connectionTimeout ? (
-                                        <><RefreshCw className="w-4 h-4 mr-2" /> Tentar Novamente</>
-                                    ) : (
-                                        <><Smartphone className="w-4 h-4 mr-2" /> Conectar {healthServiceName}</>
-                                    )}
+                                    <Smartphone className="w-4 h-4 mr-2" /> Em Breve
                                 </Button>
                             </div>
                         ) : (
