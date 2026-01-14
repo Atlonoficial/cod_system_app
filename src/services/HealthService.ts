@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════
- * COD System - Health Service (Build 20)
+ * COD System - Health Service (Build 40 - DEFINITIVE FIX)
  * ═══════════════════════════════════════════════════════════════════════════
  * @copyright (c) 2024-2026 Atlon Tech (CNPJ: 58.079.600/0001-77)
  * 
@@ -8,15 +8,13 @@
  * - iOS: Apple HealthKit
  * - Android: Health Connect 
  * 
- * Requirements:
- * - npm install @capgo/capacitor-health
- * - iOS: HealthKit capability enabled (App.entitlements)
- * - Android: Health Connect permissions in AndroidManifest.xml
+ * BUILD 40 FIX: Eliminated dynamic imports that caused await to hang on iOS
  * ═══════════════════════════════════════════════════════════════════════════
  */
 
 import { Capacitor } from '@capacitor/core';
 import { debugLog } from '@/lib/debugLogger';
+import { Health } from '@capgo/capacitor-health'; // ✅ DIRECT IMPORT - NO MORE await hang!
 
 // Types
 export interface HealthDataResponse {
@@ -29,70 +27,17 @@ export interface HealthDataResponse {
     lastUpdated: string;        // ISO date
 }
 
-// Dynamic import for the health plugin
-let HealthPlugin: any = null;
-let pluginLoadAttempted = false;
-
-async function getHealthPlugin() {
-    debugLog('HealthService', '🔌 getHealthPlugin() chamado');
-
-    try {
-        debugLog('HealthService', '📦 Executando import direto...');
-
-        const module = await import('@capgo/capacitor-health');
-
-        debugLog('HealthService', '📥 Import completo!');
-        debugLog('HealthService', `Chaves: ${Object.keys(module).join(', ')}`);
-
-        let plugin = null;
-
-        if (module.Health) {
-            debugLog('HealthService', '✅ Encontrou module.Health');
-            plugin = module.Health;
-        } else if (module.default) {
-            debugLog('HealthService', '✅ Encontrou module.default');
-            plugin = module.default;
-        } else {
-            debugLog('HealthService', '❌ Nenhum export encontrado!');
-            return null;
-        }
-
-        if (plugin) {
-            debugLog('HealthService', `✅ Plugin tipo: ${typeof plugin}`);
-
-            const methods = ['requestAuthorization', 'isAvailable'];
-            for (const method of methods) {
-                const hasMethod = typeof plugin[method] === 'function';
-                debugLog('HealthService', `  - ${method}: ${hasMethod ? '✅' : '❌'}`);
-            }
-
-            debugLog('HealthService', '🎉 RETORNANDO PLUGIN!');
-            return plugin;
-        }
-
-        debugLog('HealthService', '💥 Plugin é null');
-        return null;
-    } catch (error) {
-        debugLog('HealthService', `🔥 ERRO!`);
-        debugLog('HealthService', `Tipo: ${(error as Error).name}`);
-        debugLog('HealthService', `Msg: ${(error as Error).message}`);
-        return null;
-    }
-}
-
 /**
- * BUILD 36: GLOBAL FUNCTION - SIMPLIFIED VERSION
- * Removed Step 1 timeout since plugin loads correctly
- * Focus on Step 3 (requestAuthorization) which is where it actually hangs
+ * BUILD 40: DEFINITIVE FIX - Direct plugin access, NO dynamic imports
+ * Previous issue: await getHealthPlugin() never resolved on iOS/Appflow
+ * Solution: Use direct static import at file top
  */
 export async function requestHealthPermissionsGlobal(): Promise<boolean> {
-    // Import debugLog here to ensure it's available
-    const { debugLog } = await import('@/lib/debugLogger');
-
     // MARKER - If this appears, we know the new code is running
     debugLog('GLOBAL', '================================================');
-    debugLog('GLOBAL', '🚀 GLOBAL_V3 - requestHealthPermissionsGlobal()');
-    debugLog('GLOBAL', '🚀 BUILD 36 - SIMPLIFIED (no Step 1 timeout)');
+    debugLog('GLOBAL', '🚀 GLOBAL_V4 - DEFINITIVE FIX');
+    debugLog('GLOBAL', '🚀 BUILD 40 - Direct Health import');
+    debugLog('GLOBAL', `🚀 Timestamp: ${new Date().toISOString()}`);
     debugLog('GLOBAL', `🚀 Timestamp: ${new Date().toISOString()}`);
     debugLog('GLOBAL', '================================================');
 
@@ -106,20 +51,20 @@ export async function requestHealthPermissionsGlobal(): Promise<boolean> {
         return false;
     }
 
-    // Step 1: Load plugin (NO TIMEOUT - it works fine)
-    debugLog('GLOBAL', '📦 Step 1: Loading plugin...');
-    const plugin = await getHealthPlugin();
+    // Step 1: Use direct Health import - NO await!
+    debugLog('GLOBAL', '📦 Using direct Health import...');
 
-    if (!plugin) {
-        debugLog('GLOBAL', '❌ Step 1: Plugin is null');
+    if (typeof Health === 'undefined' || !Health) {
+        debugLog('GLOBAL', '❌ Health plugin unavailable');
         return false;
     }
-    debugLog('GLOBAL', '✅ Step 1: Plugin loaded!');
+
+    debugLog('GLOBAL', '✅ Health plugin ready');
 
     // Step 2: Check isAvailable (NO TIMEOUT - just informational)
     debugLog('GLOBAL', '🔍 Step 2: Checking isAvailable...');
     try {
-        const availResult = await plugin.isAvailable();
+        const availResult = await Health.isAvailable();
         debugLog('GLOBAL', `✅ Step 2 Result: ${JSON.stringify(availResult)}`);
 
         if (!(availResult as any)?.available) {
@@ -137,7 +82,7 @@ export async function requestHealthPermissionsGlobal(): Promise<boolean> {
     debugLog('GLOBAL', '⏱️ Starting 30 second timeout...');
 
     try {
-        const authPromise = plugin.requestAuthorization({
+        const authPromise = Health.requestAuthorization({
             read: ['steps'],
             write: []
         });
