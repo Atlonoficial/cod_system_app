@@ -222,39 +222,39 @@ export const WorkoutDetail = ({ workout, onBack, onStartWorkout, onExerciseSelec
       <div className="pt-16">{/* BUILD 32: Reduced from pt-20 */}
         {/* Stats section - Ultra clean like Home BUILD 32 */}
         <div className="px-4 py-6">
-          <div className="grid grid-cols-2 gap-4">{/* Increased gap from 3 to 4 */}
+          <div className="grid grid-cols-2 gap-3">{/* Professional grid layout */}
             {/* Duração */}
-            <div className="flex items-center gap-3 px-2 py-2">
-              <Clock className="w-6 h-6 text-primary flex-shrink-0" />
+            <div className="flex items-center gap-3 p-3 bg-card/30 rounded-xl border border-border/20">
+              <Clock className="w-5 h-5 text-primary flex-shrink-0" />
               <div className="min-w-0">
-                <p className="text-xl font-bold text-foreground leading-tight">{workout.duration} min</p>
+                <p className="text-lg font-bold text-foreground leading-tight">{workout.duration} min</p>
                 <p className="text-xs text-muted-foreground">Duração</p>
               </div>
             </div>
 
             {/* Exercícios */}
-            <div className="flex items-center gap-3 px-2 py-2">
-              <Dumbbell className="w-6 h-6 text-purple-400 flex-shrink-0" />
+            <div className="flex items-center gap-3 p-3 bg-card/30 rounded-xl border border-border/20">
+              <Dumbbell className="w-5 h-5 text-purple-400 flex-shrink-0" />
               <div className="min-w-0">
-                <p className="text-xl font-bold text-foreground leading-tight">{workout.exercises.length}</p>
+                <p className="text-lg font-bold text-foreground leading-tight">{workout.exercises.length}</p>
                 <p className="text-xs text-muted-foreground">Exercícios</p>
               </div>
             </div>
 
             {/* Dificuldade */}
-            <div className="flex items-center gap-3 px-2 py-2">
-              <Flame className="w-6 h-6 text-orange-400 flex-shrink-0" />
+            <div className="flex items-center gap-3 p-3 bg-card/30 rounded-xl border border-border/20">
+              <Flame className="w-5 h-5 text-orange-400 flex-shrink-0" />
               <div className="min-w-0">
-                <p className="text-xl font-bold text-foreground leading-tight">{workout.difficulty}</p>
+                <p className="text-lg font-bold text-foreground leading-tight">{workout.difficulty}</p>
                 <p className="text-xs text-muted-foreground">Dificuldade</p>
               </div>
             </div>
 
             {/* Calorias */}
-            <div className="flex items-center gap-3 px-2 py-2">
-              <Zap className="w-6 h-6 text-green-400 flex-shrink-0" />
+            <div className="flex items-center gap-3 p-3 bg-card/30 rounded-xl border border-border/20">
+              <Zap className="w-5 h-5 text-green-400 flex-shrink-0" />
               <div className="min-w-0">
-                <p className="text-xl font-bold text-foreground leading-tight">~{estimateCalories()}</p>
+                <p className="text-lg font-bold text-foreground leading-tight">~{estimateCalories()}</p>
                 <p className="text-xs text-muted-foreground">kcal</p>
               </div>
             </div>

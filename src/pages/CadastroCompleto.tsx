@@ -241,10 +241,13 @@ export default function CadastroCompleto() {
           <Card className="mb-6">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium">Completude do Perfil</span>
-                <span className="text-sm text-muted-foreground">{calculateCompleteness()}%</span>
+                <span className="text-sm font-medium">Perfil Completo</span>
+                <span className="text-sm font-semibold text-primary">{calculateCompleteness()}%</span>
               </div>
               <Progress value={calculateCompleteness()} className="h-2" />
+              <p className="text-xs text-muted-foreground mt-2">
+                Preencha todas as informações para uma experiência personalizada
+              </p>
             </CardContent>
           </Card>
 
