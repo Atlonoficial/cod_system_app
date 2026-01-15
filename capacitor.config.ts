@@ -36,7 +36,7 @@ const config: CapacitorConfig = {
     ...(maybeServer as any).server,
     cleartext: true,
     allowNavigation: [
-      'https://bqbopkqzkavhmenjlhab.supabase.co',
+      'https://swvpuadolibssbhiozje.supabase.co
     ]
   },
 

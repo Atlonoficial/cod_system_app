@@ -28,7 +28,7 @@ import { AcceptTerms } from "./pages/AcceptTerms";
 import { Anamnese } from "./pages/Anamnese";
 import { LoadingScreen } from "@/components/auth/LoadingScreen";
 import ContaSeguranca from "./pages/ContaSeguranca";
-import AssinaturasPlanos from "./pages/AssinaturasPlanos";
+import StatusAcesso from "./pages/StatusAcesso";
 import { LazySettings } from "./pages/lazy/LazySettings";
 // LazyAIChat removed
 import { LazyTeacherStudentChat } from "./pages/lazy/LazyTeacherStudentChat";
@@ -141,7 +141,7 @@ const AuthenticatedApp = () => {
         {/* Configurações sempre acessíveis (para ver status do plano) */}
         <Route path="/configuracoes" element={<AuthGuard><TermsGuard><LazySettings /></TermsGuard></AuthGuard>} />
         <Route path="/conta-seguranca" element={<AuthGuard><TermsGuard><ContaSeguranca /></TermsGuard></AuthGuard>} />
-        <Route path="/assinaturas-planos" element={<AuthGuard><TermsGuard><AssinaturasPlanos /></TermsGuard></AuthGuard>} />
+        <Route path="/status-acesso" element={<AuthGuard><TermsGuard><StatusAcesso /></TermsGuard></AuthGuard>} />
         <Route path="/conexoes-saude" element={<AuthGuard><TermsGuard><HealthConnectionsScreen onBack={() => window.history.back()} /></TermsGuard></AuthGuard>} />
         <Route path="/wellness-history" element={<AuthGuard><TermsGuard><WellnessHistoryPage /></TermsGuard></AuthGuard>} />
 

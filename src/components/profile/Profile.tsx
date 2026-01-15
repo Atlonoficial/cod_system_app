@@ -264,14 +264,14 @@ export const Profile = () => {
           </CardContent>
         </Card>
 
-        <Card role="button" onClick={() => navigate("/assinaturas-planos")} className="hover:bg-muted/40 transition-colors">
+        <Card role="button" onClick={() => navigate("/status-acesso")} className="hover:bg-muted/40 transition-colors">
           <CardContent className="p-4 flex items-center gap-4">
             <div className="w-10 h-10 rounded-full bg-primary/15 flex items-center justify-center">
-              <CreditCard className="w-5 h-5 text-primary" />
+              <Shield className="w-5 h-5 text-primary" />
             </div>
             <div className="flex-1">
-              <p className="font-medium">Meu Acesso</p>
-              <p className="text-sm text-muted-foreground">Status da consultoria</p>
+              <p className="font-medium">Status da Conta</p>
+              <p className="text-sm text-muted-foreground">Recursos liberados</p>
             </div>
           </CardContent>
         </Card>

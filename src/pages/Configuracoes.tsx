@@ -128,8 +128,8 @@ const Configuracoes = () => {
     }
   };
 
-  const handlePlanosClick = () => {
-    navigate("/assinaturas-planos");
+  const handleStatusClick = () => {
+    navigate("/status-acesso");
   };
 
   const configItems = [
@@ -139,7 +139,7 @@ const Configuracoes = () => {
       title: "Meu Acesso",
       description: "Detalhes do seu acesso",
       action: <ChevronRight className="w-4 h-4 text-muted-foreground" />,
-      onClick: handlePlanosClick
+      onClick: handleStatusClick
     },
     {
       icon: Lock,

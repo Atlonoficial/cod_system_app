@@ -10,7 +10,7 @@ import { ConnectionStatus } from "@/components/ui/ConnectionStatus";
 import { supabase } from "@/integrations/supabase/client";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
-const AssinaturasPlanos = () => {
+const StatusAcesso = () => {
   const navigate = useNavigate();
   const { student } = useStudentProfile();
   const { subscription } = useActiveSubscription();
@@ -36,7 +36,7 @@ const AssinaturasPlanos = () => {
     loadTeacherInfo();
   }, [student?.teacher_id]);
 
-  const planoAtual = useMemo(() => {
+  const acessoAtual = useMemo(() => {
     if (subscription) {
       return {
         nome: subscription.plan_name,
@@ -87,11 +87,11 @@ const AssinaturasPlanos = () => {
 
       <div className="p-4 space-y-6">
         {/* Status do Acesso */}
-        <Card className={`p-6 bg-card border-border/50 ${planoAtual?.expirationStatus === 'expired' ? 'border-destructive/50 bg-destructive/5' : ''}`}>
+        <Card className={`p-6 bg-card border-border/50 ${acessoAtual?.expirationStatus === 'expired' ? 'border-destructive/50 bg-destructive/5' : ''}`}>
           <div className="flex items-start justify-between mb-6">
             <div className="flex items-center gap-4">
-              <div className={`w-12 h-12 rounded-full flex items-center justify-center ${planoAtual?.expirationStatus === 'expired' ? 'bg-destructive/10' : 'bg-primary/10'}`}>
-                {planoAtual?.expirationStatus === 'expired' ? (
+              <div className={`w-12 h-12 rounded-full flex items-center justify-center ${acessoAtual?.expirationStatus === 'expired' ? 'bg-destructive/10' : 'bg-primary/10'}`}>
+                {acessoAtual?.expirationStatus === 'expired' ? (
                   <Shield className="w-6 h-6 text-destructive" />
                 ) : (
                   <User className="w-6 h-6 text-primary" />
@@ -100,11 +100,11 @@ const AssinaturasPlanos = () => {
               <div>
                 <h2 className="text-lg font-semibold text-foreground">Status da Conta</h2>
                 <div className="flex items-center gap-2 mt-1">
-                  <Badge variant="secondary" className={`${planoAtual?.expirationStatus === 'expired'
+                  <Badge variant="secondary" className={`${acessoAtual?.expirationStatus === 'expired'
                     ? 'bg-destructive/10 text-destructive hover:bg-destructive/20'
                     : 'bg-primary/10 text-primary hover:bg-primary/20'
                     }`}>
-                    {planoAtual?.expirationStatus === 'expired' ? 'Expirado' : (planoAtual?.status === 'active' ? 'Ativo' : 'Regular')}
+                    {acessoAtual?.expirationStatus === 'expired' ? 'Expirado' : (acessoAtual?.status === 'active' ? 'Ativo' : 'Regular')}
                   </Badge>
                 </div>
               </div>
@@ -114,10 +114,10 @@ const AssinaturasPlanos = () => {
           <div className="space-y-4">
             <div className="p-4 bg-muted/30 rounded-lg border border-border/50">
               <h3 className="text-sm font-medium text-foreground mb-2">
-                {planoAtual?.expirationStatus === 'expired' ? 'Acesso Expirado' : 'Recursos Liberados'}
+                {acessoAtual?.expirationStatus === 'expired' ? 'Acesso Expirado' : 'Recursos Liberados'}
               </h3>
 
-              {planoAtual?.expirationStatus === 'expired' ? (
+              {acessoAtual?.expirationStatus === 'expired' ? (
                 <p className="text-sm text-muted-foreground">
                   Seu período de acesso encerrou. Entre em contato com seu treinador para renovar sua consultoria e liberar o acesso aos treinos e funcionalidades.
                 </p>
@@ -127,9 +127,9 @@ const AssinaturasPlanos = () => {
                     Alguns recursos podem estar bloqueados dependendo da configuração feita pelo seu treinador.
                   </p>
 
-                  {planoAtual?.features && planoAtual.features.length > 0 && (
+                  {acessoAtual?.features && acessoAtual.features.length > 0 && (
                     <div className="mt-4 space-y-2">
-                      {planoAtual.features.map((feature, index) => (
+                      {acessoAtual.features.map((feature, index) => (
                         <div key={index} className="flex items-center gap-2">
                           <Check className="w-4 h-4 text-primary" />
                           <span className="text-sm text-foreground">{feature}</span>
@@ -178,4 +178,4 @@ const AssinaturasPlanos = () => {
   );
 };
 
-export default AssinaturasPlanos;
+export default StatusAcesso;
