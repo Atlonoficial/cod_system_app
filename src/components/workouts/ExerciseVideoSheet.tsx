@@ -115,6 +115,16 @@ export const ExerciseVideoSheet = ({
                             Assista ao vídeo demonstrativo para executar o exercício corretamente.
                         </p>
                     )}
+
+                    {/* Botão de confirmação com gradiente COD */}
+                    <div className="mt-6 pb-4">
+                        <button
+                            onClick={() => setOpen(false)}
+                            className="w-full bg-gradient-to-r from-primary to-purple-500 text-white px-6 py-3.5 rounded-xl font-semibold hover:opacity-90 active:scale-[0.98] transition-all shadow-lg"
+                        >
+                            Ok, entendi!
+                        </button>
+                    </div>
                 </div>
             </SheetContent>
         </Sheet>
