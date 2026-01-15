@@ -698,6 +698,12 @@ export const WorkoutSessionCOD = ({ workout, onFinish, onExit }: WorkoutSessionC
                         previousWeight={
                             exerciseLogs.get(currentExerciseIndex)?.[currentSetNumber - 2]?.weight || 0
                         }
+                        exerciseName={currentExercise.name}
+                        exerciseProgress={{
+                            current: currentExerciseIndex + 1,
+                            total: workout.exercises.length,
+                            percent: Math.round(progressPercent)
+                        }}
                         onComplete={handleSetComplete}
                     />
                 )}

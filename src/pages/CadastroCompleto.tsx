@@ -214,8 +214,8 @@ export default function CadastroCompleto() {
   return (
     <div className="page-scroll-container flex flex-col">
       {/* Fixed Header with Safe Area and Background to prevent overlap */}
-      <div className="fixed top-0 left-0 right-0 z-50 pt-safe bg-background">
-        <div className="px-4 py-3 flex items-center gap-3">
+      <div className="fixed top-0 left-0 right-0 z-50 pt-safe bg-background border-b border-border/10">
+        <div className="px-4 py-2 flex items-center gap-3">
           <Button
             variant="ghost"
             size="sm"
@@ -224,9 +224,9 @@ export default function CadastroCompleto() {
           >
             <ArrowLeft className="w-5 h-5" />
           </Button>
-          <div className="flex-1">
-            <h1 className="text-xl font-bold">Cadastro Completo</h1>
-            <p className="text-xs text-muted-foreground">
+          <div className="flex-1 min-w-0">
+            <h1 className="text-lg font-bold truncate">Cadastro Completo</h1>
+            <p className="text-xs text-muted-foreground truncate">
               Complete suas informações pessoais
             </p>
           </div>
@@ -234,7 +234,7 @@ export default function CadastroCompleto() {
       </div>
 
       {/* Scrollable Content */}
-      <div className="flex-1 overflow-y-auto pt-20 pb-safe-4xl">
+      <div className="flex-1 overflow-y-auto pt-16 pb-32">
         <div className="max-w-2xl mx-auto px-4">
 
           {/* Progress Bar */}

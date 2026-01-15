@@ -9,6 +9,8 @@ interface SetLoggerProps {
     totalSets: number;
     targetReps: number;
     previousWeight?: number;
+    exerciseName?: string;
+    exerciseProgress?: { current: number; total: number; percent: number };
     onComplete: (reps: number, weight: number, rpe: number) => void;
     onCancel?: () => void;
 }
@@ -39,6 +41,8 @@ export const SetLogger: React.FC<SetLoggerProps> = ({
     totalSets,
     targetReps,
     previousWeight = 0,
+    exerciseName,
+    exerciseProgress,
     onComplete,
     onCancel
 }) => {
@@ -59,13 +63,37 @@ export const SetLogger: React.FC<SetLoggerProps> = ({
     };
 
     return (
-        <div className="p-6">{/* BUILD 29: Removed visible background */}
-            {/* Header */}
-            <div className="flex justify-between items-center mb-6">
-                <span className="px-4 py-2 rounded-full bg-gradient-to-r from-primary to-purple-500 font-semibold text-sm">
-                    Série {setNumber}/{totalSets}
-                </span>
-                <span className="text-gray-400 text-sm">Alvo: {targetReps} reps</span>
+        <div className="px-5 py-6">{/* BUILD 47: Increased lateral padding from p-6 to px-5 py-6 */}
+            {/* Header - BUILD 47: Completely reorganized to prevent overlap */}
+            <div className="flex items-start justify-between gap-4 mb-6">
+                {/* Left side: Exercise name and series info */}
+                <div className="flex-1 min-w-0">
+                    {exerciseName && (
+                        <h2 className="text-lg font-bold leading-tight mb-2 line-clamp-2 text-foreground">
+                            {exerciseName}
+                        </h2>
+                    )}
+                    <div className="flex items-center gap-3 flex-wrap">
+                        <span className="px-3 py-1 rounded-full bg-gradient-to-r from-primary to-purple-500 font-semibold text-xs whitespace-nowrap">
+                            Série {setNumber}/{totalSets}
+                        </span>
+                        <span className="text-muted-foreground text-xs whitespace-nowrap">
+                            Alvo: {targetReps} reps
+                        </span>
+                    </div>
+                </div>
+
+                {/* Right side: Progress info */}
+                {exerciseProgress && (
+                    <div className="flex-shrink-0 text-right">
+                        <div className="text-xs text-muted-foreground">
+                            Exercício {exerciseProgress.current}/{exerciseProgress.total}
+                        </div>
+                        <div className="text-xs font-bold text-primary">
+                            {exerciseProgress.percent}%
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* Reps Input */}

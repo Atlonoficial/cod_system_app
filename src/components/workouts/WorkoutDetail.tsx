@@ -199,7 +199,7 @@ export const WorkoutDetail = ({ workout, onBack, onStartWorkout, onExerciseSelec
       {/* Fixed Header - Transparent, no second background */}
       <div className="fixed top-0 left-0 right-0 z-50 pt-safe">
         {/* Navigation Row */}
-        <div className="flex items-center justify-between px-4 py-3">
+        <div className="flex items-center justify-between px-4 py-3 gap-3">
           <button
             onClick={onBack}
             style={{ pointerEvents: 'auto' }}
@@ -209,7 +209,7 @@ export const WorkoutDetail = ({ workout, onBack, onStartWorkout, onExerciseSelec
           </button>
 
           {/* Title centered */}
-          <div className="flex-1 mx-4 text-center">
+          <div className="flex-1 mx-3 text-center min-w-0">
             <h1 className="text-lg font-bold text-foreground leading-tight line-clamp-1">{workout.name}</h1>
             <p className="text-xs text-muted-foreground">{workout.type}</p>
           </div>
@@ -222,7 +222,7 @@ export const WorkoutDetail = ({ workout, onBack, onStartWorkout, onExerciseSelec
       <div className="pt-16">{/* BUILD 32: Reduced from pt-20 */}
         {/* Stats section - Ultra clean like Home BUILD 32 */}
         <div className="px-4 py-6">
-          <div className="grid grid-cols-2 gap-3">{/* Professional grid layout */}
+          <div className="grid grid-cols-2 gap-4">{/* Professional grid layout */}
             {/* Duração */}
             <div className="flex items-center gap-3 p-3 bg-card/30 rounded-xl border border-border/20">
               <Clock className="w-5 h-5 text-primary flex-shrink-0" />
