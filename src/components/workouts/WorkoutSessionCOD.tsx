@@ -600,9 +600,9 @@ export const WorkoutSessionCOD = ({ workout, onFinish, onExit }: WorkoutSessionC
                     </DropdownMenu>
                 </div>
 
-                {/* Readiness Badge - More subtle */}
+                {/* Readiness Badge - More subtle - BUILD 48: Increased margin */}
                 {readinessLevel && readinessLevel !== 'green' && (
-                    <div className="mx-4 mb-3 flex items-center justify-center gap-2 py-2 px-4 bg-amber-500/10 rounded-xl text-sm border border-amber-500/20">
+                    <div className="mx-4 mb-6 flex items-center justify-center gap-2 py-2 px-4 bg-amber-500/10 rounded-xl text-sm border border-amber-500/20">
                         <AlertTriangle className="w-4 h-4 text-amber-400" />
                         <span className="font-medium text-amber-300 text-xs">{readinessMessage}</span>
                     </div>
@@ -653,8 +653,8 @@ export const WorkoutSessionCOD = ({ workout, onFinish, onExit }: WorkoutSessionC
                 </div>
             </div>
 
-            {/* Scrollable Content Area - Adjusted for smaller header */}
-            <div className="pt-[240px] pb-32 px-4">
+            {/* Scrollable Content Area - BUILD 48: Increased offset to prevent overlap */}
+            <div className="pt-[270px] pb-32 px-4">
                 {/* Current Exercise Info - BUILD 29: Clean design - No background */}
                 <Card className="mb-4 border-border/20 bg-transparent">
                     <CardContent className="p-4">

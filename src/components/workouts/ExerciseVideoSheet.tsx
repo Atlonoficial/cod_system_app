@@ -34,7 +34,7 @@ export const ExerciseVideoSheet = ({
             <div onClick={handleOpen}>
                 {trigger || (
                     <button
-                        className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary/10 text-primary text-sm font-medium hover:bg-primary/20 active:scale-[0.98] transition-all border border-primary/20"
+                        className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-white text-sm font-medium hover:bg-primary/90 active:scale-[0.98] transition-all shadow-md"
                     >
                         <Play className="w-4 h-4" />
                         <span>Ver demonstração</span>

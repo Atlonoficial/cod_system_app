@@ -197,9 +197,10 @@ export const WorkoutDetail = ({ workout, onBack, onStartWorkout, onExerciseSelec
   return (
     <div className="min-h-screen bg-background workout-page">{/* BUILD 25: workout-page remove quadrados */}
       {/* Fixed Header - Transparent, no second background */}
-      <div className="fixed top-0 left-0 right-0 z-50 pt-safe">
+      {/* BUILD 48: Fixed header with increased spacing to prevent overlap with cards */}
+      <div className="fixed top-0 left-0 right-0 z-50 pt-safe bg-background/80 backdrop-blur-sm">
         {/* Navigation Row */}
-        <div className="flex items-center justify-between px-4 py-3 gap-3">
+        <div className="flex items-center justify-between px-4 py-4 gap-3">
           <button
             onClick={onBack}
             style={{ pointerEvents: 'auto' }}
@@ -218,8 +219,8 @@ export const WorkoutDetail = ({ workout, onBack, onStartWorkout, onExerciseSelec
         </div>
       </div>
 
-      {/* Content with top margin to account for fixed header */}
-      <div className="pt-16">{/* BUILD 32: Reduced from pt-20 */}
+      {/* Content with top margin to account for fixed header - BUILD 48: Increased to pt-24 */}
+      <div className="pt-24">
         {/* Stats section - Ultra clean like Home BUILD 32 */}
         <div className="px-4 py-6">
           <div className="grid grid-cols-2 gap-4">{/* Professional grid layout */}
@@ -304,9 +305,10 @@ export const WorkoutDetail = ({ workout, onBack, onStartWorkout, onExerciseSelec
                       exerciseName={exercise.name}
                       onPlay={(e) => handlePlayClick(e, exercise)}
                     />
+                    {/* BUILD 48: Improved button contrast with white text */}
                     <button
                       onClick={() => handleExpandClick(exercise)}
-                      className="px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-xs font-medium hover:bg-primary/20 transition-all active:scale-95"
+                      className="px-3 py-1.5 rounded-lg bg-primary text-white text-xs font-medium hover:bg-primary/90 transition-all active:scale-95 shadow-sm"
                       aria-label="Ver descrição do exercício"
                     >
                       {expandedExercise === exercise.id ? 'Ocultar' : 'Ver descrição'}
