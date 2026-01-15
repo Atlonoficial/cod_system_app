@@ -1,10 +1,10 @@
 /**
  * ExerciseVideoSheet - Native Bottom Sheet for Exercise Videos
- * Build 18: Modal nativo com swipe para fechar
+ * BUILD 50: Otimizado com descrição/orientações e altura compacta
  */
 
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { Play } from "lucide-react";
+import { Play, FileText, Info } from "lucide-react";
 import { VideoPlayer } from "./VideoPlayer";
 import { useHapticFeedback } from "@/hooks/useHapticFeedback";
 import { useState } from "react";
@@ -13,12 +13,16 @@ interface ExerciseVideoSheetProps {
     exerciseName: string;
     videoUrl?: string;
     trigger?: React.ReactNode;
+    description?: string;
+    notes?: string;
 }
 
 export const ExerciseVideoSheet = ({
     exerciseName,
     videoUrl,
-    trigger
+    trigger,
+    description,
+    notes
 }: ExerciseVideoSheetProps) => {
     const { light } = useHapticFeedback();
     const [open, setOpen] = useState(false);
@@ -27,6 +31,11 @@ export const ExerciseVideoSheet = ({
         light();
         setOpen(true);
     };
+
+    // Check if we have any content to show besides video
+    const hasDescription = description && !/^\d+$/.test(description.trim());
+    const hasNotes = notes && notes.trim().length > 0;
+    const hasExtraContent = hasDescription || hasNotes;
 
     return (
         <Sheet open={open} onOpenChange={setOpen}>
@@ -42,11 +51,12 @@ export const ExerciseVideoSheet = ({
                 )}
             </div>
 
+            {/* BUILD 50: Reduced height from 85vh to 70vh, scrollable content */}
             <SheetContent
                 side="bottom"
-                className="h-[85vh] rounded-t-3xl p-0 bg-background border-t border-border/50"
+                className="h-[70vh] rounded-t-3xl p-0 bg-background border-t border-border/50"
             >
-                {/* Indicador de swipe (drag handle) */}
+                {/* Drag handle */}
                 <div className="flex justify-center pt-3 pb-2">
                     <div className="w-12 h-1.5 bg-muted-foreground/30 rounded-full" />
                 </div>
@@ -58,13 +68,53 @@ export const ExerciseVideoSheet = ({
                     </SheetTitle>
                 </SheetHeader>
 
-                {/* Vídeo - Ocupa maior área possível */}
-                <div className="p-4 flex-1 flex items-center justify-center h-[calc(100%-80px)]">
-                    <VideoPlayer
-                        exerciseName={exerciseName}
-                        videoUrl={videoUrl}
-                        className="w-full h-full max-h-full"
-                    />
+                {/* Scrollable content area */}
+                <div className="overflow-y-auto h-[calc(70vh-80px)] px-4 py-4">
+                    {/* Vídeo - Aspect ratio 16:9 */}
+                    <div className="mb-4">
+                        <VideoPlayer
+                            exerciseName={exerciseName}
+                            videoUrl={videoUrl}
+                            className="w-full aspect-video rounded-xl overflow-hidden"
+                        />
+                    </div>
+
+                    {/* Descrição */}
+                    {hasDescription && (
+                        <div className="mb-4">
+                            <div className="flex items-center gap-2 mb-2">
+                                <FileText className="w-4 h-4 text-primary" />
+                                <h4 className="text-sm font-semibold text-foreground">
+                                    Descrição
+                                </h4>
+                            </div>
+                            <p className="text-sm text-muted-foreground leading-relaxed pl-6">
+                                {description}
+                            </p>
+                        </div>
+                    )}
+
+                    {/* Orientações */}
+                    {hasNotes && (
+                        <div className="mb-4">
+                            <div className="flex items-center gap-2 mb-2">
+                                <Info className="w-4 h-4 text-amber-400" />
+                                <h4 className="text-sm font-semibold text-foreground">
+                                    Orientações
+                                </h4>
+                            </div>
+                            <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line pl-6">
+                                {notes}
+                            </p>
+                        </div>
+                    )}
+
+                    {/* Mensagem se não houver conteúdo extra */}
+                    {!hasExtraContent && (
+                        <p className="text-sm text-muted-foreground text-center py-4">
+                            Assista ao vídeo demonstrativo para executar o exercício corretamente.
+                        </p>
+                    )}
                 </div>
             </SheetContent>
         </Sheet>

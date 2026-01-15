@@ -655,34 +655,56 @@ export const WorkoutSessionCOD = ({ workout, onFinish, onExit }: WorkoutSessionC
 
             {/* Scrollable Content Area - BUILD 49: Increased offset to prevent overlap */}
             <div className="pt-[290px] pb-32 px-4">
-                {/* Current Exercise Info - BUILD 29: Clean design - No background */}
-                <Card className="mb-4 border-border/20 bg-transparent">
-                    <CardContent className="p-4">
-                        <h2 className="text-lg font-bold mb-1 text-foreground line-clamp-2">{currentExercise?.name}</h2>
-                        {/* Only show description if it's not purely numeric (hide exercise IDs like "2212") */}
+                {/* Current Exercise Info - BUILD 50: Professional layout with proper spacing */}
+                <Card className="mb-4 border-border/20 bg-card/30 backdrop-blur-sm">
+                    <CardContent className="p-5">
+                        {/* Exercise Title - With proper spacing */}
+                        <h2 className="text-lg font-bold mb-4 text-foreground line-clamp-2 leading-tight">
+                            {currentExercise?.name}
+                        </h2>
+
+                        {/* Exercise Info - Compact badges */}
+                        <div className="flex flex-wrap items-center gap-2 mb-4">
+                            <span className="inline-flex items-center gap-1.5 bg-primary/10 px-2.5 py-1 rounded-full text-xs border border-primary/20">
+                                <Zap className="w-3 h-3 text-primary" />
+                                <span className="font-medium text-foreground">{adaptedSets}</span>
+                                <span className="text-muted-foreground">séries</span>
+                            </span>
+                            <span className="inline-flex items-center gap-1.5 bg-purple-500/10 px-2.5 py-1 rounded-full text-xs border border-purple-500/20">
+                                <Target className="w-3 h-3 text-purple-400" />
+                                <span className="font-medium text-foreground">{adaptedReps}</span>
+                                <span className="text-muted-foreground">reps</span>
+                            </span>
+                            <span className="inline-flex items-center gap-1.5 bg-green-500/10 px-2.5 py-1 rounded-full text-xs border border-green-500/20">
+                                <Clock className="w-3 h-3 text-green-400" />
+                                <span className="font-medium text-foreground">{adaptedRest}s</span>
+                                <span className="text-muted-foreground">descanso</span>
+                            </span>
+                        </div>
+
+                        {/* Description - Only show if it's not purely numeric */}
                         {currentExercise?.description && !/^\d+$/.test(currentExercise.description.trim()) && (
-                            <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{currentExercise?.description}</p>
+                            <p className="text-sm text-muted-foreground mb-4 line-clamp-3 leading-relaxed">
+                                {currentExercise?.description}
+                            </p>
                         )}
 
-                        {/* Adapted Values Badge - mais legível */}
+                        {/* Adapted Values Badge - Only show if not green readiness */}
                         {readinessLevel !== 'green' && (
-                            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary/10 rounded-xl text-xs mb-3 border border-primary/20">
-                                <Zap className="w-3.5 h-3.5 text-primary" />
-                                <span className="font-medium">{adaptedSets} séries</span>
-                                <span className="text-muted-foreground">×</span>
-                                <span className="font-medium">{adaptedReps} reps</span>
-                                <span className="mx-1 text-muted-foreground/50">•</span>
-                                <Clock className="w-3 h-3 text-muted-foreground" />
-                                <span className="text-muted-foreground">{adaptedRest}s</span>
+                            <div className="flex items-center gap-2 mb-4 px-3 py-2 bg-amber-500/10 rounded-xl text-xs border border-amber-500/20">
+                                <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
+                                <span className="text-amber-300">Treino adaptado para sua condição atual</span>
                             </div>
                         )}
 
-                        {/* BUILD 18: Video Player as Native Bottom Sheet */}
+                        {/* Video Button - With description and notes */}
                         {currentExercise?.video_url && (
                             <div className="mt-2">
                                 <ExerciseVideoSheet
                                     exerciseName={currentExercise.name}
                                     videoUrl={currentExercise.video_url}
+                                    description={currentExercise.description}
+                                    notes={currentExercise.notes}
                                 />
                             </div>
                         )}

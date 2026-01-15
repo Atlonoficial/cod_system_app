@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import { ArrowLeft, Clock, Flame, Dumbbell, Play, ChevronDown, CheckCircle2, X, Zap, Timer } from "lucide-react";
+import { ArrowLeft, Clock, Flame, Dumbbell, Play, ChevronDown, CheckCircle2, X, Zap, Timer, FileText, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { VideoPlayer } from "./VideoPlayer";
 import { useExerciseVideo } from "@/hooks/useExerciseVideo";
@@ -18,6 +18,7 @@ interface Exercise {
   duration?: string;
   rest?: string;
   description?: string;
+  notes?: string;
 }
 
 interface WorkoutDetailProps {
@@ -316,9 +317,36 @@ export const WorkoutDetail = ({ workout, onBack, onStartWorkout, onExerciseSelec
                   </div>
                 </div>
 
-                {/* Detalhes expandíveis com animação */}
+                {/* Detalhes expandíveis com animação - BUILD 50: Descrição e orientações */}
                 {expandedExercise === exercise.id && (
-                  <div className="mt-3 pt-3 border-t border-border/20 animate-in slide-in-from-top-2 duration-300">
+                  <div className="mt-4 pt-4 border-t border-border/20 animate-in slide-in-from-top-2 duration-300 space-y-4">
+                    {/* Descrição do exercício */}
+                    {exercise.description && !/^\d+$/.test(exercise.description.trim()) && (
+                      <div>
+                        <div className="flex items-center gap-2 mb-2">
+                          <FileText className="w-4 h-4 text-primary" />
+                          <h4 className="text-sm font-semibold text-foreground">Descrição</h4>
+                        </div>
+                        <p className="text-sm text-muted-foreground leading-relaxed pl-6">
+                          {exercise.description}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Orientações do admin */}
+                    {exercise.notes && (
+                      <div>
+                        <div className="flex items-center gap-2 mb-2">
+                          <Info className="w-4 h-4 text-amber-400" />
+                          <h4 className="text-sm font-semibold text-foreground">Orientações</h4>
+                        </div>
+                        <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line pl-6">
+                          {exercise.notes}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Vídeo demonstrativo */}
                     <ExerciseInfoDisplay exerciseName={exercise.name} />
                   </div>
                 )}
