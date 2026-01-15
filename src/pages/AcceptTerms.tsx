@@ -147,7 +147,7 @@ export const AcceptTerms = () => {
                 Os Termos de Uso definem as regras de utilização do aplicativo, suas responsabilidades e nossos compromissos.
               </p>
               <a
-                href="https://exemplo.com/terms"
+                href="https://metodocod.com/termos-de-uso"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-primary underline hover:text-primary/80 text-sm font-medium"
@@ -162,13 +162,28 @@ export const AcceptTerms = () => {
                 Nossa Política de Privacidade explica como coletamos, usamos e protegemos seus dados pessoais.
               </p>
               <a
-                href="https://exemplo.com/privacy"
+                href="https://metodocod.com/politica-de-privacidade"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-primary underline hover:text-primary/80 text-sm font-medium"
               >
                 Ler Política de Privacidade completa →
               </a>
+            </div>
+
+            <div className="border-t border-border pt-4">
+              <h3 className="font-semibold mb-2">🤖 Serviços de Terceiros</h3>
+              <p className="text-sm text-muted-foreground mb-2">
+                Utilizamos serviços confiáveis para melhorar sua experiência:
+              </p>
+              <ul className="text-sm text-muted-foreground space-y-1 ml-4 list-disc">
+                <li><strong>Supabase</strong> - Armazenamento seguro de dados</li>
+                <li><strong>OneSignal</strong> - Notificações push</li>
+                <li><strong>Apple HealthKit</strong> - Dados de saúde (opcional)</li>
+              </ul>
+              <p className="text-xs text-muted-foreground mt-2 italic">
+                Seus dados NÃO são usados para treinamento de inteligência artificial.
+              </p>
             </div>
           </div>
 

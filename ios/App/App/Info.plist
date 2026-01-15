@@ -51,17 +51,17 @@
 	<key>NSCameraUsageDescription</key>
 	<string>Precisamos da câmera para que você possa enviar fotos do seu progresso físico e das suas refeições para o acompanhamento do professor.</string>
 	<key>NSUserTrackingUsageDescription</key>
-	<string>Seus dados serão usados para entregar anúncios personalizados e melhorar sua experiência no app.</string>
+	<string>Coletamos dados anônimos de uso para melhorar o app e entender quais funcionalidades são mais úteis. Você pode recusar sem perder acesso.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Usamos sua localização apenas para enviar notificações relevantes sobre treinos próximos a você.</string>
+	<string>Sua localização é usada opcionalmente para identificar academias próximas e personalizar recomendações de treino outdoor.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Usamos sua localização apenas para enviar notificações relevantes sobre treinos próximos a você.</string>
+	<string>Sua localização pode ser usada em segundo plano para rastrear corridas e treinos ao ar livre com GPS.</string>
 	<key>NSUserNotificationsUsageDescription</key>
 	<string>Este app envia notificações para lembrar sobre treinos e refeições.</string>
 	<key>NSHealthShareUsageDescription</key>
-	<string>Usamos dados do Apple Health para monitorar seu progresso de treino, passos, calorias e atividade física.</string>
+	<string>Acessamos dados de saúde (sono, passos, frequência cardíaca, variabilidade cardíaca) para personalizar seus treinos e monitorar sua recuperação muscular. Nenhum dado de saúde é compartilhado com terceiros.</string>
 	<key>NSHealthUpdateUsageDescription</key>
-	<string>Registramos dados de exercícios concluídos para acompanhamento do seu progresso.</string>
+	<string>Registramos dados de exercícios concluídos (duração, calorias queimadas) no Apple Health para seu acompanhamento pessoal.</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>CFBundleURLTypes</key>
