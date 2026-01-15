@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, useLocation, useNavigate } from "react-ro
 import { useEffect, Suspense } from "react";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import { TermsGuard } from "@/components/auth/TermsGuard";
+import { MembershipGate } from "@/components/auth/MembershipGate";
 // Gamification imports removed
 import { SecurityProvider } from "@/components/security/SecurityProvider";
 import { ErrorBoundary } from "@/components/common/ErrorBoundary";
@@ -121,11 +122,13 @@ const AuthenticatedApp = () => {
         {/* ✅ BUILD 37: Fallback para variações de URL de confirmação */}
         <Route path="/auth/callback" element={<AuthConfirm />} />
 
-        {/* Protected routes (with TermsGuard) */}
+        {/* Protected routes (with TermsGuard + MembershipGate) */}
         <Route path="/" element={
           <AuthGuard>
             <TermsGuard>
-              <Index />
+              <MembershipGate>
+                <Index />
+              </MembershipGate>
             </TermsGuard>
           </AuthGuard>
         } />
