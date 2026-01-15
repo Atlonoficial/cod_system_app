@@ -35,6 +35,7 @@ import { LazyTeacherStudentChat } from "./pages/lazy/LazyTeacherStudentChat";
 import { LazyAgenda } from "./pages/lazy/LazyAgenda";
 import { LazyMetas } from "./pages/lazy/LazyMetas";
 import PoliticaPrivacidade from "./pages/PoliticaPrivacidade";
+import TermosDeUso from "./pages/TermosDeUso";
 
 
 // LazyCursos removed
@@ -99,6 +100,7 @@ const AuthenticatedApp = () => {
       <Routes>
         {/* Public routes (no AuthGuard, no TermsGuard) */}
         <Route path="/politica-privacidade" element={<PoliticaPrivacidade />} />
+        <Route path="/termos-de-uso" element={<TermosDeUso />} />
         <Route path="/accept-terms" element={<AcceptTerms />} />
 
         {/* Authentication Routes */}
