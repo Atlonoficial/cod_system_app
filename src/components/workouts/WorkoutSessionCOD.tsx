@@ -653,8 +653,8 @@ export const WorkoutSessionCOD = ({ workout, onFinish, onExit }: WorkoutSessionC
                 </div>
             </div>
 
-            {/* Scrollable Content Area - BUILD 48: Increased offset to prevent overlap */}
-            <div className="pt-[270px] pb-32 px-4">
+            {/* Scrollable Content Area - BUILD 49: Increased offset to prevent overlap */}
+            <div className="pt-[290px] pb-32 px-4">
                 {/* Current Exercise Info - BUILD 29: Clean design - No background */}
                 <Card className="mb-4 border-border/20 bg-transparent">
                     <CardContent className="p-4">

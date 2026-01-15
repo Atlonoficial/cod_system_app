@@ -219,8 +219,8 @@ export const WorkoutDetail = ({ workout, onBack, onStartWorkout, onExerciseSelec
         </div>
       </div>
 
-      {/* Content with top margin to account for fixed header - BUILD 48: Increased to pt-24 */}
-      <div className="pt-24">
+      {/* Content with top margin to account for fixed header - BUILD 49: Increased to pt-32 */}
+      <div className="pt-32">
         {/* Stats section - Ultra clean like Home BUILD 32 */}
         <div className="px-4 py-6">
           <div className="grid grid-cols-2 gap-4">{/* Professional grid layout */}
