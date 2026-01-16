@@ -124,10 +124,10 @@ export const ExerciseVideoSheet = ({
                 )}
             </div>
 
-            {/* BUILD 50: Reduced height from 85vh to 70vh, scrollable content */}
+            {/* BUILD 55: Increased height from 70vh to 85vh for better video display */}
             <SheetContent
                 side="bottom"
-                className="h-[70vh] rounded-t-3xl p-0 bg-background border-t border-border/50"
+                className="h-[85vh] rounded-t-3xl p-0 bg-background border-t border-border/50"
             >
                 {/* Drag handle */}
                 <div className="flex justify-center pt-3 pb-2">
@@ -141,8 +141,8 @@ export const ExerciseVideoSheet = ({
                     </SheetTitle>
                 </SheetHeader>
 
-                {/* Scrollable content area */}
-                <div className="overflow-y-auto h-[calc(70vh-80px)] px-4 py-4">
+                {/* Scrollable content area - BUILD 55: Adjusted calc for 85vh */}
+                <div className="overflow-y-auto h-[calc(85vh-80px)] px-4 py-4">
                     {/* Vídeo - Aspect ratio 16:9 */}
                     <div className="mb-4">
                         <VideoPlayer
