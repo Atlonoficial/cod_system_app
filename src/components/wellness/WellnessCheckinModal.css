@@ -112,6 +112,7 @@
     margin-bottom: 2rem;
 }
 
+/* BUILD 53: Slider com suporte a touch para apps nativos iOS/Android */
 .wellness-slider {
     --knob-size: 32px;
     --knob-background: #fff;
@@ -119,6 +120,11 @@
     --pin-background: var(--bar-background-active);
     --pin-color: #fff;
     padding: 0;
+    /* CRITICAL: Touch-action para apps nativos */
+    touch-action: none !important;
+    -webkit-touch-action: none !important;
+    -webkit-user-select: none !important;
+    user-select: none !important;
 }
 
 .wellness-labels {

@@ -313,23 +313,45 @@ export const useWeeklyFeedback = () => {
     }
 
     // PROTEÇÃO 3: Verificar no banco de dados se já enviou HOJE
+    // BUILD 53: Corrigido para buscar students.id correto (FK) em vez de user.id (auth.uid)
     try {
-      const todayStart = new Date(today + 'T00:00:00').toISOString();
-      const { data: todayFeedback } = await supabase
-        .from('feedbacks')
+      // PRIMEIRO: Buscar o ID correto da tabela students
+      const { data: studentRecord, error: studentError } = await supabase
+        .from('students')
         .select('id')
-        .eq('student_id', user.id)
+        .eq('user_id', user.id)
         .eq('teacher_id', finalTeacherId)
-        .eq('type', 'periodic_feedback')
-        .gte('created_at', todayStart)
-        .limit(1)
         .maybeSingle();
 
-      if (todayFeedback) {
-        console.log('[Feedback] ❌ Feedback already sent today (database check)');
-        localStorage.setItem(feedbackKey, 'true'); // Sincronizar localStorage
-        setFeedbackSubmittedToday(true);
-        return false;
+      if (studentError) {
+        console.error('[Feedback] Error fetching student record:', studentError);
+      }
+
+      const realStudentId = studentRecord?.id;
+      console.log('[Feedback] BUILD 53 - Student ID mapping:', {
+        authUserId: user.id,
+        studentsTableId: realStudentId
+      });
+
+      // DEPOIS: Verificar usando o ID correto da tabela students
+      if (realStudentId) {
+        const todayStart = new Date(today + 'T00:00:00').toISOString();
+        const { data: todayFeedback } = await supabase
+          .from('feedbacks')
+          .select('id')
+          .eq('student_id', realStudentId)  // ✅ BUILD 53: Usa students.id correto
+          .eq('teacher_id', finalTeacherId)
+          .eq('type', 'periodic_feedback')
+          .gte('created_at', todayStart)
+          .limit(1)
+          .maybeSingle();
+
+        if (todayFeedback) {
+          console.log('[Feedback] ❌ Feedback already sent today (database check with correct student_id)');
+          localStorage.setItem(feedbackKey, 'true'); // Sincronizar localStorage
+          setFeedbackSubmittedToday(true);
+          return false;
+        }
       }
     } catch (error) {
       console.error('[Feedback] Error checking today feedback:', error);
