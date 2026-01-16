@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef, useMemo } from "react";
+ï»¿import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { ArrowLeft, MoreVertical, Flag, Activity, Play, ChevronUp, Clock, Zap, Target, TrendingUp, AlertTriangle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -337,13 +337,13 @@ export const WorkoutSessionCOD = ({ workout, onFinish, onExit }: WorkoutSessionC
         // Update total volume
         // Total volume auto-updates via useMemo
 
-        toast.success(`Série ${currentSetNumber} registrada! ${reps}×${weight}kg RPE:${rpe}`);
+        toast.success(`SÃ©rie ${currentSetNumber} registrada! ${reps}Ã—${weight}kg RPE:${rpe}`);
 
         // Check if all sets done
         if (currentSetNumber >= adaptedSets) {
             // Exercise complete - show timer for transition
             await haptics.success();
-            toast.success('?? Exercício concluído!');
+            toast.success('?? ExercÃ­cio concluÃ­do!');
             setShowSetLogger(false);
             setShowTimer(true);
         } else {
@@ -584,7 +584,7 @@ export const WorkoutSessionCOD = ({ workout, onFinish, onExit }: WorkoutSessionC
                         <DropdownMenuTrigger asChild>
                             <button
                                 className="w-10 h-10 rounded-xl flex items-center justify-center hover:bg-card/30 transition-colors"
-                                aria-label="Menu de opções"
+                                aria-label="Menu de opÃ§Ãµes"
                             >
                                 <MoreVertical className="w-5 h-5 text-foreground" />
                             </button>
@@ -619,7 +619,7 @@ export const WorkoutSessionCOD = ({ workout, onFinish, onExit }: WorkoutSessionC
                         />
                     </div>
                     <div className="flex justify-between text-xs text-muted-foreground mt-1.5">
-                        <span>Exercício {currentExerciseIndex + 1}/{workout.exercises.length}</span>
+                        <span>ExercÃ­cio {currentExerciseIndex + 1}/{workout.exercises.length}</span>
                         <span className="font-medium text-primary">{Math.round(progressPercent)}%</span>
                     </div>
                 </div>
@@ -629,7 +629,7 @@ export const WorkoutSessionCOD = ({ workout, onFinish, onExit }: WorkoutSessionC
                     <div className="p-2 text-center">
                         <div className="flex items-center justify-center gap-1 mb-1">
                             <Target className="w-4 h-4 text-primary" />
-                            <p className="text-[10px] text-muted-foreground">Séries</p>
+                            <p className="text-[10px] text-muted-foreground">SÃ©ries</p>
                         </div>
                         <p className="text-xl font-bold text-foreground">{displaySetsCount}/{adaptedSets}</p>
                     </div>
@@ -670,7 +670,7 @@ export const WorkoutSessionCOD = ({ workout, onFinish, onExit }: WorkoutSessionC
                             <span className="inline-flex items-center gap-1.5 bg-primary/10 px-2.5 py-1 rounded-full text-xs border border-primary/20">
                                 <Zap className="w-3 h-3 text-primary" />
                                 <span className="font-medium text-foreground">{adaptedSets}</span>
-                                <span className="text-muted-foreground">séries</span>
+                                <span className="text-muted-foreground">sÃ©ries</span>
                             </span>
                             <span className="inline-flex items-center gap-1.5 bg-purple-500/10 px-2.5 py-1 rounded-full text-xs border border-purple-500/20">
                                 <Target className="w-3 h-3 text-purple-400" />
@@ -695,7 +695,7 @@ export const WorkoutSessionCOD = ({ workout, onFinish, onExit }: WorkoutSessionC
                         {readinessLevel !== 'green' && (
                             <div className="flex items-center gap-2 mb-4 px-3 py-2 bg-amber-500/10 rounded-xl text-xs border border-amber-500/20">
                                 <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
-                                <span className="text-amber-300">Treino adaptado para sua condição atual</span>
+                                <span className="text-amber-300">Treino adaptado para sua condiÃ§Ã£o atual</span>
                             </div>
                         )}
 
@@ -736,7 +736,7 @@ export const WorkoutSessionCOD = ({ workout, onFinish, onExit }: WorkoutSessionC
                 {showTimer && (
                     <div className="bg-white/5 rounded-2xl p-4">
                         <h3 className="text-center text-muted-foreground mb-4">
-                            {currentSetNumber > adaptedSets ? 'Próximo exercício em...' : `Descanso - Série ${currentSetNumber}`}
+                            {currentSetNumber > adaptedSets ? 'PrÃ³ximo exercÃ­cio em...' : `Descanso - SÃ©rie ${currentSetNumber}`}
                         </h3>
                         <AGTTimer
                             restSeconds={adaptedRest}
@@ -754,7 +754,7 @@ export const WorkoutSessionCOD = ({ workout, onFinish, onExit }: WorkoutSessionC
                         className="w-full mt-4"
                         onClick={handleNextExercise}
                     >
-                        Pular para próximo exercício
+                        Pular para prÃ³ximo exercÃ­cio
                     </Button>
                 )}
             </div>
@@ -824,11 +824,11 @@ export const WorkoutSessionCOD = ({ workout, onFinish, onExit }: WorkoutSessionC
                     <AlertDialogHeader>
                         <AlertDialogTitle>Finalizar treino antecipadamente?</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Você ainda não completou todos os exercícios. Tem certeza que deseja finalizar o treino agora?
+                            VocÃª ainda nÃ£o completou todos os exercÃ­cios. Tem certeza que deseja finalizar o treino agora?
                             <br /><br />
                             <strong>Progresso atual:</strong>
-                            <br />• Exercício {currentExerciseIndex + 1} de {workout.exercises.length}
-                            <br />• Séries completadas: {completedSetsCount}/{adaptedSets}
+                            <br />Â• ExercÃ­cio {currentExerciseIndex + 1} de {workout.exercises.length}
+                            <br />Â• SÃ©ries completadas: {completedSetsCount}/{adaptedSets}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
@@ -849,12 +849,12 @@ export const WorkoutSessionCOD = ({ workout, onFinish, onExit }: WorkoutSessionC
                     <AlertDialogHeader>
                         <AlertDialogTitle>Sair do treino?</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Seu progresso será salvo automaticamente e você poderá continuar depois.
+                            Seu progresso serÃ¡ salvo automaticamente e vocÃª poderÃ¡ continuar depois.
                             <br /><br />
                             <strong>Progresso atual:</strong>
-                            <br />• Tempo: {formatTime(time)}
-                            <br />• Exercício {currentExerciseIndex + 1} de {workout.exercises.length}
-                            <br />• Volume total: {totalVolume}kg
+                            <br />Â• Tempo: {formatTime(time)}
+                            <br />Â• ExercÃ­cio {currentExerciseIndex + 1} de {workout.exercises.length}
+                            <br />Â• Volume total: {totalVolume}kg
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
@@ -876,5 +876,6 @@ export const WorkoutSessionCOD = ({ workout, onFinish, onExit }: WorkoutSessionC
 };
 
 export default WorkoutSessionCOD;
+
 
 
