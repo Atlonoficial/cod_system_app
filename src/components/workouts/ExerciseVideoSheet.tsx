@@ -1,6 +1,6 @@
 /**
  * ExerciseVideoSheet - Native Bottom Sheet for Exercise Videos
- * BUILD 52: Com instruções do admin e gradiente verde
+ * BUILD 53: Corrigido parser de instruções para array JSON do banco
  */
 
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
@@ -34,18 +34,41 @@ export const ExerciseVideoSheet = ({
         setOpen(true);
     };
 
-    // Normalize instructions to string format
+    // BUILD 53: Normalize instructions to string format
+    // Corrigido para lidar com array JSON do banco de dados
     const normalizeInstructions = (): string => {
         if (!instructions) return '';
 
-        // If already a string, return as-is
+        // BUILD 53: Se for string mas parecer JSON, tentar parsear
         if (typeof instructions === 'string') {
+            // Se começa com [ ou {, pode ser JSON string
+            const trimmed = instructions.trim();
+            if (trimmed.startsWith('[') || trimmed.startsWith('{')) {
+                try {
+                    const parsed = JSON.parse(trimmed);
+                    if (Array.isArray(parsed)) {
+                        return parsed.join('\n');
+                    }
+                    return trimmed; // Retorna original se não for array
+                } catch {
+                    return trimmed; // Se falhar o parse, retorna original
+                }
+            }
             return instructions;
         }
 
-        // If array (from database), join with line breaks
+        // Se já for array (do database), join com line breaks
         if (Array.isArray(instructions)) {
             return instructions.join('\n');
+        }
+
+        // BUILD 53: Se for objeto, tentar converter para string
+        if (typeof instructions === 'object') {
+            try {
+                return JSON.stringify(instructions);
+            } catch {
+                return '';
+            }
         }
 
         return '';
