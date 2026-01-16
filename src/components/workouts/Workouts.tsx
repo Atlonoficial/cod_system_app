@@ -339,31 +339,7 @@ export const Workouts = () => {
         <p className="text-muted-foreground">Escolha seu treino e vamos começar!</p>
       </div>
 
-      {/* Search and Filter */}
-      <div className="mb-6 space-y-4">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-          <input
-            placeholder="Buscar treinos..."
-            className="w-full pl-10 pr-4 py-3 bg-card/50 border border-border/50 rounded-2xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent/50"
-          />
-        </div>
-
-        {/* Filter chips */}
-        <div className="flex gap-2 overflow-x-auto pb-2">
-          {muscleGroups.map((group) => (
-            <button
-              key={group}
-              className={`px-4 py-2 rounded-2xl text-sm font-medium whitespace-nowrap transition-colors ${group === "Todos"
-                ? "bg-accent text-background"
-                : "bg-card/50 text-muted-foreground hover:bg-card/70"
-                }`}
-            >
-              {group}
-            </button>
-          ))}
-        </div>
-      </div>
+      {/* BUILD 56: Removed search and filter for cleaner UI */}
 
       {/* Workout Grid - Mesocycle Hierarchy or Flat List */}
       {hasMesocycles ? (
@@ -461,70 +437,38 @@ export const Workouts = () => {
           {workouts.map((workout) => {
             const mode = workout.scheduling_mode || 'flexible';
 
-            // FLEXIBLE MODE: Show all sessions as a grid
+            // FLEXIBLE MODE: Show all sessions as a simple grid
+            // BUILD 56: Removed "Sugestão para Hoje" section for cleaner UI
             if (mode === 'flexible') {
               return (
-                <div key={workout.id} className="space-y-4">
-                  {currentSession?.sessionIndex !== undefined && (
-                    <div className="bg-gradient-to-br from-accent/10 to-transparent p-4 rounded-2xl border border-accent/20">
-                      <h3 className="text-sm font-semibold text-accent mb-3 flex items-center gap-2">
-                        <Target className="w-4 h-4" />
-                        Sugestão para Hoje
-                      </h3>
-                      <WorkoutCard
-                        name={currentSession.sessionName}
-                        duration={currentSession.estimatedDuration || 0}
-                        difficulty={difficultyPt(currentSession.difficulty)}
-                        calories={isNaN(currentSession.estimatedDuration) ? 0 : Math.round((currentSession.estimatedDuration || 0) * 8)} // Estimate
-                        muscleGroup={workout.sessions?.[currentSession.sessionIndex]?.exercises?.[0]?.muscle_groups?.join(', ') || 'Geral'}
-                        isCompleted={false} // Todo: check history
-                        onClick={() => {
-                          // Construct a workout object that represents this session
-                          const session = workout.sessions[currentSession.sessionIndex];
-                          const sessionWorkout = {
-                            ...workout,
-                            name: session.name,
-                            sessions: [session] // Explicitly set only this session
-                          };
-                          handleWorkoutSelect(sessionWorkout);
-                        }}
-                        highlighted
-                      />
+                <div key={workout.id} className="grid grid-cols-1 gap-3">
+                  {workout.sessions.map((session, idx) => (
+                    <div
+                      key={session.id}
+                      onClick={() => {
+                        const sessionWorkout = {
+                          ...workout,
+                          name: session.name,
+                          sessions: [session]
+                        };
+                        handleWorkoutSelect(sessionWorkout);
+                      }}
+                      className="flex items-center gap-4 p-4 bg-card/50 rounded-2xl border border-border/50 hover:bg-card hover:border-accent/30 transition-all cursor-pointer"
+                    >
+                      <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center text-foreground font-bold text-lg">
+                        {String.fromCharCode(65 + idx)}
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-foreground">{session.name}</h4>
+                        <p className="text-xs text-muted-foreground flex items-center gap-2 mt-1">
+                          <span>{session.exercises.length} exercícios</span>
+                          <span>•</span>
+                          <span>~{estimateWorkoutDuration({ sessions: [session] })} min</span>
+                        </p>
+                      </div>
+                      <ChevronRight className="w-5 h-5 text-muted-foreground" />
                     </div>
-                  )}
-
-                  <div>
-                    <h3 className="text-sm text-muted-foreground mb-3 uppercase tracking-wider font-medium">Todos os Treinos</h3>
-                    <div className="grid grid-cols-1 gap-3">
-                      {workout.sessions.map((session, idx) => (
-                        <div
-                          key={session.id}
-                          onClick={() => {
-                            const sessionWorkout = {
-                              ...workout,
-                              name: session.name,
-                              sessions: [session]
-                            };
-                            handleWorkoutSelect(sessionWorkout);
-                          }}
-                          className="flex items-center gap-4 p-4 bg-card/50 rounded-2xl border border-border/50 hover:bg-card hover:border-accent/30 transition-all cursor-pointer"
-                        >
-                          <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center text-foreground font-bold text-lg">
-                            {String.fromCharCode(65 + idx)}
-                          </div>
-                          <div className="flex-1">
-                            <h4 className="font-semibold text-foreground">{session.name}</h4>
-                            <p className="text-xs text-muted-foreground flex items-center gap-2 mt-1">
-                              <span>{session.exercises.length} exercícios</span>
-                              <span>•</span>
-                              <span>~{estimateWorkoutDuration({ sessions: [session] })} min</span>
-                            </p>
-                          </div>
-                          <ChevronRight className="w-5 h-5 text-muted-foreground" />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+                  ))}
                 </div>
               );
             }
