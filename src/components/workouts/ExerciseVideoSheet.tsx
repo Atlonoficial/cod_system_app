@@ -34,35 +34,46 @@ export const ExerciseVideoSheet = ({
         setOpen(true);
     };
 
-    // BUILD 53: Normalize instructions to string format
-    // Corrigido para lidar com array JSON do banco de dados
+    // BUILD 55: Normalize instructions to string format
+    // Corrigido para lidar com array do PostgreSQL (text[])
     const normalizeInstructions = (): string => {
+        // DEBUG: Ver exatamente o que está chegando
+        console.log('[ExerciseVideoSheet] instructions received:', {
+            value: instructions,
+            type: typeof instructions,
+            isArray: Array.isArray(instructions),
+            length: instructions ? (Array.isArray(instructions) ? instructions.length : String(instructions).length) : 0
+        });
+
         if (!instructions) return '';
 
-        // BUILD 53: Se for string mas parecer JSON, tentar parsear
+        // PRIORIDADE 1: Se já for array (do PostgreSQL text[]), join diretamente
+        if (Array.isArray(instructions)) {
+            console.log('[ExerciseVideoSheet] Processing as array, length:', instructions.length);
+            return instructions.join('\n');
+        }
+
+        // PRIORIDADE 2: Se for string, verificar se é JSON
         if (typeof instructions === 'string') {
-            // Se começa com [ ou {, pode ser JSON string
             const trimmed = instructions.trim();
+
+            // Tentar parsear como JSON se parecer JSON
             if (trimmed.startsWith('[') || trimmed.startsWith('{')) {
                 try {
                     const parsed = JSON.parse(trimmed);
                     if (Array.isArray(parsed)) {
+                        console.log('[ExerciseVideoSheet] Parsed JSON array, length:', parsed.length);
                         return parsed.join('\n');
                     }
-                    return trimmed; // Retorna original se não for array
+                    return trimmed;
                 } catch {
-                    return trimmed; // Se falhar o parse, retorna original
+                    return trimmed;
                 }
             }
             return instructions;
         }
 
-        // Se já for array (do database), join com line breaks
-        if (Array.isArray(instructions)) {
-            return instructions.join('\n');
-        }
-
-        // BUILD 53: Se for objeto, tentar converter para string
+        // PRIORIDADE 3: Se for objeto, tentar converter
         if (typeof instructions === 'object') {
             try {
                 return JSON.stringify(instructions);

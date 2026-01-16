@@ -19,7 +19,7 @@ export interface Exercise {
   muscle_groups?: string[];
   equipment?: string[];
   difficulty?: string;
-  instructions?: string;
+  instructions?: string[] | null;  // BUILD 55: Corrigido para array (PostgreSQL text[])
   video_url?: string;
   image_url?: string;
 }
@@ -85,7 +85,7 @@ export const useWorkouts = () => {
                 muscle_groups: ex.muscle_groups || [],
                 equipment: ex.equipment || [],
                 difficulty: ex.difficulty || plan.difficulty,
-                instructions: ex.instructions || ex.notes || '',
+                instructions: ex.instructions || [],  // BUILD 55: Preservar array, não converter para string
                 video_url: ex.video_url || '',
                 image_url: ex.image_url || ''
               };
@@ -120,7 +120,7 @@ export const useWorkouts = () => {
               muscle_groups: ex.muscle_groups || [],
               equipment: ex.equipment || [],
               difficulty: ex.difficulty || plan.difficulty,
-              instructions: ex.instructions || ex.notes || '',
+              instructions: ex.instructions || [],  // BUILD 55: Preservar array
               video_url: ex.video_url || '',
               image_url: ex.image_url || ''
             };
