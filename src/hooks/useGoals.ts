@@ -59,7 +59,7 @@ export const useGoals = () => {
     if (!user?.id) return false;
 
     try {
-      // BUILD 57: Enviar apenas campos válidos para evitar erros de schema
+      // BUILD 57: Enviar APENAS campos que existem na tabela
       const insertData = {
         user_id: user.id,
         title: goalData.title,
@@ -72,10 +72,8 @@ export const useGoals = () => {
         status: goalData.status || 'active',
         start_date: goalData.start_date || new Date().toISOString().split('T')[0],
         target_date: goalData.target_date || null,
-        points_reward: goalData.points_reward || 100,
-        // Removido is_challenge_based pois pode causar conflito de schema
-        challenge_id: goalData.challenge_id || null,
-        metadata: goalData.metadata || null
+        points_reward: goalData.points_reward || 100
+        // REMOVIDO: challenge_id, metadata, is_challenge_based - não existem na tabela
       };
 
       console.log('[useGoals] Creating goal with data:', insertData);
