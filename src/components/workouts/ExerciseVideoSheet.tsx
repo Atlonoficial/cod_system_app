@@ -1,6 +1,6 @@
 /**
  * ExerciseVideoSheet - Native Bottom Sheet for Exercise Videos
- * BUILD 54: Corrigido parser de instruções para array JSON do banco
+ * BUILD 55: Corrigido parser de instruções + tipo string[] no types.ts
  */
 
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";

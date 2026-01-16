@@ -1,5 +1,5 @@
 /**
- * BUILD 54: Slider com suporte TOTAL a touch para iOS/Android NATIVO
+ * BUILD 55: Slider com suporte TOTAL a touch para iOS/Android NATIVO
  * CRITICAL: touch-action: none aplicado INLINE para máxima prioridade
  * - onTouchStart handler para prevenir propagação de eventos
  * - Área de toque expandida para 44x44px (Apple HIG compliance)
