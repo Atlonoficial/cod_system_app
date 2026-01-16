@@ -1,12 +1,13 @@
 /**
  * ExerciseVideoSheet - Native Bottom Sheet for Exercise Videos
- * BUILD 55: Corrigido parser de instruções + tipo string[] no types.ts
+ * BUILD 55: Busca instruções diretamente do banco via useExerciseVideo
  */
 
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { Play, FileText, Info } from "lucide-react";
+import { Play, FileText, Info, Loader2 } from "lucide-react";
 import { VideoPlayer } from "./VideoPlayer";
 import { useHapticFeedback } from "@/hooks/useHapticFeedback";
+import { useExerciseVideo } from "@/hooks/useExerciseVideo";
 import { useState } from "react";
 
 interface ExerciseVideoSheetProps {
@@ -23,46 +24,47 @@ export const ExerciseVideoSheet = ({
     videoUrl,
     trigger,
     description,
-    instructions,
+    instructions: propInstructions,
     notes
 }: ExerciseVideoSheetProps) => {
     const { light } = useHapticFeedback();
     const [open, setOpen] = useState(false);
+
+    // BUILD 55: Buscar instruções diretamente do banco de dados
+    const { instructions: dbInstructions, loading: dbLoading } = useExerciseVideo(exerciseName);
 
     const handleOpen = () => {
         light();
         setOpen(true);
     };
 
-    // BUILD 55: Normalize instructions to string format
-    // Corrigido para lidar com array do PostgreSQL (text[])
-    const normalizeInstructions = (): string => {
-        // DEBUG: Ver exatamente o que está chegando
-        console.log('[ExerciseVideoSheet] instructions received:', {
-            value: instructions,
-            type: typeof instructions,
-            isArray: Array.isArray(instructions),
-            length: instructions ? (Array.isArray(instructions) ? instructions.length : String(instructions).length) : 0
-        });
-
-        if (!instructions) return '';
-
-        // PRIORIDADE 1: Se já for array (do PostgreSQL text[]), join diretamente
-        if (Array.isArray(instructions)) {
-            console.log('[ExerciseVideoSheet] Processing as array, length:', instructions.length);
-            return instructions.join('\n');
+    // BUILD 55: Use instruções do banco (prioridade) ou props (fallback)
+    // dbInstructions já vem formatado como string do hook
+    const getInstructionsText = (): string => {
+        // PRIORIDADE 1: Instruções do banco (já formatadas pelo hook)
+        if (dbInstructions && dbInstructions.trim().length > 0) {
+            console.log('[ExerciseVideoSheet] Using DB instructions, length:', dbInstructions.length);
+            return dbInstructions;
         }
 
-        // PRIORIDADE 2: Se for string, verificar se é JSON
-        if (typeof instructions === 'string') {
-            const trimmed = instructions.trim();
+        // PRIORIDADE 2: Instruções das props
+        if (!propInstructions) return '';
 
-            // Tentar parsear como JSON se parecer JSON
+        // Se for array, join
+        if (Array.isArray(propInstructions)) {
+            console.log('[ExerciseVideoSheet] Using prop array, length:', propInstructions.length);
+            return propInstructions.join('\n');
+        }
+
+        // Se for string
+        if (typeof propInstructions === 'string') {
+            const trimmed = propInstructions.trim();
+
+            // Tentar parsear se parecer JSON
             if (trimmed.startsWith('[') || trimmed.startsWith('{')) {
                 try {
                     const parsed = JSON.parse(trimmed);
                     if (Array.isArray(parsed)) {
-                        console.log('[ExerciseVideoSheet] Parsed JSON array, length:', parsed.length);
                         return parsed.join('\n');
                     }
                     return trimmed;
@@ -70,16 +72,7 @@ export const ExerciseVideoSheet = ({
                     return trimmed;
                 }
             }
-            return instructions;
-        }
-
-        // PRIORIDADE 3: Se for objeto, tentar converter
-        if (typeof instructions === 'object') {
-            try {
-                return JSON.stringify(instructions);
-            } catch {
-                return '';
-            }
+            return propInstructions;
         }
 
         return '';
@@ -87,8 +80,8 @@ export const ExerciseVideoSheet = ({
 
     // Check if we have any content to show besides video
     const hasDescription = description && !/^\d+$/.test(description.trim());
-    const instructionsText = normalizeInstructions();
-    const hasInstructions = instructionsText && instructionsText.trim().length > 0;
+    const instructionsText = getInstructionsText();
+    const hasInstructions = instructionsText && instructionsText.trim().length > 0 && !/^\d+$/.test(instructionsText.trim());
     const hasNotes = notes && notes.trim().length > 0;
     const hasExtraContent = hasDescription || hasInstructions || hasNotes;
 
