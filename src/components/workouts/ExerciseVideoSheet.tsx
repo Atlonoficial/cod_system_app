@@ -1,6 +1,6 @@
 /**
  * ExerciseVideoSheet - Native Bottom Sheet for Exercise Videos
- * BUILD 51: Com instruções do admin e gradiente verde
+ * BUILD 52: Com instruções do admin e gradiente verde
  */
 
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
@@ -14,7 +14,7 @@ interface ExerciseVideoSheetProps {
     videoUrl?: string;
     trigger?: React.ReactNode;
     description?: string;
-    instructions?: string;
+    instructions?: string | string[];
     notes?: string;
 }
 
@@ -34,9 +34,27 @@ export const ExerciseVideoSheet = ({
         setOpen(true);
     };
 
+    // Normalize instructions to string format
+    const normalizeInstructions = (): string => {
+        if (!instructions) return '';
+
+        // If already a string, return as-is
+        if (typeof instructions === 'string') {
+            return instructions;
+        }
+
+        // If array (from database), join with line breaks
+        if (Array.isArray(instructions)) {
+            return instructions.join('\n');
+        }
+
+        return '';
+    };
+
     // Check if we have any content to show besides video
     const hasDescription = description && !/^\d+$/.test(description.trim());
-    const hasInstructions = instructions && instructions.trim().length > 0;
+    const instructionsText = normalizeInstructions();
+    const hasInstructions = instructionsText && instructionsText.trim().length > 0;
     const hasNotes = notes && notes.trim().length > 0;
     const hasExtraContent = hasDescription || hasInstructions || hasNotes;
 
@@ -100,7 +118,7 @@ export const ExerciseVideoSheet = ({
                         />
                     </div>
 
-                    {/* Instruções do Admin - BUILD 51: Campo principal */}
+                    {/* Instruções do Admin - BUILD 52: Campo principal */}
                     {hasInstructions && (
                         <div className="mb-4">
                             <div className="flex items-center gap-2 mb-3">
@@ -110,7 +128,7 @@ export const ExerciseVideoSheet = ({
                                 </h4>
                             </div>
                             <div className="text-sm text-muted-foreground leading-relaxed pl-6">
-                                {processInstructions(instructions)}
+                                {processInstructions(instructionsText)}
                             </div>
                         </div>
                     )}
@@ -152,7 +170,7 @@ export const ExerciseVideoSheet = ({
                         </p>
                     )}
 
-                    {/* Botão de confirmação - BUILD 51: Gradiente verde (estilo Tutoriais) */}
+                    {/* Botão de confirmação - BUILD 52: Gradiente verde (estilo Tutoriais) */}
                     <div className="mt-6 pb-4">
                         <button
                             onClick={() => setOpen(false)}

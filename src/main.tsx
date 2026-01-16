@@ -47,7 +47,7 @@ const waitForCapacitor = async () => {
     await new Promise(resolve => setTimeout(resolve, waitTime));
     bootHealthCheck.addStep('STEP 3: Wait complete');
 
-    // ✅ BUILD 51: NUNCA aguardar storage - Supabase usa localStorage imediatamente
+    // ✅ BUILD 52: NUNCA aguardar storage - Supabase usa localStorage imediatamente
     logger.info('Boot', '🔐 STEP 4: Creating Supabase client (no storage wait)...', {
       timestamp: Date.now()
     });
@@ -63,7 +63,7 @@ const waitForCapacitor = async () => {
       });
       bootHealthCheck.addStep('STEP 5: Supabase client ready');
 
-      // ✅ BUILD 51: Inicializar storage EM BACKGROUND (não bloquear boot)
+      // ✅ BUILD 52: Inicializar storage EM BACKGROUND (não bloquear boot)
       // Modificado: Executar para TODAS as plataformas nativas (Android e iOS)
       setTimeout(async () => {
         try {
@@ -87,7 +87,7 @@ const waitForCapacitor = async () => {
       }, 2000);
 
     } catch (error) {
-      // ✅ BUILD 51: Se Supabase falhar, é erro crítico (mas não deve acontecer)
+      // ✅ BUILD 52: Se Supabase falhar, é erro crítico (mas não deve acontecer)
       logger.error('Boot', '❌ CRITICAL: Supabase init failed:', error);
       bootHealthCheck.addStep('STEP 4: Supabase FAILED');
       throw new Error(`Boot initialization failed: ${error}`);
@@ -102,13 +102,13 @@ const waitForCapacitor = async () => {
 };
 
 (async () => {
-  // ✅ BUILD 51: Timeout de emergência reduzido para 5s
+  // ✅ BUILD 52: Timeout de emergência reduzido para 5s
   const emergencyTimeout = setTimeout(() => {
     logger.error('Boot', '🚨 EMERGENCY: Boot taking too long (5s), forcing render');
 
     bootManager.markBootComplete();
 
-    // ✅ BUILD 51: NUNCA usar StrictMode em nativo ou produção
+    // ✅ BUILD 52: NUNCA usar StrictMode em nativo ou produção
     const isNative = Capacitor.isNativePlatform();
     const IS_PRODUCTION = import.meta.env.PROD;
     const AppWrapper = (isNative || IS_PRODUCTION) ? <App /> : <StrictMode><App /></StrictMode>;
@@ -185,7 +185,7 @@ const waitForCapacitor = async () => {
     logger.info('Boot', '⏳ STEP 8.5: Waiting 50ms for flag propagation...');
     await new Promise(resolve => setTimeout(resolve, 50));
 
-    // ✅ BUILD 51: Renderizar React NUNCA com StrictMode em nativo ou produção
+    // ✅ BUILD 52: Renderizar React NUNCA com StrictMode em nativo ou produção
     logger.info('Boot', '🔄 STEP 9: Rendering React application...');
 
     const isNative = Capacitor.isNativePlatform();

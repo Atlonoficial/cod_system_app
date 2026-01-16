@@ -5,7 +5,7 @@ interface Exercise {
   id: string;
   name: string;
   video_url?: string;
-  instructions?: string;
+  instructions?: string[] | null;
   description?: string;
 }
 
@@ -100,12 +100,25 @@ export const useExerciseVideo = (exerciseName: string) => {
     fetchExercise();
   }, [exerciseName]);
 
+  // Convert instructions array to string for display
+  const formatInstructions = (): string | undefined => {
+    if (!exercise?.instructions) return undefined;
+
+    // Handle array format (current database format)
+    if (Array.isArray(exercise.instructions)) {
+      return exercise.instructions.join('\n');
+    }
+
+    // Handle legacy string format (if any old data exists)
+    return exercise.instructions as unknown as string;
+  };
+
   return {
     exercise,
     loading,
     error,
     videoUrl: exercise?.video_url,
-    instructions: exercise?.instructions,
+    instructions: formatInstructions(),
     description: exercise?.description
   };
 };

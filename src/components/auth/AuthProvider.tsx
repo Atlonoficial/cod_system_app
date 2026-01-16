@@ -97,7 +97,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     logger.info('AuthProvider', `🔄 State update: ${stateStr}`);
   }, [auth.loading, auth.isAuthenticated, auth.user, auth.userProfile, forceRender, emergencyMode, location.pathname]);
 
-  // ✅ BUILD 51: FORÇA loading = false após 1s (2s → 1s mais agressivo)
+  // ✅ BUILD 52: FORÇA loading = false após 1s (2s → 1s mais agressivo)
   useEffect(() => {
     const forceLoadingOff = setTimeout(() => {
       if (auth.loading && !forceRender) {
@@ -126,7 +126,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const isPublicRoute = PUBLIC_PATHS.some((p) => location.pathname.startsWith(p));
 
-  // ✅ BUILD 51: Timeout reduzido para 1.5s (3s → 1.5s)
+  // ✅ BUILD 52: Timeout reduzido para 1.5s (3s → 1.5s)
   useEffect(() => {
     const timeout = setTimeout(() => {
       if (auth.loading && !forceRender) {
@@ -140,7 +140,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     return () => clearTimeout(timeout);
   }, [auth.loading, forceRender, auth.user]);
 
-  // ✅ BUILD 51: Emergency timeout reduzido para 3s (5s → 3s)
+  // ✅ BUILD 52: Emergency timeout reduzido para 3s (5s → 3s)
   useEffect(() => {
     const timer = setTimeout(() => {
       // ✅ Ativar emergency mode APENAS se ainda estiver carregando E não tiver forçado render
