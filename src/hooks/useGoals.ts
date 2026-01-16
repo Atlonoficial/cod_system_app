@@ -59,28 +59,28 @@ export const useGoals = () => {
     if (!user?.id) return false;
 
     try {
-      // BUILD 57: Enviar APENAS campos que existem na tabela
-      const insertData = {
+      // BUILD 57: Payload MÍNIMO - apenas campos obrigatórios
+      const insertData: Record<string, any> = {
         user_id: user.id,
         title: goalData.title,
-        description: goalData.description || null,
-        category: goalData.category || 'general',
-        target_type: goalData.target_type || 'numeric',
-        target_value: goalData.target_value,
-        target_unit: goalData.target_unit || null,
-        current_value: goalData.current_value || 0,
-        status: goalData.status || 'active',
-        start_date: goalData.start_date || new Date().toISOString().split('T')[0],
-        target_date: goalData.target_date || null,
-        points_reward: goalData.points_reward || 100
-        // REMOVIDO: challenge_id, metadata, is_challenge_based - não existem na tabela
+        target_value: goalData.target_value
       };
+
+      // Adicionar campos opcionais apenas se tiverem valor
+      if (goalData.description) insertData.description = goalData.description;
+      if (goalData.category) insertData.category = goalData.category;
+      if (goalData.target_type) insertData.target_type = goalData.target_type;
+      if (goalData.target_unit) insertData.target_unit = goalData.target_unit;
+      if (goalData.current_value !== undefined) insertData.current_value = goalData.current_value;
+      if (goalData.status) insertData.status = goalData.status;
+      if (goalData.start_date) insertData.start_date = goalData.start_date;
+      if (goalData.target_date) insertData.target_date = goalData.target_date;
 
       console.log('[useGoals] Creating goal with data:', insertData);
 
       const { data, error } = await supabase
         .from('user_goals')
-        .insert(insertData)
+        .insert(insertData as any)
         .select()
         .single();
 
