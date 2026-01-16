@@ -201,7 +201,7 @@ export type Database = {
           examples: string[] | null
           id: string
           image_url: string | null
-          instructions: string | null
+          instructions: string[] | null
           muscles: string[] | null
           name: string
           updated_at: string
@@ -216,7 +216,7 @@ export type Database = {
           examples?: string[] | null
           id?: string
           image_url?: string | null
-          instructions?: string | null
+          instructions?: string[] | null
           muscles?: string[] | null
           name: string
           updated_at?: string
@@ -231,7 +231,7 @@ export type Database = {
           examples?: string[] | null
           id?: string
           image_url?: string | null
-          instructions?: string | null
+          instructions?: string[] | null
           muscles?: string[] | null
           name?: string
           updated_at?: string
@@ -1535,7 +1535,7 @@ export type Database = {
           equipment: string[] | null
           id: string
           image_url: string | null
-          instructions: string | null
+          instructions: string[] | null
           muscle_group: string
           muscle_groups: string[] | null
           name: string
@@ -1556,7 +1556,7 @@ export type Database = {
           equipment?: string[] | null
           id?: string
           image_url?: string | null
-          instructions?: string | null
+          instructions?: string[] | null
           muscle_group: string
           muscle_groups?: string[] | null
           name: string
@@ -1577,7 +1577,7 @@ export type Database = {
           equipment?: string[] | null
           id?: string
           image_url?: string | null
-          instructions?: string | null
+          instructions?: string[] | null
           muscle_group?: string
           muscle_groups?: string[] | null
           name?: string
@@ -5523,11 +5523,11 @@ export type Database = {
     }
     Functions: {
       accept_invitation:
-        | { Args: { code: string }; Returns: string }
-        | {
-            Args: { invitation_code: string; user_id_param?: string }
-            Returns: string
-          }
+      | { Args: { code: string }; Returns: string }
+      | {
+        Args: { invitation_code: string; user_id_param?: string }
+        Returns: string
+      }
       activate_student_plan: {
         Args: {
           p_plan_catalog_id: string
@@ -5564,25 +5564,25 @@ export type Database = {
         Returns: undefined
       }
       award_points_enhanced:
-        | {
-            Args: {
-              p_activity_type: string
-              p_custom_points?: number
-              p_description: string
-              p_user_id: string
-            }
-            Returns: undefined
-          }
-        | {
-            Args: {
-              p_activity_type: string
-              p_custom_points?: number
-              p_description?: string
-              p_metadata?: Json
-              p_user_id: string
-            }
-            Returns: undefined
-          }
+      | {
+        Args: {
+          p_activity_type: string
+          p_custom_points?: number
+          p_description: string
+          p_user_id: string
+        }
+        Returns: undefined
+      }
+      | {
+        Args: {
+          p_activity_type: string
+          p_custom_points?: number
+          p_description?: string
+          p_metadata?: Json
+          p_user_id: string
+        }
+        Returns: undefined
+      }
       award_points_enhanced_v3: {
         Args: {
           p_activity_type: string
@@ -5594,67 +5594,67 @@ export type Database = {
         Returns: Json
       }
       book_appointment:
-        | {
-            Args: {
-              p_description?: string
-              p_duration?: number
-              p_is_manual_creation?: boolean
-              p_scheduled_time: string
-              p_student_notes?: string
-              p_student_objectives?: string
-              p_student_title?: string
-              p_teacher_id: string
-              p_title?: string
-              p_type?: string
-            }
-            Returns: string
-          }
-        | {
-            Args: {
-              p_description?: string
-              p_duration?: number
-              p_is_manual_creation?: boolean
-              p_scheduled_time: string
-              p_student_id?: string
-              p_student_notes?: string
-              p_student_objectives?: string
-              p_student_title?: string
-              p_teacher_id: string
-              p_title?: string
-              p_type?: string
-            }
-            Returns: string
-          }
-        | {
-            Args: {
-              p_description?: string
-              p_duration?: number
-              p_location_id?: string
-              p_scheduled_time: string
-              p_student_notes?: string
-              p_student_objectives?: string
-              p_student_title?: string
-              p_teacher_id: string
-              p_title?: string
-              p_type?: string
-            }
-            Returns: string
-          }
-        | {
-            Args: {
-              p_description?: string
-              p_duration?: number
-              p_scheduled_time: string
-              p_student_id: string
-              p_student_notes?: string
-              p_student_objectives?: string
-              p_student_title?: string
-              p_teacher_id: string
-              p_title?: string
-              p_type?: string
-            }
-            Returns: string
-          }
+      | {
+        Args: {
+          p_description?: string
+          p_duration?: number
+          p_is_manual_creation?: boolean
+          p_scheduled_time: string
+          p_student_notes?: string
+          p_student_objectives?: string
+          p_student_title?: string
+          p_teacher_id: string
+          p_title?: string
+          p_type?: string
+        }
+        Returns: string
+      }
+      | {
+        Args: {
+          p_description?: string
+          p_duration?: number
+          p_is_manual_creation?: boolean
+          p_scheduled_time: string
+          p_student_id?: string
+          p_student_notes?: string
+          p_student_objectives?: string
+          p_student_title?: string
+          p_teacher_id: string
+          p_title?: string
+          p_type?: string
+        }
+        Returns: string
+      }
+      | {
+        Args: {
+          p_description?: string
+          p_duration?: number
+          p_location_id?: string
+          p_scheduled_time: string
+          p_student_notes?: string
+          p_student_objectives?: string
+          p_student_title?: string
+          p_teacher_id: string
+          p_title?: string
+          p_type?: string
+        }
+        Returns: string
+      }
+      | {
+        Args: {
+          p_description?: string
+          p_duration?: number
+          p_scheduled_time: string
+          p_student_id: string
+          p_student_notes?: string
+          p_student_objectives?: string
+          p_student_title?: string
+          p_teacher_id: string
+          p_title?: string
+          p_type?: string
+        }
+        Returns: string
+      }
       calculate_meal_plan_totals: {
         Args: { meals_data_param: Json }
         Returns: {
@@ -6167,14 +6167,14 @@ export type Database = {
         Returns: boolean
       }
       user_has_feature_access:
-        | {
-            Args: { p_feature_key: string; p_user_id: string }
-            Returns: boolean
-          }
-        | {
-            Args: { p_feature: string; p_teacher_id: string; p_user_id: string }
-            Returns: boolean
-          }
+      | {
+        Args: { p_feature_key: string; p_user_id: string }
+        Returns: boolean
+      }
+      | {
+        Args: { p_feature: string; p_teacher_id: string; p_user_id: string }
+        Returns: boolean
+      }
       validate_input: {
         Args: { allow_html?: boolean; input_text: string; max_length?: number }
         Returns: boolean
@@ -6212,116 +6212,116 @@ type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
-    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
-    | { schema: keyof DatabaseWithoutInternals },
+  | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+  | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
+  ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+    DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+  : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
   ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+    DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
       Row: infer R
     }
-    ? R
-    : never
+  ? R
+  : never
   : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
-        DefaultSchema["Views"])
-    ? (DefaultSchema["Tables"] &
-        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
-        Row: infer R
-      }
-      ? R
-      : never
-    : never
+    DefaultSchema["Views"])
+  ? (DefaultSchema["Tables"] &
+    DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+      Row: infer R
+    }
+  ? R
+  : never
+  : never
 
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema["Tables"]
-    | { schema: keyof DatabaseWithoutInternals },
+  | keyof DefaultSchema["Tables"]
+  | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+  ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+  : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
   ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-      Insert: infer I
-    }
-    ? I
-    : never
+    Insert: infer I
+  }
+  ? I
+  : never
   : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-        Insert: infer I
-      }
-      ? I
-      : never
-    : never
+  ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+    Insert: infer I
+  }
+  ? I
+  : never
+  : never
 
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema["Tables"]
-    | { schema: keyof DatabaseWithoutInternals },
+  | keyof DefaultSchema["Tables"]
+  | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+  ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+  : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
   ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-      Update: infer U
-    }
-    ? U
-    : never
+    Update: infer U
+  }
+  ? U
+  : never
   : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-        Update: infer U
-      }
-      ? U
-      : never
-    : never
+  ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+    Update: infer U
+  }
+  ? U
+  : never
+  : never
 
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
-    | keyof DefaultSchema["Enums"]
-    | { schema: keyof DatabaseWithoutInternals },
+  | keyof DefaultSchema["Enums"]
+  | { schema: keyof DatabaseWithoutInternals },
   EnumName extends DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
+  ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+  : never = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
   ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
-    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
-    : never
+  ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+  : never
 
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
-    | keyof DefaultSchema["CompositeTypes"]
-    | { schema: keyof DatabaseWithoutInternals },
+  | keyof DefaultSchema["CompositeTypes"]
+  | { schema: keyof DatabaseWithoutInternals },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
+  ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+  : never = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
   ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
   : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
-    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
-    : never
+  ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+  : never
 
 export const Constants = {
   public: {
