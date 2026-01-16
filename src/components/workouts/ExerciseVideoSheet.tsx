@@ -43,7 +43,7 @@ export const ExerciseVideoSheet = ({
 
     // BUILD 55: Use instruções do banco (prioridade) ou props (fallback)
     const getInstructionsText = (): string => {
-        if (dbInstructions && dbInstructions.trim().length > 0) {
+        if (dbInstructions && typeof dbInstructions === 'string' && dbInstructions.trim().length > 0) {
             return dbInstructions;
         }
 
@@ -72,10 +72,10 @@ export const ExerciseVideoSheet = ({
         return '';
     };
 
-    const hasDescription = description && !/^\d+$/.test(description.trim());
+    const hasDescription = description && typeof description === 'string' && !/^\d+$/.test(description.trim());
     const instructionsText = getInstructionsText();
     const hasInstructions = instructionsText && instructionsText.trim().length > 0 && !/^\d+$/.test(instructionsText.trim());
-    const hasNotes = notes && notes.trim().length > 0;
+    const hasNotes = notes && typeof notes === 'string' && notes.trim().length > 0;
     const hasExtraContent = hasDescription || hasInstructions || hasNotes;
 
     // Process instructions formatting (***bold***)
