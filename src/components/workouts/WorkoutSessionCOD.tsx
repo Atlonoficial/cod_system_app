@@ -685,7 +685,7 @@ export const WorkoutSessionCOD = ({ workout, onFinish, onExit }: WorkoutSessionC
                         </div>
 
                         {/* Description - Only show if it's not purely numeric */}
-                        {currentExercise?.description && !/^\d+$/.test(currentExercise.description.trim()) && (
+                        {currentExercise?.description && typeof currentExercise.description === 'string' && !/^\d+$/.test(currentExercise.description.trim()) && (
                             <p className="text-sm text-muted-foreground mb-4 line-clamp-3 leading-relaxed">
                                 {currentExercise?.description}
                             </p>
