@@ -1,6 +1,6 @@
 /**
  * ExerciseVideoSheet - Native Bottom Sheet for Exercise Videos
- * BUILD 50: Otimizado com descrição/orientações e altura compacta
+ * BUILD 51: Com instruções do admin e gradiente verde
  */
 
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
@@ -14,6 +14,7 @@ interface ExerciseVideoSheetProps {
     videoUrl?: string;
     trigger?: React.ReactNode;
     description?: string;
+    instructions?: string;
     notes?: string;
 }
 
@@ -22,6 +23,7 @@ export const ExerciseVideoSheet = ({
     videoUrl,
     trigger,
     description,
+    instructions,
     notes
 }: ExerciseVideoSheetProps) => {
     const { light } = useHapticFeedback();
@@ -34,8 +36,27 @@ export const ExerciseVideoSheet = ({
 
     // Check if we have any content to show besides video
     const hasDescription = description && !/^\d+$/.test(description.trim());
+    const hasInstructions = instructions && instructions.trim().length > 0;
     const hasNotes = notes && notes.trim().length > 0;
-    const hasExtraContent = hasDescription || hasNotes;
+    const hasExtraContent = hasDescription || hasInstructions || hasNotes;
+
+    // Process instructions formatting (***bold***)
+    const processInstructions = (text: string) => {
+        return text.split('\n').map((line, idx) => {
+            // Replace ***text*** with bold
+            const processedLine = line.replace(
+                /\*\*\*(.+?)\*\*\*/g,
+                '<strong class="text-foreground font-semibold">$1</strong>'
+            );
+            return (
+                <p
+                    key={idx}
+                    className="mb-2 last:mb-0"
+                    dangerouslySetInnerHTML={{ __html: processedLine }}
+                />
+            );
+        });
+    };
 
     return (
         <Sheet open={open} onOpenChange={setOpen}>
@@ -79,11 +100,26 @@ export const ExerciseVideoSheet = ({
                         />
                     </div>
 
+                    {/* Instruções do Admin - BUILD 51: Campo principal */}
+                    {hasInstructions && (
+                        <div className="mb-4">
+                            <div className="flex items-center gap-2 mb-3">
+                                <FileText className="w-4 h-4 text-teal-400" />
+                                <h4 className="text-sm font-semibold text-foreground">
+                                    Instruções
+                                </h4>
+                            </div>
+                            <div className="text-sm text-muted-foreground leading-relaxed pl-6">
+                                {processInstructions(instructions)}
+                            </div>
+                        </div>
+                    )}
+
                     {/* Descrição */}
                     {hasDescription && (
                         <div className="mb-4">
                             <div className="flex items-center gap-2 mb-2">
-                                <FileText className="w-4 h-4 text-primary" />
+                                <Info className="w-4 h-4 text-blue-400" />
                                 <h4 className="text-sm font-semibold text-foreground">
                                     Descrição
                                 </h4>
@@ -94,13 +130,13 @@ export const ExerciseVideoSheet = ({
                         </div>
                     )}
 
-                    {/* Orientações */}
+                    {/* Observações */}
                     {hasNotes && (
                         <div className="mb-4">
                             <div className="flex items-center gap-2 mb-2">
                                 <Info className="w-4 h-4 text-amber-400" />
                                 <h4 className="text-sm font-semibold text-foreground">
-                                    Orientações
+                                    Observações
                                 </h4>
                             </div>
                             <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line pl-6">
@@ -116,11 +152,11 @@ export const ExerciseVideoSheet = ({
                         </p>
                     )}
 
-                    {/* Botão de confirmação com gradiente COD */}
+                    {/* Botão de confirmação - BUILD 51: Gradiente verde (estilo Tutoriais) */}
                     <div className="mt-6 pb-4">
                         <button
                             onClick={() => setOpen(false)}
-                            className="w-full bg-gradient-to-r from-primary to-purple-500 text-white px-6 py-3.5 rounded-xl font-semibold hover:opacity-90 active:scale-[0.98] transition-all shadow-lg"
+                            className="w-full bg-gradient-to-r from-teal-400 to-cyan-500 text-white px-6 py-3.5 rounded-xl font-semibold hover:opacity-90 active:scale-[0.98] transition-all shadow-lg"
                         >
                             Ok, entendi!
                         </button>

@@ -44,6 +44,8 @@ interface Exercise {
     duration?: string;
     rest: string;
     description: string;
+    instructions?: string;
+    notes?: string;
     video_url?: string;
 }
 
@@ -622,8 +624,8 @@ export const WorkoutSessionCOD = ({ workout, onFinish, onExit }: WorkoutSessionC
                     </div>
                 </div>
 
-                {/* Stats Cards - BUILD 32: Ultra clean like Home */}
-                <div className="grid grid-cols-3 gap-4 px-4 pb-4">
+                {/* Stats Cards - BUILD 51: Increased bottom padding for spacing */}
+                <div className="grid grid-cols-3 gap-4 px-4 pb-6">
                     <div className="p-2 text-center">
                         <div className="flex items-center justify-center gap-1 mb-1">
                             <Target className="w-4 h-4 text-primary" />
@@ -653,13 +655,13 @@ export const WorkoutSessionCOD = ({ workout, onFinish, onExit }: WorkoutSessionC
                 </div>
             </div>
 
-            {/* Scrollable Content Area - BUILD 49: Increased offset to prevent overlap */}
-            <div className="pt-[290px] pb-32 px-4">
+            {/* Scrollable Content Area - BUILD 51: Further increased offset for better spacing */}
+            <div className="pt-[310px] pb-32 px-4">
                 {/* Current Exercise Info - BUILD 50: Professional layout with proper spacing */}
                 <Card className="mb-4 border-border/20 bg-card/30 backdrop-blur-sm">
-                    <CardContent className="p-5">
-                        {/* Exercise Title - With proper spacing */}
-                        <h2 className="text-lg font-bold mb-4 text-foreground line-clamp-2 leading-tight">
+                    <CardContent className="p-6 pt-8">
+                        {/* Exercise Title - BUILD 51: Increased spacing */}
+                        <h2 className="text-lg font-bold mb-5 text-foreground line-clamp-2 leading-tight">
                             {currentExercise?.name}
                         </h2>
 
@@ -697,13 +699,14 @@ export const WorkoutSessionCOD = ({ workout, onFinish, onExit }: WorkoutSessionC
                             </div>
                         )}
 
-                        {/* Video Button - With description and notes */}
+                        {/* Video Button - With description, instructions and notes */}
                         {currentExercise?.video_url && (
                             <div className="mt-2">
                                 <ExerciseVideoSheet
                                     exerciseName={currentExercise.name}
                                     videoUrl={currentExercise.video_url}
                                     description={currentExercise.description}
+                                    instructions={currentExercise.instructions}
                                     notes={currentExercise.notes}
                                 />
                             </div>
