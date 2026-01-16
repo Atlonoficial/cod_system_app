@@ -59,21 +59,45 @@ export const useGoals = () => {
     if (!user?.id) return false;
 
     try {
-      const { error } = await supabase
-        .from('user_goals')
-        .insert({
-          ...goalData,
-          user_id: user.id
-        });
+      // BUILD 57: Enviar apenas campos válidos para evitar erros de schema
+      const insertData = {
+        user_id: user.id,
+        title: goalData.title,
+        description: goalData.description || null,
+        category: goalData.category || 'general',
+        target_type: goalData.target_type || 'numeric',
+        target_value: goalData.target_value,
+        target_unit: goalData.target_unit || null,
+        current_value: goalData.current_value || 0,
+        status: goalData.status || 'active',
+        start_date: goalData.start_date || new Date().toISOString().split('T')[0],
+        target_date: goalData.target_date || null,
+        points_reward: goalData.points_reward || 100,
+        // Removido is_challenge_based pois pode causar conflito de schema
+        challenge_id: goalData.challenge_id || null,
+        metadata: goalData.metadata || null
+      };
 
-      if (error) throw error;
-      
+      console.log('[useGoals] Creating goal with data:', insertData);
+
+      const { data, error } = await supabase
+        .from('user_goals')
+        .insert(insertData)
+        .select()
+        .single();
+
+      if (error) {
+        console.error('[useGoals] Error creating goal:', error);
+        throw error;
+      }
+
+      console.log('[useGoals] Goal created successfully:', data);
       await fetchGoals();
       toast.success('Meta criada com sucesso! 🎯');
       return true;
     } catch (err: any) {
       console.error('Error creating goal:', err);
-      toast.error('Erro ao criar meta');
+      toast.error(`Erro ao criar meta: ${err.message || 'Erro desconhecido'}`);
       return false;
     }
   }, [user?.id, fetchGoals]);
@@ -86,7 +110,7 @@ export const useGoals = () => {
         .eq('id', goalId);
 
       if (error) throw error;
-      
+
       await fetchGoals();
       toast.success('Meta atualizada! 📈');
       return true;
@@ -105,7 +129,7 @@ export const useGoals = () => {
         .eq('id', goalId);
 
       if (error) throw error;
-      
+
       await fetchGoals();
       return true;
     } catch (err: any) {
@@ -123,7 +147,7 @@ export const useGoals = () => {
         .eq('id', goalId);
 
       if (error) throw error;
-      
+
       await fetchGoals();
       toast.success('Meta cancelada');
       return true;
@@ -138,7 +162,7 @@ export const useGoals = () => {
   const getGoalStats = useCallback(() => {
     const activeGoals = goals.filter(goal => goal.status === 'active');
     const completedGoals = goals.filter(goal => goal.status === 'completed');
-    const averageProgress = activeGoals.length > 0 
+    const averageProgress = activeGoals.length > 0
       ? activeGoals.reduce((sum, goal) => sum + goal.progress_percentage, 0) / activeGoals.length
       : 0;
 

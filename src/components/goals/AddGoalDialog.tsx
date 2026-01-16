@@ -43,26 +43,25 @@ export const AddGoalDialog = ({ trigger }: AddGoalDialogProps) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.title || !formData.target_value) {
       return;
     }
 
+    // BUILD 57: Payload simplificado para evitar erros de schema
     const success = await createGoal({
       title: formData.title,
-      description: formData.description,
+      description: formData.description || undefined,
       category: formData.category,
       target_type: 'numeric',
       target_value: parseFloat(formData.target_value),
-      target_unit: formData.target_unit,
+      target_unit: formData.target_unit || undefined,
       current_value: 0,
       status: 'active',
       start_date: new Date().toISOString().split('T')[0],
       target_date: formData.target_date || undefined,
-      points_reward: parseInt(formData.points_reward),
-      is_challenge_based: false,
-      metadata: {}
-    });
+      points_reward: parseInt(formData.points_reward) || 100
+    } as any);
 
     if (success) {
       setOpen(false);
@@ -91,14 +90,17 @@ export const AddGoalDialog = ({ trigger }: AddGoalDialogProps) => {
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md" aria-describedby="goal-dialog-description">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Target size={20} className="text-primary" />
             Nova Meta
           </DialogTitle>
+          <p id="goal-dialog-description" className="text-sm text-muted-foreground">
+            Defina uma nova meta pessoal para acompanhar seu progresso.
+          </p>
         </DialogHeader>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <Label htmlFor="title">Título da Meta</Label>

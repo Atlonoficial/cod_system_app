@@ -367,7 +367,7 @@ export const WorkoutDetail = ({ workout, onBack, onStartWorkout, onExerciseSelec
           </button>
         </div>
 
-        {/* Modal de vídeo bottom sheet - BUILD 56 */}
+        {/* Modal de vídeo bottom sheet - BUILD 57: Conteúdo Completo */}
         <Sheet open={!!videoModalExercise} onOpenChange={(open) => !open && setVideoModalExercise(null)}>
           <SheetContent
             side="bottom"
@@ -387,11 +387,27 @@ export const WorkoutDetail = ({ workout, onBack, onStartWorkout, onExerciseSelec
 
             {/* Content scrollável */}
             <div className="overflow-y-auto h-[calc(70vh-80px)] px-4 py-4">
-              <div className="w-full animate-scale-in">
+              {/* Vídeo */}
+              <div className="w-full animate-scale-in mb-4">
                 <VideoPlayer
                   exerciseName={videoModalExercise?.name || ''}
                   className="w-full aspect-video rounded-xl overflow-hidden"
                 />
+              </div>
+
+              {/* Instruções e Descrição do Exercício */}
+              {videoModalExercise && (
+                <ExerciseInfoDisplay exerciseName={videoModalExercise.name} />
+              )}
+
+              {/* Botão de confirmação - BUILD 57 */}
+              <div className="mt-6 pb-4">
+                <button
+                  onClick={() => setVideoModalExercise(null)}
+                  className="w-full bg-gradient-to-r from-teal-400 to-cyan-500 text-white px-6 py-3.5 rounded-xl font-semibold hover:opacity-90 active:scale-[0.98] transition-all shadow-lg"
+                >
+                  Ok, entendi!
+                </button>
               </div>
             </div>
           </SheetContent>
