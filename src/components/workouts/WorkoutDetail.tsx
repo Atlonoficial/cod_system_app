@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { ArrowLeft, Clock, Flame, Dumbbell, Play, ChevronDown, CheckCircle2, X, Zap, Timer, FileText, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { VideoPlayer } from "./VideoPlayer";
 import { useExerciseVideo } from "@/hooks/useExerciseVideo";
 import { BottomNavigation } from "@/components/layout/BottomNavigation";
@@ -366,31 +367,35 @@ export const WorkoutDetail = ({ workout, onBack, onStartWorkout, onExerciseSelec
           </button>
         </div>
 
-        {/* Modal de vídeo fullscreen */}
-        {videoModalExercise && (
-          <div
-            className="fixed inset-0 bg-black/95 z-[60] flex flex-col animate-fade-in"
-            onClick={() => setVideoModalExercise(null)}
+        {/* Modal de vídeo bottom sheet - BUILD 56 */}
+        <Sheet open={!!videoModalExercise} onOpenChange={(open) => !open && setVideoModalExercise(null)}>
+          <SheetContent
+            side="bottom"
+            className="h-[70vh] rounded-t-3xl p-0 bg-background border-t border-border/50"
           >
-            <div className="flex items-center justify-between p-4 bg-black/50 backdrop-blur-sm pt-safe">
-              <h3 className="text-white font-semibold text-lg truncate flex-1">
-                {videoModalExercise.name}
-              </h3>
-              <button
-                onClick={() => setVideoModalExercise(null)}
-                className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors ml-4"
-                aria-label="Fechar vídeo"
-              >
-                <X className="w-6 h-6 text-white" />
-              </button>
+            {/* Drag handle */}
+            <div className="flex justify-center pt-3 pb-2">
+              <div className="w-12 h-1.5 bg-muted-foreground/30 rounded-full" />
             </div>
-            <div className="flex-1 flex items-center justify-center p-4" onClick={(e) => e.stopPropagation()}>
-              <div className="w-full max-w-2xl animate-scale-in">
-                <VideoPlayer exerciseName={videoModalExercise.name} />
+
+            {/* Header */}
+            <SheetHeader className="px-4 pb-3 border-b border-border/30">
+              <SheetTitle className="text-base font-semibold text-foreground line-clamp-2 text-left">
+                {videoModalExercise?.name}
+              </SheetTitle>
+            </SheetHeader>
+
+            {/* Content scrollável */}
+            <div className="overflow-y-auto h-[calc(70vh-80px)] px-4 py-4">
+              <div className="w-full animate-scale-in">
+                <VideoPlayer
+                  exerciseName={videoModalExercise?.name || ''}
+                  className="w-full aspect-video rounded-xl overflow-hidden"
+                />
               </div>
             </div>
-          </div>
-        )}
+          </SheetContent>
+        </Sheet>
       </div>
     </div>
   );

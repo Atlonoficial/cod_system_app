@@ -1,9 +1,10 @@
 /**
- * ExerciseVideoSheet - Fullscreen Modal for Exercise Videos
- * BUILD 56: Transformed from bottom sheet to fullscreen modal (matching WorkoutDetail style)
+ * ExerciseVideoSheet - Bottom Sheet Modal for Exercise Videos
+ * BUILD 56: Bottom sheet format (70vh, desliza de baixo)
  */
 
-import { X, Play, FileText, Info } from "lucide-react";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Play, FileText, Info } from "lucide-react";
 import { VideoPlayer } from "./VideoPlayer";
 import { useHapticFeedback } from "@/hooks/useHapticFeedback";
 import { useExerciseVideo } from "@/hooks/useExerciseVideo";
@@ -35,10 +36,6 @@ export const ExerciseVideoSheet = ({
     const handleOpen = () => {
         light();
         setOpen(true);
-    };
-
-    const handleClose = () => {
-        setOpen(false);
     };
 
     // BUILD 55: Use instruções do banco (prioridade) ou props (fallback)
@@ -83,7 +80,7 @@ export const ExerciseVideoSheet = ({
         return text.split('\n').map((line, idx) => {
             const processedLine = line.replace(
                 /\*\*\*(.+?)\*\*\*/g,
-                '<strong class="text-white font-semibold">$1</strong>'
+                '<strong class="text-foreground font-semibold">$1</strong>'
             );
             return (
                 <p
@@ -96,7 +93,7 @@ export const ExerciseVideoSheet = ({
     };
 
     return (
-        <>
+        <Sheet open={open} onOpenChange={setOpen}>
             {/* Trigger Button */}
             <div onClick={handleOpen}>
                 {trigger || (
@@ -109,107 +106,98 @@ export const ExerciseVideoSheet = ({
                 )}
             </div>
 
-            {/* BUILD 56: Fullscreen Modal (matching WorkoutDetail style) */}
-            {open && (
-                <div
-                    className="fixed inset-0 bg-black/95 z-[60] flex flex-col animate-fade-in"
-                    onClick={handleClose}
-                >
-                    {/* Header */}
-                    <div className="flex items-center justify-between p-4 bg-black/50 backdrop-blur-sm pt-safe">
-                        <h3 className="text-white font-semibold text-lg truncate flex-1 pr-4">
-                            {exerciseName}
-                        </h3>
+            {/* BUILD 56: Bottom Sheet (70vh, desliza de baixo) */}
+            <SheetContent
+                side="bottom"
+                className="h-[70vh] rounded-t-3xl p-0 bg-background border-t border-border/50"
+            >
+                {/* Drag handle */}
+                <div className="flex justify-center pt-3 pb-2">
+                    <div className="w-12 h-1.5 bg-muted-foreground/30 rounded-full" />
+                </div>
+
+                {/* Header compacto */}
+                <SheetHeader className="px-4 pb-3 border-b border-border/30">
+                    <SheetTitle className="text-base font-semibold text-foreground line-clamp-2 text-left">
+                        {exerciseName}
+                    </SheetTitle>
+                </SheetHeader>
+
+                {/* Scrollable content area */}
+                <div className="overflow-y-auto h-[calc(70vh-80px)] px-4 py-4">
+                    {/* Vídeo - Aspect ratio 16:9 */}
+                    <div className="mb-4">
+                        <VideoPlayer
+                            exerciseName={exerciseName}
+                            videoUrl={videoUrl}
+                            className="w-full aspect-video rounded-xl overflow-hidden"
+                        />
+                    </div>
+
+                    {/* Instruções do Admin - BUILD 52: Campo principal */}
+                    {hasInstructions && (
+                        <div className="mb-4">
+                            <div className="flex items-center gap-2 mb-3">
+                                <FileText className="w-4 h-4 text-teal-400" />
+                                <h4 className="text-sm font-semibold text-foreground">
+                                    Instruções
+                                </h4>
+                            </div>
+                            <div className="text-sm text-muted-foreground leading-relaxed pl-6">
+                                {processInstructions(instructionsText)}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Descrição */}
+                    {hasDescription && (
+                        <div className="mb-4">
+                            <div className="flex items-center gap-2 mb-2">
+                                <Info className="w-4 h-4 text-blue-400" />
+                                <h4 className="text-sm font-semibold text-foreground">
+                                    Descrição
+                                </h4>
+                            </div>
+                            <p className="text-sm text-muted-foreground leading-relaxed pl-6">
+                                {description}
+                            </p>
+                        </div>
+                    )}
+
+                    {/* Observações */}
+                    {hasNotes && (
+                        <div className="mb-4">
+                            <div className="flex items-center gap-2 mb-2">
+                                <Info className="w-4 h-4 text-amber-400" />
+                                <h4 className="text-sm font-semibold text-foreground">
+                                    Observações
+                                </h4>
+                            </div>
+                            <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line pl-6">
+                                {notes}
+                            </p>
+                        </div>
+                    )}
+
+                    {/* Mensagem se não houver conteúdo extra */}
+                    {!hasExtraContent && (
+                        <p className="text-sm text-muted-foreground text-center py-4">
+                            Assista ao vídeo demonstrativo para executar o exercício corretamente.
+                        </p>
+                    )}
+
+                    {/* Botão de confirmação - BUILD 52: Gradiente verde (estilo Tutoriais) */}
+                    <div className="mt-6 pb-4">
                         <button
-                            onClick={handleClose}
-                            className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"
-                            aria-label="Fechar"
+                            onClick={() => setOpen(false)}
+                            className="w-full bg-gradient-to-r from-teal-400 to-cyan-500 text-white px-6 py-3.5 rounded-xl font-semibold hover:opacity-90 active:scale-[0.98] transition-all shadow-lg"
                         >
-                            <X className="w-6 h-6 text-white" />
+                            Ok, entendi!
                         </button>
                     </div>
-
-                    {/* Scrollable Content */}
-                    <div
-                        className="flex-1 overflow-y-auto pb-safe"
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        {/* Video */}
-                        <div className="p-4">
-                            <div className="w-full max-w-2xl mx-auto animate-scale-in">
-                                <VideoPlayer
-                                    exerciseName={exerciseName}
-                                    videoUrl={videoUrl}
-                                    className="w-full aspect-video rounded-xl overflow-hidden"
-                                />
-                            </div>
-                        </div>
-
-                        {/* Instruções */}
-                        {hasInstructions && (
-                            <div className="px-4 mb-4">
-                                <div className="flex items-center gap-2 mb-3">
-                                    <FileText className="w-4 h-4 text-teal-400" />
-                                    <h4 className="text-sm font-semibold text-white">
-                                        Instruções
-                                    </h4>
-                                </div>
-                                <div className="text-sm text-gray-300 leading-relaxed pl-6">
-                                    {processInstructions(instructionsText)}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Descrição */}
-                        {hasDescription && (
-                            <div className="px-4 mb-4">
-                                <div className="flex items-center gap-2 mb-2">
-                                    <Info className="w-4 h-4 text-blue-400" />
-                                    <h4 className="text-sm font-semibold text-white">
-                                        Descrição
-                                    </h4>
-                                </div>
-                                <p className="text-sm text-gray-300 leading-relaxed pl-6">
-                                    {description}
-                                </p>
-                            </div>
-                        )}
-
-                        {/* Observações */}
-                        {hasNotes && (
-                            <div className="px-4 mb-4">
-                                <div className="flex items-center gap-2 mb-2">
-                                    <Info className="w-4 h-4 text-amber-400" />
-                                    <h4 className="text-sm font-semibold text-white">
-                                        Observações
-                                    </h4>
-                                </div>
-                                <p className="text-sm text-gray-300 leading-relaxed whitespace-pre-line pl-6">
-                                    {notes}
-                                </p>
-                            </div>
-                        )}
-
-                        {/* Mensagem se não houver conteúdo extra */}
-                        {!hasExtraContent && (
-                            <p className="text-sm text-gray-400 text-center py-4 px-4">
-                                Assista ao vídeo demonstrativo para executar o exercício corretamente.
-                            </p>
-                        )}
-
-                        {/* Botão de confirmação */}
-                        <div className="px-4 py-6">
-                            <button
-                                onClick={handleClose}
-                                className="w-full bg-gradient-to-r from-teal-400 to-cyan-500 text-white px-6 py-3.5 rounded-xl font-semibold hover:opacity-90 active:scale-[0.98] transition-all shadow-lg"
-                            >
-                                Ok, entendi!
-                            </button>
-                        </div>
-                    </div>
                 </div>
-            )}
-        </>
+            </SheetContent>
+        </Sheet>
     );
 };
 
