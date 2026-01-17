@@ -59,22 +59,22 @@ export const useGoals = () => {
     if (!user?.id) return false;
 
     try {
-      // BUILD 57: Payload MÍNIMO - apenas campos obrigatórios
+      // BUILD 57: Payload ULTRA MÍNIMO - testando apenas campos que sabemos existir
+      // Colunas confirmadas no erro: user_id, title, target_value
+      // Colunas que NÃO existem: start_date, target_date, points_reward, challenge_id, metadata, is_challenge_based
       const insertData: Record<string, any> = {
         user_id: user.id,
         title: goalData.title,
         target_value: goalData.target_value
       };
 
-      // Adicionar campos opcionais apenas se tiverem valor
+      // Tentar adicionar campos que PODEM existir (um por um para descobrir quais funcionam)
       if (goalData.description) insertData.description = goalData.description;
       if (goalData.category) insertData.category = goalData.category;
-      if (goalData.target_type) insertData.target_type = goalData.target_type;
       if (goalData.target_unit) insertData.target_unit = goalData.target_unit;
       if (goalData.current_value !== undefined) insertData.current_value = goalData.current_value;
       if (goalData.status) insertData.status = goalData.status;
-      if (goalData.start_date) insertData.start_date = goalData.start_date;
-      if (goalData.target_date) insertData.target_date = goalData.target_date;
+      // REMOVIDO: start_date, target_date, target_type - provavelmente não existem
 
       console.log('[useGoals] Creating goal with data:', insertData);
 
