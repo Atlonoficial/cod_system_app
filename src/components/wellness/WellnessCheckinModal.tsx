@@ -206,7 +206,7 @@ export const WellnessCheckinModal: React.FC<WellnessCheckinModalProps> = ({
     };
 
     return (
-        <Dialog open={isOpen} onOpenChange={() => { }}>
+        <Dialog open={isOpen} onOpenChange={(open) => { if (!open) onComplete(); }}>
             <DialogContent className="wellness-modal-content max-w-md mx-auto bg-gradient-to-b from-slate-900 to-slate-800 border-slate-700">
                 <DialogTitle className="sr-only">Wellness Check-in</DialogTitle>
 
