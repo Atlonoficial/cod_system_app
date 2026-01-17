@@ -76,7 +76,8 @@ export const useGoals = () => {
       if (goalData.category) insertData.category = goalData.category;
       // Mapear nomes antigos para novos
       if (goalData.target_unit) insertData.unit = goalData.target_unit; // target_unit -> unit
-      if (goalData.target_type) insertData.goal_type = goalData.target_type; // target_type -> goal_type
+      // REMOVIDO: goal_type - constraint aceita apenas 'weight', 'strength', 'cardio', etc.
+      // Deixar como NULL até mapear corretamente categoria -> goal_type
       if (goalData.target_date) insertData.deadline = goalData.target_date; // target_date -> deadline
 
       console.log('[useGoals] Creating goal with data:', insertData);
