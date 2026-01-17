@@ -48,19 +48,19 @@ export const AddGoalDialog = ({ trigger }: AddGoalDialogProps) => {
       return;
     }
 
-    // BUILD 57: Payload simplificado para evitar erros de schema
+    // BUILD 57: Payload com campos que EXISTEM na tabela user_goals
+    // Colunas reais: user_id, title, description, target_value, current_value, unit, goal_type, category, deadline, status
     const success = await createGoal({
       title: formData.title,
       description: formData.description || undefined,
       category: formData.category,
-      target_type: 'numeric',
+      target_type: 'numeric', // será mapeado para goal_type no hook
       target_value: parseFloat(formData.target_value),
-      target_unit: formData.target_unit || undefined,
+      target_unit: formData.target_unit || undefined, // será mapeado para unit no hook
       current_value: 0,
       status: 'active',
-      start_date: new Date().toISOString().split('T')[0],
-      target_date: formData.target_date || undefined,
-      points_reward: parseInt(formData.points_reward) || 100
+      target_date: formData.target_date || undefined // será mapeado para deadline no hook
+      // REMOVIDO: start_date, points_reward - não existem na tabela
     } as any);
 
     if (success) {

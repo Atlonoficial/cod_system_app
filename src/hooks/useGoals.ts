@@ -59,22 +59,25 @@ export const useGoals = () => {
     if (!user?.id) return false;
 
     try {
-      // BUILD 57: Payload ULTRA MÍNIMO - testando apenas campos que sabemos existir
-      // Colunas confirmadas no erro: user_id, title, target_value
-      // Colunas que NÃO existem: start_date, target_date, points_reward, challenge_id, metadata, is_challenge_based
+      // BUILD 57: Colunas REAIS da tabela user_goals (descoberto via diagnóstico)
+      // Obrigatórios: user_id, title
+      // Opcionais: description, target_value, current_value, unit, goal_type, category, deadline, status
+      // NÃO EXISTEM: start_date, target_date, points_reward, challenge_id, metadata, is_challenge_based, target_unit, target_type
       const insertData: Record<string, any> = {
         user_id: user.id,
         title: goalData.title,
-        target_value: goalData.target_value
+        target_value: goalData.target_value || 0,
+        current_value: goalData.current_value || 0,
+        status: goalData.status || 'active'
       };
 
-      // Tentar adicionar campos que PODEM existir (um por um para descobrir quais funcionam)
+      // Campos opcionais com nomes CORRETOS
       if (goalData.description) insertData.description = goalData.description;
       if (goalData.category) insertData.category = goalData.category;
-      if (goalData.target_unit) insertData.target_unit = goalData.target_unit;
-      if (goalData.current_value !== undefined) insertData.current_value = goalData.current_value;
-      if (goalData.status) insertData.status = goalData.status;
-      // REMOVIDO: start_date, target_date, target_type - provavelmente não existem
+      // Mapear nomes antigos para novos
+      if (goalData.target_unit) insertData.unit = goalData.target_unit; // target_unit -> unit
+      if (goalData.target_type) insertData.goal_type = goalData.target_type; // target_type -> goal_type
+      if (goalData.target_date) insertData.deadline = goalData.target_date; // target_date -> deadline
 
       console.log('[useGoals] Creating goal with data:', insertData);
 
