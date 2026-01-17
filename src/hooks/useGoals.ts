@@ -125,21 +125,53 @@ export const useGoals = () => {
 
   const updateGoalProgress = useCallback(async (goalId: string, newValue: number) => {
     try {
+      // Buscar meta atual para calcular progresso
+      const goal = goals.find(g => g.id === goalId);
+      if (!goal) {
+        toast.error('Meta não encontrada');
+        return false;
+      }
+
+      // Calcular progress_percentage
+      const progress = goal.target_value > 0
+        ? Math.min(100, (newValue / goal.target_value) * 100)
+        : 0;
+
+      // Preparar updates
+      const updates: Record<string, any> = {
+        current_value: newValue,
+        progress_percentage: Math.round(progress)
+      };
+
+      // Se atingiu 100%, marcar como completed
+      if (progress >= 100 && goal.status === 'active') {
+        updates.status = 'completed';
+        updates.completed_at = new Date().toISOString();
+      }
+
+      console.log('[useGoals] Updating progress:', { goalId, newValue, progress, updates });
+
       const { error } = await supabase
         .from('user_goals')
-        .update({ current_value: newValue })
+        .update(updates as any)
         .eq('id', goalId);
 
       if (error) throw error;
 
       await fetchGoals();
+
+      if (progress >= 100) {
+        toast.success('🎉 Parabéns! Meta concluída!');
+      } else {
+        toast.success('Progresso atualizado! 📈');
+      }
       return true;
     } catch (err: any) {
       console.error('Error updating goal progress:', err);
       toast.error('Erro ao atualizar progresso');
       return false;
     }
-  }, [fetchGoals]);
+  }, [goals, fetchGoals]);
 
   const deleteGoal = useCallback(async (goalId: string) => {
     try {

@@ -6,6 +6,8 @@ import { useNavigate } from "react-router-dom";
 import { useGoals } from "@/hooks/useGoals";
 import { AddGoalDialog } from "@/components/goals/AddGoalDialog";
 import { UpdateProgressDialog } from "@/components/goals/UpdateProgressDialog";
+import { EditGoalDialog } from "@/components/goals/EditGoalDialog";
+import { DeleteGoalConfirm } from "@/components/goals/DeleteGoalConfirm";
 
 const categoryColors: Record<string, string> = {
   peso: "success",
@@ -178,9 +180,14 @@ export const Metas = () => {
                 </div>
 
                 <div className="flex gap-2 mt-4">
-                  <Button size="sm" variant="outline" className="flex-1">
-                    Editar
-                  </Button>
+                  <EditGoalDialog
+                    goal={meta}
+                    trigger={
+                      <Button size="sm" variant="outline" className="flex-1">
+                        Editar
+                      </Button>
+                    }
+                  />
                   <UpdateProgressDialog
                     goal={meta}
                     trigger={
@@ -188,6 +195,9 @@ export const Metas = () => {
                         Atualizar
                       </Button>
                     }
+                  />
+                  <DeleteGoalConfirm
+                    goal={meta}
                   />
                 </div>
               </Card>
