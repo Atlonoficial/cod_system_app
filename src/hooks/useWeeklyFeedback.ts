@@ -627,11 +627,21 @@ export const useWeeklyFeedback = () => {
       const pointsAwarded = resultData.points_awarded || 0;
       console.log('[Feedback] Success! Points awarded:', pointsAwarded);
 
-      // PROTEÇÃO 3: Salvar no localStorage que feedback foi enviado com sucesso
+      // BUILD 58: PROTEÇÃO 3 - Ordem CRÍTICA: Setar flags ANTES de fechar modal
+      // Isso previne race condition onde o useEffect roda antes das flags serem setadas
       const today = new Date().toISOString().split('T')[0];
       const feedbackKey = `feedback_sent_${user.id}_${today}`;
+
+      // PASSO 1: Marcar como fechado manualmente PRIMEIRO (previne verificações futuras)
+      wasManuallyClosedRef.current = true;
+
+      // PASSO 2: Marcar que já foi submetido hoje
+      setFeedbackSubmittedToday(true);
+
+      // PASSO 3: Persistir no localStorage
       localStorage.setItem(feedbackKey, 'true');
-      setFeedbackSubmittedToday(true); // Marcar flag de estado
+
+      console.log('[Feedback] BUILD 58: Flags set before modal close - wasManuallyClosedRef:', wasManuallyClosedRef.current);
 
       // Usar toast padrão do sistema de gamificação
       toast({
@@ -639,9 +649,10 @@ export const useWeeklyFeedback = () => {
         description: "Obrigado pelo seu feedback!",
       });
 
+      // PASSO 4: Fechar modal DEPOIS de todas as flags estarem setadas
       setShouldShowModal(false);
-      wasManuallyClosedRef.current = true; // Marcar como fechado manualmente
       return true;
+
 
     } catch (error: any) {
       console.error('[Feedback] Submit error:', error);

@@ -160,7 +160,8 @@ export const PostWorkoutCheckout: React.FC<PostWorkoutCheckoutProps> = ({
                                 </span>
                             </div>
                         </div>
-                        <div className="py-2">
+                        {/* BUILD 58: touch-action inline for mobile slider support */}
+                        <div className="py-2" style={{ touchAction: 'none' }}>
                             <input
                                 type="range"
                                 min="1"
@@ -169,6 +170,7 @@ export const PostWorkoutCheckout: React.FC<PostWorkoutCheckoutProps> = ({
                                 value={overallRpe}
                                 onChange={(e) => setOverallRpe(parseInt(e.target.value))}
                                 className="rpe-slider"
+                                style={{ touchAction: 'none', WebkitAppearance: 'none' }}
                                 aria-label="RPE slider"
                                 title="Ajuste o RPE de 1 a 10"
                             />
@@ -178,6 +180,7 @@ export const PostWorkoutCheckout: React.FC<PostWorkoutCheckoutProps> = ({
                             <span>Moderado</span>
                             <span>Máximo</span>
                         </div>
+
                     </div>
 
                     {/* Notes - Minimal */}

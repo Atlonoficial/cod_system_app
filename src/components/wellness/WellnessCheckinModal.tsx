@@ -259,8 +259,11 @@ export const WellnessCheckinModal: React.FC<WellnessCheckinModalProps> = ({
                             </span>
                         </div>
 
-                        {/* Slider */}
-                        <div className="px-4 mb-8">
+                        {/* Slider - BUILD 58: touch-action inline for mobile support */}
+                        <div
+                            className="px-4 mb-8"
+                            style={{ touchAction: 'none', WebkitTouchCallout: 'none' }}
+                        >
                             <Slider
                                 min={currentMetric.min || 1}
                                 max={currentMetric.max || 10}
@@ -274,6 +277,7 @@ export const WellnessCheckinModal: React.FC<WellnessCheckinModalProps> = ({
                                 <span>{currentMetric.highLabel}</span>
                             </div>
                         </div>
+
 
                         {/* Button */}
                         <Button

@@ -254,3 +254,75 @@
 .readiness-red {
     color: #ef4444;
 }
+
+/* ========================================
+   BUILD 58: MOBILE SLIDER TOUCH FIX
+   Garantir que sliders funcionem em apps nativos iOS/Android
+   ======================================== */
+
+/* Aplicar touch-action: none em TODOS os sliders do app */
+.wellness-slider,
+.wellness-slider *,
+[role="slider"],
+[data-radix-slider-track],
+[data-radix-slider-range],
+[data-radix-slider-thumb] {
+    touch-action: none !important;
+    -webkit-touch-callout: none !important;
+    -webkit-user-select: none !important;
+    user-select: none !important;
+    -webkit-tap-highlight-color: transparent !important;
+}
+
+/* Thumb (botão deslizante) - área de toque aumentada */
+[role="slider"],
+[data-radix-slider-thumb] {
+    pointer-events: auto !important;
+    cursor: grab !important;
+    /* Área de toque mínima de 44x44px (Apple HIG) */
+    min-width: 44px !important;
+    min-height: 44px !important;
+}
+
+[role="slider"]:active,
+[data-radix-slider-thumb]:active {
+    cursor: grabbing !important;
+    transform: scale(1.1);
+}
+
+/* Track (barra do slider) - deve ser clicável */
+[data-radix-slider-track] {
+    pointer-events: auto !important;
+    cursor: pointer !important;
+}
+
+/* Container do slider no modal wellness */
+.wellness-container .px-4,
+.wellness-modal-content .px-4,
+[class*="wellness"] .mb-8 {
+    touch-action: none !important;
+    pointer-events: auto !important;
+}
+
+/* Prevenir scroll/swipe do container enquanto arrasta slider */
+.wellness-modal-content,
+.wellness-container {
+    overscroll-behavior: contain;
+}
+
+/* Fix para Dialog/Modal que pode bloquear eventos */
+[data-radix-dialog-content],
+[role="dialog"] {
+    touch-action: auto;
+}
+
+/* Garantir que overlay do modal não bloqueia interação */
+[data-radix-dialog-overlay] {
+    touch-action: none;
+    pointer-events: none;
+}
+
+/* O conteúdo do dialog deve ter pointer events */
+[data-radix-dialog-content] * {
+    pointer-events: auto;
+}

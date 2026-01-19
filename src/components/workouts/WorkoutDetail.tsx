@@ -322,7 +322,7 @@ export const WorkoutDetail = ({ workout, onBack, onStartWorkout, onExerciseSelec
                 {expandedExercise === exercise.id && (
                   <div className="mt-4 pt-4 border-t border-border/20 animate-in slide-in-from-top-2 duration-300 space-y-4">
                     {/* Descrição do exercício */}
-                    {exercise.description && !/^\d+$/.test(exercise.description.trim()) && (
+                    {exercise.description && typeof exercise.description === 'string' && exercise.description.trim() !== '' && !/^\d+$/.test(exercise.description.trim()) && (
                       <div>
                         <div className="flex items-center gap-2 mb-2">
                           <FileText className="w-4 h-4 text-primary" />
@@ -333,6 +333,7 @@ export const WorkoutDetail = ({ workout, onBack, onStartWorkout, onExerciseSelec
                         </p>
                       </div>
                     )}
+
 
                     {/* Orientações do admin */}
                     {exercise.notes && (

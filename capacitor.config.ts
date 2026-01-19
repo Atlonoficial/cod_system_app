@@ -1,7 +1,7 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════
  * COD SYSTEM - Capacitor Configuration
- * Version: 1.0.0 | Build: 20
+ * Version: 1.0.0 | Build: 58
  * ═══════════════════════════════════════════════════════════════════════════
  * @copyright (c) 2024-2026 Atlon Tech (CNPJ: 58.079.600/0001-77)
  * All intellectual property rights reserved to Atlon Tech

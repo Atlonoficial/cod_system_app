@@ -69,11 +69,12 @@ export const ExerciseVideoSheet = ({
         return '';
     };
 
-    const hasDescription = description && typeof description === 'string' && !/^\d+$/.test(description.trim());
+    const hasDescription = description && typeof description === 'string' && description.trim() !== '' && !/^\d+$/.test(description.trim());
     const instructionsText = getInstructionsText();
-    const hasInstructions = instructionsText && instructionsText.trim().length > 0 && !/^\d+$/.test(instructionsText.trim());
+    const hasInstructions = instructionsText && typeof instructionsText === 'string' && instructionsText.trim().length > 0 && !/^\d+$/.test(instructionsText.trim());
     const hasNotes = notes && typeof notes === 'string' && notes.trim().length > 0;
     const hasExtraContent = hasDescription || hasInstructions || hasNotes;
+
 
     // Process instructions formatting (***bold***)
     const processInstructions = (text: string) => {
